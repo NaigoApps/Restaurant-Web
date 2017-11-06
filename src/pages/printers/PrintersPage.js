@@ -1,0 +1,78 @@
+import React, {Component} from 'react';
+import Page from "../Page";
+import EntitiesEditor from "../../components/editors/EntitiesEditor";
+import printersCreatorActions from "./PrintersCreatorActions";
+import printersEditorActions from "./PrintersEditorActions";
+import printersActions from "../../generic/PrintersActions";
+import {TYPES} from "../../components/editors/EntityEditor";
+import printersPageStore from "./PrintersPageStore";
+import printersPageActions from "./PrintersPageActions";
+
+export default class PrintersPage extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = printersPageStore.getState();
+
+        this.updateState = this.updateState.bind(this);
+    }
+
+    componentDidMount() {
+        printersPageStore.addChangeListener(this.updateState);
+
+        printersPageActions.initPrintersPage();
+    }
+
+    updateState(state) {
+        this.setState(state);
+    }
+
+    componentWillUnmount() {
+        printersPageStore.removeChangeListener(this.updateState);
+    }
+
+    render() {
+        const tables = this.state.tables;
+        const selectedTable = this.state.selectedTable;
+        const inCreationTable = this.state.inCreationTable;
+
+        return (
+
+            <Page>
+                <EntitiesEditor descriptor={this.getPrintersDescriptor()}/>
+            </Page>
+        )
+    }
+
+    getPrintersDescriptor() {
+        return {
+            name: ["printer", "printers"],
+            label: ["Stampante", "Stampanti"],
+            renderer: {
+                name: p => p.name
+            },
+            entities: {
+                list: this.state.printers,
+                selected: this.state.selectedPrinter,
+                created: this.state.createdPrinter
+            },
+            components: {
+                creator: {
+                    actionsProvider: printersCreatorActions
+                },
+                editor: {
+                    actionsProvider: printersEditorActions
+                }
+            },
+            crudActionsProvider: printersActions,
+            fields: [
+                {
+                    type: TYPES.SELECT,
+                    name: "name",
+                    optionsProvider: () => this.state.services,
+                    label: "Nome"
+                }
+            ]
+        };
+    }
+}

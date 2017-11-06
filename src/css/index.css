@@ -1,0 +1,50 @@
+.top-sep {
+    margin-top: 10px;
+}
+
+.form-inline .form-group {
+    margin-left: 10px;
+}
+
+.keyboard-character {
+    display: inline-block;
+}
+
+.keyboard-character.xs {
+    width: 6.25%;
+}
+
+.keyboard-character.sm {
+    width: 9.375%;
+}
+
+.keyboard-character.md {
+    width: 12.5%;
+}
+
+.keyboard-character.lg {
+    width: 25%;
+}
+
+.keyboard-character.space {
+    width: 31.25%;
+}
+
+.editor-body {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.floating-button-container{
+    position: relative;
+
+}
+
+.floating-button-right {
+    position: absolute;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    right: 0;
+    top: 0;
+}
