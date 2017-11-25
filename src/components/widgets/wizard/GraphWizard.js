@@ -6,6 +6,16 @@ import wizardActions from "./WizardActions";
 import graphWizardStore from "./GraphWizardStore";
 import graphWizardActions from "./GraphWizardActions";
 import Button from "../../../widgets/Button";
+import GraphWizardPage from "./graph/GraphWizardPage";
+
+/**
+ * function initializer -> provides initial wizard data
+ * boolean autoShow -> if true wizard modal will show after mount
+ * string label -> label of wizard button
+ * function renderer(data) -> text to output as review
+ * function commitAction -> called when user confirms wizard
+ * function abortAction -> called when user aborts
+ */
 
 export default class GraphWizard extends Component {
     constructor(props) {
@@ -13,19 +23,28 @@ export default class GraphWizard extends Component {
 
         this.state = {
             uuid: "gw_" + uuid(),
-            wizardData: {
-                page: null,
-                data: props.initializer()
-            }
+            confirmed: false,
+            page: null,
+            data: {}
         };
 
         this.updateWizard = this.updateWizard.bind(this);
+
     }
 
     componentDidMount() {
         graphWizardStore.addChangeListener(this.updateWizard);
+        $('#' + this.state.uuid).on('hide.bs.modal', this.mayAbort.bind(this));
         if (this.props.autoShow) {
             this.openWizard();
+        }
+    }
+
+    mayAbort() {
+        if (!this.state.confirmed) {
+            if (this.props.abortAction) {
+                this.props.abortAction();
+            }
         }
     }
 
@@ -34,54 +53,48 @@ export default class GraphWizard extends Component {
     }
 
     openWizard() {
-        graphWizardActions.reset(React.Children.toArray(this.props.children).map(page => page.props),this.props.initializer());
+        graphWizardActions.reset(this.initialWizardData(), this.props.initialPage);
         $("#" + this.state.uuid).modal("show");
     }
 
-    closeWizard() {
-        this.props.commitAction(this.state.wizardData.data);
+    initialWizardData() {
+        let initialData = {};
+        React.Children.forEach(this.props.children, child => {
+            initialData[child.props.identifier] = GraphWizardPage.initializeWizard(child.props);
+        });
+        return initialData;
+    }
+
+    confirmAction() {
+        this.props.commitAction(this.state.data);
         $("#" + this.state.uuid).modal("hide");
     }
 
-    updateWizard() {
+    abortAction() {
         this.setState({
-            wizardData: graphWizardStore.getWizardData()
+            confirmed: false
         });
+        $("#" + this.state.uuid).modal("hide");
     }
 
-    goBackAction() {
-        wizardActions.previousStep();
+    updateWizard(state) {
+        this.setState(state);
     }
 
     movePage(pageProps) {
         graphWizardActions.movePage(pageProps.identifier);
         if (pageProps.onEnter) {
-            pageProps.onEnter(this.state.wizardData.data);
+            pageProps.onEnter(this.state.data);
         }
-    }
-
-    abortAction() {
-        $("#" + this.state.uuid).modal("hide");
-    }
-
-    confirmAction(option) {
-        let data = this.state.wizardData.data.slice();
-        data.push(option);
-        this.props.commitAction(data);
-        $("#" + this.state.uuid).modal("hide");
     }
 
     pagesNumber() {
         return React.Children.count(this.props.children);
     }
 
-    isLastPage() {
-        return this.state.wizardData.step === this.pagesNumber() - 1;
-    }
-
     getPageButtonClass(page) {
         let classes = ["btn", "navbar-btn"];
-        if (this.state.wizardData.page === page.identifier) {
+        if (this.state.page === page.identifier) {
             classes.push("active");
         }
         if (page.type) {
@@ -93,73 +106,119 @@ export default class GraphWizard extends Component {
     }
 
     render() {
+        if (this.props.isForNav) {
+            return this.buildNavContent();
+        } else {
+            return this.buildDefaultContent();
+        }
+    }
 
-        const pageName = this.state.wizardData.page;
-        const pagesNumber = this.pagesNumber();
+    buildAbortButton() {
+        return <Button
+            text="Annulla"
+            type="danger"
+            commitAction={this.abortAction.bind(this)}/>;
+    }
+
+    buildConfirmButton() {
+        return <Button
+            text="Conferma"
+            type="success"
+            disabled={this.props.isValid && !this.props.isValid(this.state.data)}
+            commitAction={this.confirmAction.bind(this)}/>;
+    }
+
+    buildNavContent() {
+        return <div className="form-group">
+            <button
+                type="button"
+                className="btn btn-primary"
+                onClick={this.openWizard.bind(this)}>
+                {this.props.label} {this.props.renderer(this.initialWizardData())} <span
+                className="glyphicon glyphicon-pencil"/>
+            </button>
+            {this.buildModal()}
+        </div>;
+    }
+
+    buildDefaultContent() {
+        return <div className="form-horizontal">
+            <div className="form-group">
+                <label className="control-label col-sm-2">{this.props.label}</label>
+                <div className="col-sm-10">
+                    <div className="input-group">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={this.openWizard.bind(this)}>
+                            {this.props.renderer(this.initialWizardData())} <span
+                            className="glyphicon glyphicon-pencil"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {this.buildModal()}
+        </div>;
+    }
+
+    buildModal() {
+
+        const pageName = this.state.page;
 
         let pages = React.Children.map(this.props.children, (child) => React.cloneElement(child, {
-            abortAction: this.abortAction.bind(this),
-            confirmAction: this.confirmAction.bind(this),
-            wizardData: this.state.wizardData.data
+            wizardData: this.state.data
         }));
 
         const currentPage = React.Children.toArray(pages).find(page => page.props.identifier === pageName);
 
-        let label = "";
-
-        let nav = React.Children.map(this.props.children, (child) => {
-            return <li role="presentation" className="active">
-                <button type="button"
-                        className={this.getPageButtonClass(child.props)}
-                        disabled={child.props.canEnter ? !child.props.canEnter(this.state.wizardData.data) : false}
-                        onClick={this.movePage.bind(this, child.props)}>{child.props.name}</button>
-            </li>;
-        });
-
-        let value = this.props.renderer(this.state.wizardData.data);
+        let value = this.props.renderer(this.state.data);
         let review;
-        if (value) {
+        if (value && !this.props.hideReview) {
             review = <div className="well well-sm text-left">
                 {value}
             </div>
         }
 
-        let confirmBtn = <Button text="Conferma" type="success" commitAction={this.closeWizard.bind(this)}/>;
+        let nav = React.Children.map(this.props.children, (child) => {
+            return <li role="presentation" className="active">
+                <button type="button"
+                        className={this.getPageButtonClass(child.props)}
+                        disabled={child.props.canEnter ? !child.props.canEnter(this.state.data) : false}
+                        onClick={this.movePage.bind(this, child.props)}>
+                    {child.props.name}
+                    <span className={child.props.icon ? "glyphicon glyphicon-" + child.props.icon : ""}/>
+                </button>
+            </li>;
+        });
 
-        return (
-            <div className="form-horizontal">
-                <div className="form-group">
-                    <label className="control-label col-sm-2">{this.props.label}</label>
-                    <div className="col-sm-10">
-                        <div className="input-group">
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={this.openWizard.bind(this)}>
-                                <span className="glyphicon glyphicon-pencil"/>
-                            </button>
-                        </div>
+        let navContainer;
+        if (nav.length > 1) {
+            navContainer = <div className="modal-header">
+                <ul className="nav nav-pills">
+                    {nav}
+                </ul>
+            </div>;
+        }
+
+        return <div className="modal fade" id={this.state.uuid}>
+            <div className="modal-dialog modal-lg">
+                <div className="modal-content">
+                    {navContainer}
+                    <div className="modal-body">
+                        {currentPage}
                     </div>
-                </div>
-                <div className="modal fade" id={this.state.uuid}>
-                    <div className="modal-dialog modal-lg">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <ul className="nav nav-pills">
-                                    {nav}
-                                </ul>
+                    <div className="modal-footer">
+                        <div className="col-sm-12">
+                            <div className="row">
+                                {review}
                             </div>
-                            <div className="modal-body">
-                                {currentPage}
-                            </div>
-                            <div className="modal-footer">
-                                {review}{confirmBtn}
+                            <div className="row text-center">
+                                {this.buildAbortButton()}{this.buildConfirmButton()}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        )
+        </div>
     }
-
 }

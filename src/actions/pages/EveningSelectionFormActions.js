@@ -1,4 +1,4 @@
-import {ACT_SELECT_EVENING, ACT_UPDATE_EVENING_DATE} from "../ActionTypes";
+import {ACT_DESELECT_EVENING, ACT_SELECT_EVENING, ACT_UPDATE_EVENING_DATE} from "../ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../RequestBuilder";
 import diningTablesActions from "../../pages/evening/DiningTablesActions";
@@ -12,6 +12,10 @@ class EveningSelectionFormActions {
     chooseEvening(date) {
         asyncActionBuilder.get(ACT_SELECT_EVENING, 'evenings', {date: date})
             .then(diningTablesActions.retrieveDiningTables);
+    }
+
+    deselectEvening(){
+        dispatcher.fireEnd(ACT_DESELECT_EVENING);
     }
 
     printTest(){

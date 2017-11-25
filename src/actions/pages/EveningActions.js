@@ -1,5 +1,6 @@
 import asyncActionBuilder from "../RequestBuilder";
 import {
+    ACT_ASK_SELECTED_EVENING,
     ACT_RETRIEVE_ACTIVE_WAITERS,
     ACT_RETRIEVE_CURRENT_MENU,
     ACT_RETRIEVE_RESTAURANT_TABLES, ACT_RETRIEVE_WAITERS, ACT_SELECT_EVENING,
@@ -35,7 +36,7 @@ class EveningActions {
     }
 
     retrieveSelectedEvening() {
-        asyncActionBuilder.get(ACT_SELECT_EVENING, 'evenings/selected')
+        asyncActionBuilder.get(ACT_ASK_SELECTED_EVENING, 'evenings/selected')
             .then(diningTablesActions.retrieveDiningTables);
     }
 

@@ -13,7 +13,7 @@ class GraphWizardStore extends AbstractStore {
         };
     }
 
-    getWizardData() {
+    getState(){
         return this.wizardData;
     }
 
@@ -21,20 +21,20 @@ class GraphWizardStore extends AbstractStore {
         let changed = true;
         switch (action.type) {
             case ACT_GRAPH_WIZARD_SET_DATA: {
-                this.wizardData.data = action.body;
-                break;
-            }
-            case ACT_GRAPH_WIZARD_MOVE_PAGE: {
-                let target = this.pagesData.find(page => page.identifier === action.body);
-                if(!target.canEnter || target.canEnter(this.wizardData.data)) {
-                    this.wizardData.page = action.body;
+                if(action.body.page) {
+                    this.wizardData.data[action.body.page] = action.body.data;
+                }else{
+                    this.wizardData.data = action.body.data;
                 }
                 break;
             }
+            case ACT_GRAPH_WIZARD_MOVE_PAGE: {
+                this.wizardData.page = action.body;
+                break;
+            }
             case ACT_RESET_GRAPH_WIZARD: {
-                this.pagesData = action.body.pagesData;
                 this.wizardData.data = action.body.initialData;
-                this.wizardData.page = 0;
+                this.wizardData.page = action.body.initialPage;
                 break;
             }
             default:

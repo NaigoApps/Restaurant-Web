@@ -4,38 +4,38 @@ export const STATUSES = {
     LOADED: 2
 };
 
-export default class LazyData{
+export default class LazyData {
 
-    constructor(status, payload){
+    constructor(status, payload) {
         this.status = status;
         this.payload = payload;
     }
 
-    isLoaded(){
+    isLoaded() {
         return this.status === STATUSES.LOADED;
     }
 
-    isLoading(){
+    isLoading() {
         return this.status === STATUSES.LOADING;
     }
 
-    isNotLoaded(){
+    isNotLoaded() {
         return this.status === STATUSES.NOT_LOADED;
     }
 
-    getPayload(){
+    getPayload() {
         return this.payload;
     }
 
-    static notLoaded(){
-        return new LazyData(STATUSES.NOT_LOADED, []);
+    static notLoaded(content) {
+        return new LazyData(STATUSES.NOT_LOADED, content !== undefined ? content : []);
     }
 
-    static loading(){
-        return new LazyData(STATUSES.LOADING, []);
+    static loading(content) {
+        return new LazyData(STATUSES.LOADING, content !== undefined ? content : []);
     }
 
-    static loaded(payload){
+    static loaded(payload) {
         return new LazyData(STATUSES.LOADED, payload);
     }
 }

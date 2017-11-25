@@ -58,6 +58,7 @@ class LocationsPageStore extends AbstractStore{
                 break;
             case ACT_DESELECT_LOCATION:
                 this.selectedLocation = null;
+                this.createdLocation = null;
                 break;
             case ACT_UPDATE_LOCATION_NAME:
                 this.setName(action.body);

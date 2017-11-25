@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import FormField from "./FormField";
 import Wizard from "../wizard/Wizard";
-import WizardPage from "../wizard/WizardPage";
 import BasicWizardPage from "../wizard/SelectWizardPage";
 
 export default class SelectInput extends Component {

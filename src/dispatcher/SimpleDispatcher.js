@@ -34,13 +34,15 @@ class SimpleDispatcher extends Dispatcher {
     }
 
     fireStart(type, body) {
+        console.log(type + " -> STARTING");
         this.dispatch(this.buildAction(ACTION_STARTED, type, body));
-        console.log(type + " -> " + ACTION_STARTED);
+        console.log(type + " -> STARTED");
     }
 
     fireEnd(type, body) {
+        console.log(type + " -> COMPLETING");
         this.dispatch(this.buildAction(ACTION_COMPLETED, type, body));
-        console.log(type + " -> " + ACTION_COMPLETED);
+        console.log(type + " -> COMPLETED");
     }
 
     fireError(type, body) {

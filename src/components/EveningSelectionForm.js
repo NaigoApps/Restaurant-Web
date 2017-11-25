@@ -9,31 +9,38 @@ const TABLE_CREATION = "TABLE_CREATION";
 export default class EveningSelectionForm extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            date: this.props.eveningDate
+        }
     }
 
     onDateChange(date) {
-        eveningSelectionFormActions.updateEveningDate(date);
+        this.setState({
+            date: date
+        });
     }
 
     onSelectEvening() {
-        eveningSelectionFormActions.chooseEvening(this.props.eveningDate);
+        eveningSelectionFormActions.chooseEvening(this.state.date);
     }
 
     render() {
-        const date = this.props.eveningDate;
+        const date = this.state.date;
 
         return (
             <div>
                 <div className="row">
                     <div className="col-sm-8 col-sm-offset-2">
-                        <div className="form-inline text-center">
+                        <div className="row">
                             <DateInput
                                 label="Selezione serata"
                                 commitAction={this.onDateChange.bind(this)}
                                 default={date}/>
-
+                        </div>
+                        <div className="row top-sep text-center">
                             <Button
-                                icon="play"
+                                text="Ok"
+                                type="info"
                                 commitAction={this.onSelectEvening.bind(this)}/>
                         </div>
                     </div>

@@ -1,31 +1,38 @@
 import React, {Component} from 'react';
-import FormField from "./FormField";
-import SelectInput from "./SelectInput";
 import Wizard from "../wizard/Wizard";
 import SelectWizardPage from "../wizard/SelectWizardPage";
+import GraphWizardPage from "../wizard/graph/GraphWizardPage";
+import GraphWizard from "../wizard/GraphWizard";
 
 export default class SelectEditor extends Component {
     constructor(props) {
         super(props);
     }
 
-    onWizardClose(data){
-        this.props.commitAction(data[0]);
+    onWizardConfirm(data){
+        this.props.commitAction(data["select_page"]);
     }
 
     render() {
         const descriptor = this.props.descriptor;
+        const value = this.props.value;
 
         return (
-            <Wizard
+            <GraphWizard
+                isValid={data => !!data["select_page"]}
+                hideReview={true}
+                initialPage="select_page"
                 label={descriptor.label}
-                renderer={(data) => this.props.value}
-                commitAction={this.onWizardClose.bind(this)}>
+                renderer={wData => wData["select_page"]}
+                commitAction={this.onWizardConfirm.bind(this)}>
                 <SelectWizardPage
+                    identifier="select_page"
+                    initializer={value}
+                    name={this.props.descriptor.label}
                     options={descriptor.optionsProvider()}
                     optionRenderer={opt => opt}
                 />
-            </Wizard>
+            </GraphWizard>
         );
 
     }

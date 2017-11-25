@@ -7,7 +7,6 @@ import {
     ACT_UPDATE_CATEGORY
 } from "../actions/ActionTypes";
 import {strcmp} from "../utils/Utils";
-import {CREATING, EDITING} from "../components/editors/EditorModes";
 import {STATUSES} from "../stores/LazyData";
 import AbstractEntityStore from "../stores/AbstractEntityStore";
 
@@ -18,17 +17,7 @@ class CategoriesStore extends AbstractEntityStore {
     constructor() {
         super();
         this.selectedCategory = null;
-        this.editorMode = EDITING;
     }
-
-    setEditorMode(mode){
-        this.editorMode = mode;
-    }
-
-    getEditorMode(){
-        return this.editorMode;
-    }
-
 
     setSelectedCategory(uuid) {
         this.selectedCategory = uuid;
@@ -79,19 +68,15 @@ class CategoriesStore extends AbstractEntityStore {
             case ACT_UPDATE_CATEGORY:
                 this.updateData(action.body);
                 this.setSelectedCategory(action.body.uuid);
-                this.setEditorMode(EDITING);
                 break;
             case ACT_DELETE_CATEGORY:
                 this.deleteData(action.body);
-                this.setEditorMode(EDITING);
                 break;
             case ACT_BEGIN_CREATE_CATEGORY:
                 this.setSelectedCategory(null);
-                this.setEditorMode(CREATING);
                 break;
             case ACT_SELECT_CATEGORY:
                 this.setSelectedCategory(action.body);
-                this.setEditorMode(EDITING);
                 break;
             default:
                 changed = false;

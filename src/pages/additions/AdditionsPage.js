@@ -79,7 +79,7 @@ export default class AdditionsPage extends Component {
 
     render() {
         return (
-            <Page>
+            <Page title="Varianti">
                 <EntitiesEditor descriptor={this.getAdditionsDescriptor()}/>
             </Page>
         )

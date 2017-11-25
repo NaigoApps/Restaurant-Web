@@ -1,4 +1,4 @@
-import {ACT_UPDATE_EVENING_DATE} from "../actions/ActionTypes";
+import {ACT_ASK_SELECTED_EVENING, ACT_SELECT_EVENING, ACT_UPDATE_EVENING_DATE} from "../actions/ActionTypes";
 import AbstractStore from "./AbstractStore";
 import {formatDate} from "../components/widgets/inputs/DateInput";
 
@@ -22,9 +22,11 @@ class EveningSelectionFormStore extends AbstractStore {
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_UPDATE_EVENING_DATE:
+            case ACT_SELECT_EVENING:
                 this.setDate(action.body);
                 break;
+            case ACT_ASK_SELECTED_EVENING:
+                this.setDate(action.body.date);
             default:
                 changed = false;
                 break;

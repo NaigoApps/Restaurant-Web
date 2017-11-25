@@ -6,7 +6,7 @@ const EVT_PHASES_STORE_CHANGED = "EVT_PHASES_STORE_CHANGED";
 
 class PhasesStore extends AbstractEntityStore {
     constructor() {
-        super();
+        super(EVT_PHASES_STORE_CHANGED);
     }
 
     getPhases(){
@@ -41,9 +41,6 @@ class PhasesStore extends AbstractEntityStore {
         return changed;
     }
 
-    getChangeEvent(){
-        return EVT_PHASES_STORE_CHANGED;
-    }
 }
 
 const phasesStore = new PhasesStore();

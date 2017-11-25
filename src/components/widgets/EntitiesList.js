@@ -1,11 +1,24 @@
 import React, {Component} from 'react';
-import EntityEditor, {ACTIONS, BUTTONS, LAYOUT} from "../editors/EntityEditor";
-import {camel, findByUuid, foo} from "../../utils/Utils";
-import EntitiesEditor from "../editors/EntitiesEditor";
+import EntityEditor, {BUTTONS} from "../editors/EntityEditor";
+import {camel, foo} from "../../utils/Utils";
+import $ from 'jquery';
 
 export default class EntitiesList extends Component {
     constructor(props) {
         super(props);
+    }
+
+    componentDidUpdate(){
+        const entities = this.props.descriptor.entities.list;
+        const selected = this.props.descriptor.entities.selected;
+        entities.forEach(e => {
+            if(e.uuid !== selected) {
+                console.log("Hide " + e.uuid);
+                $('#collapse_' + e.uuid).collapse('hide');
+            }
+        });
+        console.log("Show " + selected);
+        $('#collapse_' + selected).collapse('show');
     }
 
     panelType(descriptor, entity) {
@@ -19,21 +32,22 @@ export default class EntitiesList extends Component {
     }
 
     headingClass(uuid) {
-        let className = ["panel-title", "text-center"];
+        let className = ["accordion-title", "text-center"];
         if (uuid === this.props.descriptor.entities.selected) {
-            className.push("h5");
-        } else {
-            className.push("h6");
+            className.push("selected");
         }
         return className.join(" ");
     }
 
 
     selectEntity(uuid) {
-        if (!this.props.descriptor.entities.selected) {
+        if (!uuid) {
+            EntitiesList.resolveDeselectMethod(this.props.descriptor)();
+        }
+        if (this.props.descriptor.entities.selected !== uuid) {
             EntitiesList.resolveSelectMethod(this.props.descriptor)(uuid);
         } else {
-            EntitiesList.resolveDeselectMethod(this.props.descriptor)(uuid);
+            EntitiesList.resolveDeselectMethod(this.props.descriptor)();
         }
     }
 
@@ -41,6 +55,20 @@ export default class EntitiesList extends Component {
         return uuid === this.props.descriptor.entities.selected;
     }
 
+    getEditorComponent(entity) {
+        let editorComponent;
+        if (this.props.descriptor.components.editor.component) {
+            editorComponent = this.props.descriptor.components.editor.component(entity);
+        } else {
+            editorComponent = <EntityEditor
+                entity={entity}
+                descriptor={EntitiesList.makeEntityDescriptor(
+                    this.props.descriptor,
+                    this.props.descriptor.components.editor.actionsProvider,
+                    true)}/>;
+        }
+        return editorComponent;
+    }
 
     render() {
         const descriptor = this.props.descriptor;
@@ -49,36 +77,27 @@ export default class EntitiesList extends Component {
         const selected = descriptor.entities.selected;
 
         let entitiesList;
+
         if (!created) {
             entitiesList = entities
-                .filter(entity => selected ? selected === entity.uuid : true)
+            .filter(entity => selected ? selected === entity.uuid : true)
                 .map((entity) => {
-                        if (descriptor.components.editor.component) {
-                            return descriptor.components.editor.component(entity);
-                        } else {
-                            return (
-                                <div className={this.panelType(descriptor, entity)} key={entity.uuid}>
-                                    <div className="panel-heading" role="tab" id={"heading_" + entity.uuid}
-                                         onClick={this.selectEntity.bind(this, entity.uuid)}>
-                                        <h5 className={this.headingClass(entity.uuid)}>
-                                            <a role="button">{descriptor.renderer.name(entity)}</a>
-                                        </h5>
-                                    </div>
-                                    <div id={"collapse_" + entity.uuid}
-                                         className={"panel-collapse collapse" + (this.isSelected(entity.uuid) ? " in" : "")}
-                                         role="tabpanel">
-                                        <div className="panel-body">
-                                            <EntityEditor
-                                                entity={entity}
-                                                descriptor={EntitiesList.makeEntityDescriptor(
-                                                    descriptor,
-                                                    descriptor.components.editor.actionsProvider,
-                                                    true)}/>
-                                        </div>
+                        return (
+                            <div className={this.panelType(descriptor, entity)} key={entity.uuid}>
+                                <div className="panel-heading clickable" role="tab"
+                                     onClick={this.selectEntity.bind(this, entity.uuid)}>
+                                    <h5 className={this.headingClass(entity.uuid)}>
+                                        {descriptor.renderer.name(entity)}
+                                    </h5>
+                                </div>
+                                <div id={"collapse_" + entity.uuid}
+                                     className={"panel-collapse collapse"}>
+                                    <div className="panel-body">
+                                        {this.getEditorComponent(entity)}
                                     </div>
                                 </div>
-                            );
-                        }
+                            </div>
+                        );
                     }
                 );
         }
@@ -91,14 +110,14 @@ export default class EntitiesList extends Component {
                 creator = descriptor.components.creator.component(EntitiesList.makeEntityDescriptor(descriptor, descriptor.components.creator.actionsProvider, false));
             } else {
                 creator = <div className="panel editor-body panel-primary">
-                    <div className="panel-heading" role="tab" id="heading_creator">
+                    <div className="panel-heading" role="tab" id="heading_creator"
+                         onClick={this.selectEntity.bind(this, null)}>
                         <h5 className="panel-title text-center">
-                            <a role="button">&nbsp;{descriptor.renderer.name(created)}&nbsp;</a>
+                            <a role="button">&nbsp;{descriptor.renderer.name(created) || "Creazione " + descriptor.label[0]}</a>
                         </h5>
                     </div>
                     <div id="collapse_creator"
-                         className="panel-collapse collapse in"
-                         role="tabpanel">
+                         className="panel-collapse collapse in">
                         <div className="panel-body">
                             <EntityEditor
                                 entity={created}
@@ -112,7 +131,8 @@ export default class EntitiesList extends Component {
             }
         }
 
-        return <div className="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        return <div className="panel-group" id={"accordion_" + descriptor.name[0]} role="tablist"
+                    aria-multiselectable="true">
             {entitiesList}
             {creator}
         </div>;

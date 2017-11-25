@@ -1,10 +1,13 @@
 import AbstractStore from "../../stores/AbstractStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
+    ACT_ABORT_CREATE_ORDINATION, ACT_ASK_SELECTED_EVENING,
     ACT_BEGIN_CREATE_ADDITION, ACT_BEGIN_CREATE_DINING_TABLE, ACT_BEGIN_CREATE_ORDER, ACT_BEGIN_CREATE_ORDINATION,
+    ACT_BEGIN_EDIT_ORDINATION,
     ACT_CREATE_ADDITION, ACT_CREATE_DINING_TABLE, ACT_CREATE_ORDER, ACT_CREATE_ORDINATION,
     ACT_DELETE_ADDITION, ACT_DELETE_DINING_TABLE, ACT_DELETE_ORDER, ACT_DELETE_ORDINATION,
-    ACT_DESELECT_ADDITION, ACT_DESELECT_DINING_TABLE, ACT_DESELECT_DISH, ACT_DESELECT_ORDER, ACT_DESELECT_ORDINATION,
+    ACT_DESELECT_ADDITION, ACT_DESELECT_DINING_TABLE, ACT_DESELECT_DISH, ACT_DESELECT_EVENING, ACT_DESELECT_ORDER,
+    ACT_DESELECT_ORDINATION,
     ACT_RETRIEVE_ADDITIONS, ACT_RETRIEVE_CATEGORIES, ACT_RETRIEVE_DINING_TABLES, ACT_RETRIEVE_ORDERS,
     ACT_RETRIEVE_ORDINATIONS, ACT_RETRIEVE_PHASES,
     ACT_RETRIEVE_RESTAURANT_TABLES,
@@ -41,6 +44,7 @@ class EveningPageStore extends AbstractStore{
         this.createdDiningTable = null;
         this.selectedOrdination = null;
         this.createdOrdination = null;
+        this.editingOrdination = false;
         this.selectedOrder = null;
         this.createdOrder = null;
     }
@@ -60,7 +64,6 @@ class EveningPageStore extends AbstractStore{
             phasesStore.getToken()
         ]);
         switch (action.type) {
-            case ACT_UPDATE_EVENING_DATE:
             case ACT_RETRIEVE_DINING_TABLES:
             case ACT_RETRIEVE_ORDINATIONS:
             case ACT_RETRIEVE_ORDERS:
@@ -68,7 +71,9 @@ class EveningPageStore extends AbstractStore{
             case ACT_RETRIEVE_RESTAURANT_TABLES:
             case ACT_RETRIEVE_CATEGORIES:
             case ACT_RETRIEVE_PHASES:
+            case ACT_ASK_SELECTED_EVENING:
             case ACT_SELECT_EVENING:
+            case ACT_DESELECT_EVENING:
             case ACT_UPDATE_EVENING:
                 break;
             case ACT_CREATE_DINING_TABLE:
@@ -109,6 +114,14 @@ class EveningPageStore extends AbstractStore{
                 this.selectedOrdination = null;
                 this.createdOrdination = this.buildOrdination();
                 break;
+            case ACT_ABORT_CREATE_ORDINATION:
+                this.selectedOrdination = null;
+                this.createdOrdination = null;
+                break;
+            case ACT_BEGIN_EDIT_ORDINATION:
+                this.createdOrdination = null;
+                this.editingOrdination = true;
+                break;
             case ACT_BEGIN_CREATE_ORDER:
                 this.selectedOrder = null;
                 this.createdOrder = this.buildOrder();
@@ -127,12 +140,16 @@ class EveningPageStore extends AbstractStore{
                 break;
             case ACT_DESELECT_DINING_TABLE:
                 this.selectedDiningTable = null;
+                this.createdDiningTable = null;
+                this.selectedOrdination = null;
                 break;
             case ACT_DESELECT_ORDINATION:
-                this.selectedDiningTable = null;
+                this.selectedOrdination = null;
+                this.createdOrdination = null;
                 break;
             case ACT_DESELECT_ORDER:
                 this.selectedDiningTable = null;
+                this.createdOrder = null;
                 break;
             case ACT_UPDATE_DINING_TABLE_CREATOR_TABLE:
                 this.setDiningTableTable(action.body);
@@ -176,10 +193,9 @@ class EveningPageStore extends AbstractStore{
 
     buildDiningTable(){
         return {
-            table: "",
-            phase: "",
-            waiter: "",
-            coverCharges: 2
+            table: null,
+            waiter: null,
+            coverCharges: null
         };
     }
 
@@ -212,6 +228,7 @@ class EveningPageStore extends AbstractStore{
 
             selectedOrdination: this.selectedOrdination,
             createdOrdination: this.createdOrdination,
+            editingOrdination: this.editingOrdination,
 
             selectedOrder: this.selectedOrder,
             createdOrder: this.createdOrder,
@@ -219,7 +236,8 @@ class EveningPageStore extends AbstractStore{
             waiters: waitersStore.getWaiters(),
             tables: tablesStore.getAllTables(),
             categories: categoriesStore.getAllCategories(),
-            dishes: dishesStore.getAllActiveDishes()
+            dishes: dishesStore.getAllActiveDishes(),
+            phases: phasesStore.getPhases()
         }
     }
 

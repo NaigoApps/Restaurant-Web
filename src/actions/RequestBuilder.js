@@ -1,12 +1,12 @@
 import dispatcher from "../dispatcher/SimpleDispatcher";
 
-class RequestBuilder{
+class RequestBuilder {
 
-    constructor(){
+    constructor() {
         this.BASE_URL = "http://localhost:8080/restaurant/rest/";
     }
 
-    buildParams(params){
+    buildParams(params) {
         var url = "?";
         var sep = "";
         Object.keys(params).forEach(function (prop) {
@@ -58,7 +58,7 @@ class RequestBuilder{
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(target)
+                    body: typeof(target) === "string" ? target : JSON.stringify(target)
                 }
             ).then((response) => {
                 if (response.ok) {
@@ -79,7 +79,7 @@ class RequestBuilder{
         })
     }
 
-    put(action, resource, object) {
+    put(action, resource, target) {
         dispatcher.fireStart(action);
         return fetch(this.BASE_URL + resource, {
             method: "PUT",
@@ -87,7 +87,7 @@ class RequestBuilder{
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: object.toString()
+            body: typeof(target) === "string" ? target : JSON.stringify(target)
         }).then((response) => {
             if (response.ok) {
                 response.json().then((result) => dispatcher.fireEnd(action, result));

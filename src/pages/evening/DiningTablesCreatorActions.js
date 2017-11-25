@@ -1,7 +1,7 @@
 import requestBuilder from "../../actions/RequestBuilder";
 import {
     ACT_BEGIN_CREATE_DINING_TABLE,
-    ACT_CREATE_DINING_TABLE,
+    ACT_CREATE_DINING_TABLE, ACT_DESELECT_DINING_TABLE,
     ACT_UPDATE_DINING_TABLE_CREATOR_COVER_CHARGES,
     ACT_UPDATE_DINING_TABLE_CREATOR_TABLE,
     ACT_UPDATE_DINING_TABLE_CREATOR_WAITER
@@ -28,6 +28,9 @@ class DiningTablesCreatorActions {
 
     createDiningTable(table) {
         requestBuilder.post(ACT_CREATE_DINING_TABLE, 'dining-tables', table);
+    }
+    deselectDiningTable(){
+        dispatcher.fireEnd(ACT_DESELECT_DINING_TABLE);
     }
 
 }

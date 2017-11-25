@@ -53,6 +53,7 @@ class TablesPageStore extends AbstractStore{
                 break;
             case ACT_DESELECT_RESTAURANT_TABLE:
                 this.selectedTable = null;
+                this.inCreationTable = null;
                 break;
             case ACT_UPDATE_RESTAURANT_TABLE_CREATOR_NAME:
                 this.setName(action.body);

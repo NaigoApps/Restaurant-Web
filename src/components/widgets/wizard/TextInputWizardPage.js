@@ -1,47 +1,36 @@
 import React, {Component} from 'react';
-import WizardPage from "./WizardPage";
 import Keyboard, {BACKSPACE, LEFT, RIGHT} from "../inputs/Keyboard";
 import {uuid} from "../../../utils/Utils";
 import $ from 'jquery';
+import graphWizardActions from "./GraphWizardActions";
+import GraphWizardPage from "./graph/GraphWizardPage";
 
 export default class TextInputWizardPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            uuid: "text_input_" + uuid(),
-            text: props.default || "",
-            hasChanged: false
+            uuid: "text_input_" + uuid()
         }
     }
 
-    componentWillReceiveProps(props){
-        this.setState({
-            text: props.default || "",
-            hasChanged: false
-        });
+    getPageData(){
+        return this.props.wizardData[this.props.identifier];
     }
-
+    
     componentDidMount() {
         let input = $("#" + this.state.uuid);
-        input[0].setSelectionRange(this.state.text.length, this.state.text.length);
+        input[0].setSelectionRange(this.getPageData().length, this.getPageData().length);
     }
 
     onChar(char) {
+        let text = this.getPageData();
         let input = $("#" + this.state.uuid)[0];
         let pos = input.selectionStart;
         switch (char) {
             case BACKSPACE:
                 if (pos > 0) {
-                    this.setState(prevState => {
-                        return {
-                            text: prevState.text.slice(0, pos - 1) + prevState.text.slice(pos),
-                            hasChanged: true
-                        };
-                    });
+                    graphWizardActions.setWizardData(text.slice(0, pos - 1) + text.slice(pos), this.props.identifier);
                     input.focus();
-                    setTimeout(() => {
-                        input.setSelectionRange(Math.max(0, pos - 1), Math.max(0, pos - 1));
-                    }, 0);
                 }
                 break;
             case LEFT:
@@ -51,25 +40,14 @@ export default class TextInputWizardPage extends Component {
                 this.onRight();
                 break;
             default:
-                this.setState(prevState => {
-                    return {
-                        text: prevState.text.substr(0, pos) + char + prevState.text.substr(pos, prevState.text.length),
-                        hasChanged: true
-                    };
-                });
+                graphWizardActions.setWizardData(text.substr(0, pos) + char + text.substr(pos, text.length), this.props.identifier);
                 input.focus();
-                setTimeout(() => {
-                    input.setSelectionRange(pos + 1, pos + 1);
-                }, 0);
                 break;
         }
     }
 
     onChange(evt) {
-        this.setState({
-            text: evt.target.value,
-            hasChanged: true
-        })
+        graphWizardActions.setWizardData(evt.target.value, this.props.identifier);
     }
 
     onLeft() {
@@ -83,23 +61,17 @@ export default class TextInputWizardPage extends Component {
     onRight() {
         let input = $("#" + this.state.uuid);
         let pos = input[0].selectionStart;
-        pos = Math.min(pos + 1, this.state.text.length);
+        pos = Math.min(pos + 1, this.getPageData().length);
         input.focus();
         input[0].setSelectionRange(pos, pos);
     }
 
     render() {
         const placeholder = this.props.placeholder;
-        const text = this.state.text;
+        const text = this.getPageData();
 
         return (
-            <WizardPage
-                pageData={text}
-                goBackAction={this.props.goBackAction}
-                goOnAction={this.props.goOnAction}
-                abortAction={this.props.abortAction}
-                confirmAction={this.props.confirmAction}
-                valid={true}>
+            <GraphWizardPage>
                 <div className="row">
                     <div className="col-sm-12">
                         <input
@@ -116,7 +88,7 @@ export default class TextInputWizardPage extends Component {
                         <Keyboard onCharAction={this.onChar.bind(this)}/>
                     </div>
                 </div>
-            </WizardPage>
+            </GraphWizardPage>
         )
     }
 

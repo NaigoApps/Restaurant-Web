@@ -1,4 +1,7 @@
-import {ACT_SELECT_EVENING, ACT_UPDATE_EVENING} from "../actions/ActionTypes";
+import {
+    ACT_ASK_SELECTED_EVENING, ACT_DESELECT_EVENING, ACT_SELECT_EVENING,
+    ACT_UPDATE_EVENING
+} from "../actions/ActionTypes";
 import {STATUSES} from "./LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
 
@@ -17,6 +20,7 @@ class EveningStore extends AbstractEntityStore {
         let changed = true;
         switch (action.type){
             case ACT_SELECT_EVENING:
+            case ACT_ASK_SELECTED_EVENING:
                 this.setStatus(STATUSES.LOADING);
                 break;
             default:
@@ -30,7 +34,12 @@ class EveningStore extends AbstractEntityStore {
         let changed = true;
         switch (action.type) {
             case ACT_SELECT_EVENING:
+            case ACT_ASK_SELECTED_EVENING:
                 this.setData([action.body]);
+                this.setStatus(STATUSES.LOADED);
+                break;
+            case ACT_DESELECT_EVENING:
+                this.setData([]);
                 this.setStatus(STATUSES.LOADED);
                 break;
             case ACT_UPDATE_EVENING:

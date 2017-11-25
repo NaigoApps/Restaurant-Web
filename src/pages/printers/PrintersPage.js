@@ -32,13 +32,8 @@ export default class PrintersPage extends Component {
     }
 
     render() {
-        const tables = this.state.tables;
-        const selectedTable = this.state.selectedTable;
-        const inCreationTable = this.state.inCreationTable;
-
         return (
-
-            <Page>
+            <Page title="Stampanti">
                 <EntitiesEditor descriptor={this.getPrintersDescriptor()}/>
             </Page>
         )
@@ -64,7 +59,6 @@ export default class PrintersPage extends Component {
                     actionsProvider: printersEditorActions
                 }
             },
-            crudActionsProvider: printersActions,
             fields: [
                 {
                     type: TYPES.SELECT,
@@ -75,4 +69,9 @@ export default class PrintersPage extends Component {
             ]
         };
     }
+
+    // isAlreadyDefined(service){
+    //     return this.state.printers
+    //         .reduce((val, printer) => val | (printer.name === service), false);
+    // }
 }

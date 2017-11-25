@@ -9,14 +9,16 @@ class GraphWizardActions {
         dispatcher.fireEnd(ACT_GRAPH_WIZARD_MOVE_PAGE, page);
     }
 
-    setWizardData(newData) {
-        dispatcher.fireEnd(ACT_GRAPH_WIZARD_SET_DATA, newData);
+    setWizardData(pageData, page) {
+        dispatcher.fireEnd(ACT_GRAPH_WIZARD_SET_DATA, {
+            page: page, data: pageData
+        });
     }
 
-    reset(pagesData, initialData) {
+    reset(initialData, initialPage) {
         dispatcher.fireEnd(ACT_RESET_GRAPH_WIZARD, {
-            pagesData: pagesData,
-            initialData: initialData
+            initialData: initialData,
+            initialPage: initialPage
         });
     }
 }

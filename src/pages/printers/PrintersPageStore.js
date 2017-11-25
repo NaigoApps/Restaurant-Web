@@ -54,6 +54,7 @@ class PrintersPageStore extends AbstractStore{
                 break;
             case ACT_DESELECT_PRINTER:
                 this.selectedPrinter = null;
+                this.createdPrinter = null;
                 break;
             case ACT_UPDATE_PRINTER_NAME:
                 this.setName(action.body);

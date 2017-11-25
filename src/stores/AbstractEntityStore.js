@@ -33,12 +33,12 @@ export default class AbstractEntityStore extends AbstractStore{
             if(result.length === 1) {
                 return LazyData.loaded(result[0]);
             }else{
-                return LazyData.loaded([]);
+                return LazyData.loaded(null);
             }
         } else if (this.isLoading()) {
-            return LazyData.loading();
+            return LazyData.loading(null);
         } else {
-            return LazyData.notLoaded();
+            return LazyData.notLoaded(null);
         }
     }
 

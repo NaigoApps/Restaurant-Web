@@ -12,7 +12,7 @@ import dispatcher from "../../dispatcher/SimpleDispatcher";
 class OrdersCreatorActions {
 
     beginOrderCreation(){
-        dispatcher.fireEnd(ACT_BEGIN_CREATE_ORDER);
+        dispatcher.fireEnd(ACT_BEGIN_CREATE_ORDER);waipag
     }
 
     updateOrderDish(uuid, dish){

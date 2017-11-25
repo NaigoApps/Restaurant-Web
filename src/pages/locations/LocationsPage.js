@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import Page from "../Page";
 import EntitiesEditor from "../../components/editors/EntitiesEditor";
-import {SHOWN, TYPES} from "../../components/editors/EntityEditor";
+import {COMPONENTS, TYPES} from "../../components/editors/EntityEditor";
 import locationsPageStore from "./LocationsPageStore";
 import locationsPageActions from "./LocationsPageActions";
 import locationsCreatorActions from "./LocationsCreatorActions";
 import locationsEditorActions from "./LocationsEditorActions";
 import locationsActions from "../../generic/LocationsActions";
+import {findByUuid} from "../../utils/Utils";
 
 export default class LocationsPage extends Component {
 
@@ -35,10 +36,19 @@ export default class LocationsPage extends Component {
 
         return (
 
-            <Page>
+            <Page title="Postazioni">
                 <EntitiesEditor descriptor={this.getLocationsDescriptor()}/>
             </Page>
         )
+    }
+
+    locationRenderer(l){
+        let printer = findByUuid(this.state.printers, l.printer);
+        if(printer) {
+            return l.name + " (Stampante " + printer.name + ")";
+        }else{
+            return l.name;
+        }
     }
 
     getLocationsDescriptor() {
@@ -46,7 +56,7 @@ export default class LocationsPage extends Component {
             name: ["location", "locations"],
             label: ["Postazione", "Postazioni"],
             renderer: {
-                name: l => l.name
+                name: this.locationRenderer.bind(this)
             },
             entities: {
                 list: this.state.locations,

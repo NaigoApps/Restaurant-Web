@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import FormField from "./FormField";
 
 export default class EntitySelectInput extends Component {
     constructor(props) {
@@ -51,7 +50,7 @@ export default class EntitySelectInput extends Component {
                 {nullOption}
                 {options}
             </select>);
-        return (<FormField compact={this.props.compact} size={this.props.size} label={label} field={field}/>);
+        return field;
     }
 
 }

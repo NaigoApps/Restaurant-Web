@@ -1,42 +1,35 @@
 import AbstractStore from "./AbstractStore";
+import {ACT_GOTO_FULLSCREEN, ACT_TOGGLE_FULL_SCREEN} from "../actions/ActionTypes";
 
 export const EVT_APPLICATION_STORE_CHANGED = "EVT_APPLICATION_STORE_CHANGED";
-
-const PAGES = {
-    WAITERS_MANAGEMENT: 0,
-    MENU_MANAGEMENT: 1,
-};
 
 class ApplicationStore extends AbstractStore {
 
     constructor() {
-        super();
-        this.currentPage = null;
-    }
-
-    setCurrentPage(page){
-        this.currentPage = page;
-    }
-
-    getCurrentPage(){
-        return this.currentPage;
+        super(EVT_APPLICATION_STORE_CHANGED);
+        this.isFullScreen = false;
     }
 
     handleCompletedAction(action) {
+        let changed = true;
         switch (action.type) {
-            case GOTO_WAITERS_MANAGEMENT:
-                this.setCurrentPage(PAGES.WAITERS_MANAGEMENT);
+            case ACT_TOGGLE_FULL_SCREEN:
+                this.isFullScreen = !this.isFullScreen;
                 break;
-            case GOTO_MENU_MANAGEMENT:
-                this.setCurrentPage(PAGES.MENU_MANAGEMENT);
+            default:
+                changed = false;
                 break;
         }
+        return changed;
     }
 
-    getChangeEvent(){
-        return EVT_APPLICATION_STORE_CHANGED;
+    getState(){
+        return {
+            fullScreen: this.isFullScreen
+        };
     }
 
 }
 
-export default applicationStore = new ApplicationStore();
+const applicationStore = new ApplicationStore();
+export default applicationStore;

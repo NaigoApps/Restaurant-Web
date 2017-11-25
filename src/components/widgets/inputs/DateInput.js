@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import FormField from "./FormField";
 
 /**
  * Expects:
@@ -8,7 +7,7 @@ import FormField from "./FormField";
  */
 
 export function formatDate(date) {
-    var formattedDate = new Date(date);
+    let formattedDate = new Date(date);
     formattedDate.setMinutes(date.getMinutes() - date.getTimezoneOffset());
     return formattedDate.toJSON().slice(0, 10);
 }
@@ -27,7 +26,8 @@ export function beautifyTime(date) {
     return "";
 }
 
-export default class DateInput extends Component {
+export default class
+DateInput extends Component {
     constructor(props) {
         super(props);
         this.state = this.resetState(props)
@@ -66,7 +66,7 @@ export default class DateInput extends Component {
         const date = this.state.date;
         const field = <input className="form-control" type="date" value={date || ""}
                              onChange={this.dateChange.bind(this)}/>;
-        return (<FormField compact={this.props.compact} label={label} field={field}/>);
+        return field;
     }
 
 }

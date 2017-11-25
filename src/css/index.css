@@ -35,7 +35,11 @@
     margin-right: 10px;
 }
 
-.floating-button-container{
+.clickable {
+    cursor: pointer;
+}
+
+.floating-button-container {
     position: relative;
 
 }
@@ -47,4 +51,98 @@
     margin-right: 5px;
     right: 0;
     top: 0;
+}
+
+.home-links-container {
+    display: flex;
+    table-layout: fixed;
+    width: 100%;
+    height: 200px;
+}
+
+.home-link {
+    margin: 10px;
+    flex-basis: 100%;
+    font-size: 40pt;
+    background-color: #107896;
+}
+
+.home-link:hover {
+    background-color: #43ABC9;
+}
+
+.home-link.main {
+    font-size: 80pt;
+}
+
+.home-link a {
+    display: block;
+    line-height: 200px;
+    text-align: center;
+    color: white;
+}
+
+.home-link.main a {
+    line-height: 200px;
+}
+
+.full-height {
+    height: 100%;
+}
+
+.squared-btn-container {
+    padding: 5%;
+}
+
+.squared-btn:hover {
+    background-color: #1b6d85;
+}
+
+.squared-btn {
+    text-align: center;
+    background-color: #2e6da4;
+    color: white;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+}
+
+.btn {
+    white-space: normal;
+}
+
+.btn.touch, .touch {
+    width: 100%;
+    margin: 15px 0;
+    height: 100px;
+    padding: 0;
+    line-height: 100px;
+}
+
+.touch-space{
+    height: 100px;
+    display: inline-block;
+    margin: 15px 0;
+}
+
+.btn.touch span, .touch span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+}
+
+.btn-group-vertical-justified{
+    width: 100%;
+}
+
+@media (min-width: 1200px) {
+    .modal-lg {
+        width: 98%;
+    }
+}
+
+@media (min-width: 992px) {
+    .modal-lg {
+        width: 98%;
+    }
 }

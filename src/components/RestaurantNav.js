@@ -1,44 +1,59 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
+import applicationStore from "../stores/ApplicationStore";
+import applicationActions from "../actions/ApplicationActions";
 
-const links = [
-    {path: "", replace: true, label: "Home"},
-    {path: "printers", label: "Stampanti"},
-    {path: "locations", label: "Postazioni"},
-    {path: "tables", label: "Tavoli"},
-    {path: "waiters", label: "Camerieri"},
-    {path: "additions", label: "Varianti"},
-    {path: "menu", label: "Menu"},
-    {path: "evening", label: "Serate"},
+export const SIZES = {
+    HIDDEN: "HIDDEN",
+    SMALL: "SMALL",
+    MAIN: "MAIN"
+};
+
+export const LINKS = [
+    {path: "", replace: true, label: "Home", size: SIZES.HIDDEN},
+    {path: "printers", label: "Stampanti", icon: "print"},
+    {path: "locations", label: "Postazioni", icon: "map-marker"},
+    {path: "tables", label: "Tavoli", icon: "record"},
+    {path: "waiters", label: "Camerieri", icon: "user"},
+    {path: "additions", label: "Varianti", icon: "pencil"},
+    {path: "menu", label: "Menu", icon: "apple"},
+    {path: "evening", label: "Serate", size: SIZES.MAIN, icon: "list-alt"},
 ];
 
 class RestaurantNav extends Component {
 
-    constructor(){
+    constructor() {
         super();
-        this.state = {
-            clicked: null
-        }
     }
 
-    clickLink(link) {
-        this.setState({clicked: link});
+    toggleFullScreen(){
+        applicationActions.toggleFullScreen();
     }
 
     render() {
-        let linksComponents = links.map(link =>
-            (<li key={link.path}>
-                <Link to={"/" + link.path} replace={link.replace ? true : false} onClick={this.clickLink.bind(this, link)}>
-                    {this.state.clicked === link ? <strong className="text-primary">{link.label}</strong> : link.label}
+        let linksComponents = <li>
+            <span className="navbar-brand">
+                <Link to={"/restaurant/"} replace={true}>
+                    <span className="glyphicon glyphicon-home"/>
                 </Link>
-            </li>));
+            </span>
+        </li>;
 
         return (
             <nav className="navbar navbar-default">
                 <div className="container-fluid">
-                    <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul className="nav navbar-nav">
+                    <div className="collapse navbar-collapse">
+                        <ul className="nav navbar-nav navbar-left">
                             {linksComponents}
+                            <p className="navbar-text">{this.props.title}</p>
+                            {this.props.content}
+                        </ul>
+                        <ul className="nav navbar-nav navbar-right">
+                            <p className="navbar-text">
+                                <a className="clickable" onClick={this.toggleFullScreen.bind(this)}>
+                                    <span className="glyphicon glyphicon-resize-full"/>
+                                </a>
+                            </p>
                         </ul>
                     </div>
                 </div>

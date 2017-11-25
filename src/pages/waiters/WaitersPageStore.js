@@ -60,6 +60,7 @@ class WaitersPageStore extends AbstractStore{
                 break;
             case ACT_DESELECT_WAITER:
                 this.selectedWaiter = null;
+                this.inCreationWaiter = null;
                 break;
             case ACT_UPDATE_WAITER_NAME:
                 this.setName(action.body);

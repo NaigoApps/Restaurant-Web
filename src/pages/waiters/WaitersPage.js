@@ -34,7 +34,7 @@ export default class WaitersPage extends Component {
         const created = this.state.inCreationWaiter;
 
         return (
-            <Page>
+            <Page title="Camerieri">
                 <WaitersEditor
                     waiters={waiters}
                     waiterStatuses={waiterStatuses}

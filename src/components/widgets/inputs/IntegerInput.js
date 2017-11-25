@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import FormField from "./FormField";
 
 /**
  * Expects:
@@ -19,7 +18,7 @@ export default class IntegerInput extends Component {
 
     resetState(props) {
         return {
-            number: props.default || 0,
+            number: props.default || "",
             hasChanged: false
         }
     }
@@ -47,11 +46,11 @@ export default class IntegerInput extends Component {
         const label = this.props.label;
         const number = this.state.number;
         const field = (
-            <input className="form-control" type="number" step="1" value={number || "0"}
+            <input className="form-control" type="text" value={number}
                    onChange={this.numberChange.bind(this)}
                    onBlur={this.commitChange.bind(this)}/>
         );
-        return (<FormField compact={this.props.compact} size={this.props.size} label={label} field={field}/>);
+        return field;
     }
 
 }

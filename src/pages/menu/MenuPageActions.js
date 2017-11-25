@@ -7,6 +7,7 @@ class MenuPageActions {
     initMenuPage(){
         categoriesActions.retrieveCategories();
         dishesActions.retrieveAllDishes();
+        dishesActions.retrieveDishesStatuses();
         locationsActions.retrieveLocations();
     }
 

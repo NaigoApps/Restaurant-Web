@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 import Button from "../../widgets/Button";
 import EntitiesEditor from "./EntitiesEditor";
-import TextEditor from "../widgets/inputs/TouchTextEditor";
+import TextEditor from "../widgets/inputs/TextEditor";
 import SelectEditor from "../widgets/inputs/SelectEditor";
 import FloatEditor from "../widgets/inputs/FloatEditor";
-import {camel, uuid} from "../../utils/Utils";
+import {camel, foo, uuid} from "../../utils/Utils";
 import BooleanEditor from "../widgets/inputs/BooleanEditor";
 import EntitySelectEditor from "../widgets/inputs/EntitySelectEditor";
 import IntegerEditor from "../widgets/inputs/IntegerEditor";
 import $ from "jquery";
+import PaginatedEntitiesList from "../widgets/PaginatedEntitiesList";
 
 export const TYPES = {
     INT: "int",
@@ -27,7 +28,7 @@ export const ACTIONS = {
     DELETE: "delete"
 };
 
-export const SHOWN = {
+export const COMPONENTS = {
     EDITOR: "EDITOR",
     CREATOR: "CREATOR"
 };
@@ -51,8 +52,8 @@ export default class EntityEditor extends Component {
         return descriptor.fields
             .filter(f =>
                 !f.shown ||
-                (entity.uuid && f.shown.includes(SHOWN.EDITOR)) ||
-                (!entity.uuid && f.shown.includes(SHOWN.CREATOR)))
+                (entity.uuid && f.shown.includes(COMPONENTS.EDITOR)) ||
+                (!entity.uuid && f.shown.includes(COMPONENTS.CREATOR)))
             .map(field => EntityEditor.makePropertyEditor(descriptor, entity, field));
     }
 
@@ -67,11 +68,22 @@ export default class EntityEditor extends Component {
             let deleteButton = (entity.uuid && !descriptor.undeletable) ? EntityEditor.makeDeleteButton(descriptor, entity) : null;
 
             return (
-                <div className="form">
-                    {components}
-                    {buttons}
-                    <div className="pull-right">
-                        {deleteButton}
+                <div className="panel panel-default">
+                    <div
+                        className="panel-heading text-center clearfix"
+                        onClick={EntityEditor.resolveDeselectMethod(descriptor)}>
+                        <div className="panel-title">
+                            {descriptor.renderer.name(entity)}
+                        </div>
+                    </div>
+                    <div className="panel-body">
+                        <div className="form">
+                            {components}
+                            {buttons}
+                            <div className="pull-right">
+                                {deleteButton}
+                            </div>
+                        </div>
                     </div>
                 </div>
             )
@@ -204,16 +216,17 @@ export default class EntityEditor extends Component {
         let button;
         let deleteMethod = EntityEditor.resolveDeleteMethod(descriptor, entity);
         let showDeleteModal = () => {
-            $("#del_" + descriptor.name).modal("show")
+            $("#del_" + descriptor.name).modal("show");
         };
         button = (
             <div>
-                <Button key="delete_btn" icon="trash" type="danger" size="sm" text={descriptor.renderer.name(entity)} commitAction={showDeleteModal}/>
+                <Button key="delete_btn" icon="trash" type="danger" size="sm" text={descriptor.renderer.name(entity)}
+                        commitAction={showDeleteModal}/>
                 <div className="modal fade" id={"del_" + descriptor.name}>
                     <div className="modal-dialog modal-sm">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h4 className="modal-title text-danger" id="gridSystemModalLabel">Eliminare?</h4>
+                                <h4 className="modal-title text-danger">Eliminare?</h4>
                             </div>
                             <div className="modal-footer">
                                 <button className="btn btn-lg btn-danger" data-dismiss="modal"
@@ -238,6 +251,15 @@ export default class EntityEditor extends Component {
             console.warn("Cannot find method " + deleteMethodName);
         }
         return deleteMethod;
+    }
+
+    static resolveDeselectMethod(descriptor) {
+        let deselectMethod = descriptor.actionsProvider['deselect' + camel(descriptor.name)];
+        if (!deselectMethod) {
+            console.warn("Unresolved method deselect" + camel(descriptor.name));
+            deselectMethod = foo;
+        }
+        return deselectMethod;
     }
 }
 

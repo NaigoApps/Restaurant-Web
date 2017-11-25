@@ -4,47 +4,28 @@ import OrderCategoryWizardPage from "../wizard/graph/OrderCategoryWizardPage";
 import OrderDishWizardPage from "../wizard/graph/OrderDishWizardPage";
 import OrdinationReviewPage from "../wizard/graph/OrdinationReviewPage";
 import graphWizardActions from "../wizard/GraphWizardActions";
-import IntegerInputWizardPage from "../wizard/IntegerInputWizardPage";
-import IntegerInputGraphWizardPage from "../wizard/graph/IntegerInputGraphWizardPage";
 import ordinationsCreatorActions from "../../../pages/evening/OrdinationsCreatorActions";
+import {findByUuid} from "../../../utils/Utils";
+import OrdersEditor from "./OrdersEditor";
 
 export default class OrdinationCreator extends Component {
     constructor(props) {
         super(props);
     }
 
-
-    onWizardClose(data) {
-        ordinationsCreatorActions.createOrdination(data.orders)
-    }
-
-    confirmDish(wData) {
-        let order = wData.pending;
-        if (order.dish) {
-            this.addOrder(wData.orders, order);
-            graphWizardActions.setWizardData({
-                orders: wData.orders,
-                pending: {
-                    category: wData.pending.category,
-                    quantity: 1
-                }
-            });
-        }
-    }
-
-    addOrder(orders, order) {
-        let found = false;
-        orders.forEach(o => {
-            if (o.dish === order.dish) {
-                o.quantity += order.quantity;
-                found = true;
-            }
+    onWizardOk(orders) {
+        ordinationsCreatorActions.createOrdination({
+            table: this.props.table,
+            orders : orders
         });
-        if (!found) {
-            delete order.category;
-            order.table = this.props.table;
-            orders.push(order);
-        }
+    }
+
+    onWizardAbort(data) {
+        ordinationsCreatorActions.abortOrdinationCreation();
+    }
+
+    resetQuantity(wData) {
+        graphWizardActions.setWizardData("", "quantity");
     }
 
     render() {
@@ -52,69 +33,45 @@ export default class OrdinationCreator extends Component {
 
         return <div className="panel-body">
             <div className="form">
-                <GraphWizard
-                    initializer={() => {
-                        return {orders: [], pending: {}}
-                    }}
+                <OrdersEditor
                     autoShow={true}
-                    label={"Ordinazioni"}
-                    renderer={(data) => this.renderWizardData.bind(this)(data)}
-                    commitAction={this.onWizardClose.bind(this)}>
-
-                    <OrderCategoryWizardPage
-                        identifier="categories"
-                        name="Categorie"
-                        label={cat => cat.name}
-                        options={this.getAvailableCategories.bind(this)}/>
-
-                    <OrderDishWizardPage
-                        identifier="dishes"
-                        name="Piatti"
-                        label={dish => dish.name}
-                        canEnter={this.canEnterInDishPage}
-                        options={this.getAvailableDishes.bind(this)}/>
-
-                    <IntegerInputGraphWizardPage
-                        identifier="quantity"
-                        name="Quantità"
-                        default={data => data.pending.quantity}
-                        canEnter={this.canEnterInQuantityPage}
-                        label={dish => dish.name}/>
-
-                    <OrdinationReviewPage
-                        identifier="review"
-                        type="success"
-                        name="Riepilogo"
-                        dishes={this.props.dishes}
-                        onEnter={this.confirmDish.bind(this)}/>
-
-                </GraphWizard>
+                    categories={this.props.categories}
+                    dishes={this.props.dishes}
+                    phases={this.props.phases}
+                    orders={[]}
+                    commitAction={this.onWizardOk.bind(this)}
+                    abortAction={this.onWizardAbort}/>
             </div>
         </div>
 
     }
 
-    canEnterInDishPage(wData){
-        return !!wData.pending.category;
+    canEnterInDishPage(wData) {
+        return !!wData["categories"];
     }
 
-    canEnterInQuantityPage(wData){
-        return !!wData.pending.dish;
+    canEnterInQuantityPage(wData) {
+        return !!wData["dishes"];
     }
 
     getAvailableCategories(wData) {
         return this.props.categories;
     }
 
+    getPhases(wData) {
+        return this.props.phases;
+    }
+
     getAvailableDishes(wData) {
-        let dishes = this.props.dishes
-            .filter(dish => !wData.pending.category || dish.category === wData.pending.category);
-        return dishes;
+        return this.props.dishes
+            .filter(dish => !wData["categories"] || dish.category === wData["categories"]);
     }
 
     renderWizardData(wData) {
-        if (wData.pending.dish) {
-            return wData.pending.quantity + " x " + this.props.dishes.find(d => d.uuid === wData.pending.dish).name;
+        if (wData["dishes"]) {
+            return wData["quantity"] + " x " +
+                this.props.dishes.find(d => d.uuid === wData["dishes"]).name +
+                " (" + this.props.phases.find(f => f.uuid === wData["phases"]).name + ")";
         }
         return null;
     }

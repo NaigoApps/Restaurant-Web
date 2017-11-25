@@ -20,6 +20,10 @@ class TablesCreatorActions {
     createTable(table) {
         asyncActionBuilder.post(ACT_CREATE_RESTAURANT_TABLE, 'restaurant-tables', table);
     }
+
+    deselectTable(){
+        dispatcher.fireEnd(ACT_DESELECT_RESTAURANT_TABLE);
+    }
 }
 
 const tablesCreatorActions = new TablesCreatorActions();

@@ -1,6 +1,6 @@
 import {
     ACT_BEGIN_CREATE_WAITER,
-    ACT_CREATE_WAITER,
+    ACT_CREATE_WAITER, ACT_DESELECT_WAITER,
     ACT_UPDATE_WAITER_CF,
     ACT_UPDATE_WAITER_NAME,
     ACT_UPDATE_WAITER_STATUS,
@@ -33,6 +33,10 @@ class WaitersCreatorActions {
 
     createWaiter(waiter) {
         asyncActionBuilder.post(ACT_CREATE_WAITER, 'waiters', waiter);
+    }
+
+    deselectWaiter(){
+        dispatcher.fireEnd(ACT_DESELECT_WAITER);
     }
 
 }

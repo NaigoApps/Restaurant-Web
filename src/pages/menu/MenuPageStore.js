@@ -84,6 +84,7 @@ class MenuPageStore extends AbstractStore{
                 break;
             case ACT_UPDATE_DISH:
                 this.selectedDish = action.body.uuid;
+                this.selectedCategory = action.body.category;
                 break;
             case ACT_DELETE_CATEGORY:
                 this.selectedCategory = null;
@@ -113,9 +114,11 @@ class MenuPageStore extends AbstractStore{
                 this.selectedCategory = null;
                 this.selectedDish = null;
                 this.inCreationDish = null;
+                this.inCreationCategory = null;
                 break;
             case ACT_DESELECT_DISH:
                 this.selectedDish = null;
+                this.inCreationDish = null;
                 break;
             case ACT_UPDATE_CATEGORY_CREATOR_NAME:
                 this.setCategoryName(action.body);

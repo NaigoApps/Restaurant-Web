@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import FormField from "./FormField";
 
 export default class BooleanEditor extends Component {
     constructor(props) {

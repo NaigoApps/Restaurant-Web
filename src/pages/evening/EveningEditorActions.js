@@ -7,9 +7,9 @@ class EveningEditorActions {
 
     updateCoverCharge(eveningUuid, value){
         asyncActionBuilder.put(
+            ACT_UPDATE_EVENING,
             'evenings/' + eveningUuid + "/coverCharge",
-            value,
-            ACT_UPDATE_EVENING
+            value
         );
     }
 

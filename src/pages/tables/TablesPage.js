@@ -38,7 +38,7 @@ export default class TablesPage extends Component {
 
         return (
 
-            <Page>
+            <Page title="Tavoli">
                 <TablesEditor
                     tables={tables}
                     selected={selectedTable}

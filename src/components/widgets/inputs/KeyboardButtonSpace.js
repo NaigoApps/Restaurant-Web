@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {uuid} from "../../../utils/Utils";
-
-export const SIZES = {SMALL: "SMALL", MEDIUM: "MEDIUM", HUGE: "HUGE"};
+import {SIZES} from "./KeyboardButton";
 
 export default class KeyboardButtonSpace extends Component {
     constructor(props) {

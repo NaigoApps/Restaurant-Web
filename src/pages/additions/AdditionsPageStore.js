@@ -62,6 +62,7 @@ class AdditionsPageStore extends AbstractStore{
                 break;
             case ACT_DESELECT_ADDITION:
                 this.selectedAddition = null;
+                this.inCreationAddition = null;
                 break;
             case ACT_UPDATE_ADDITION_NAME:
                 this.setName(action.body);

@@ -1,5 +1,8 @@
 import requestBuilder from "../../actions/RequestBuilder";
-import {ACT_BEGIN_CREATE_ORDINATION, ACT_CREATE_ORDINATION} from "../../actions/ActionTypes";
+import {
+    ACT_ABORT_CREATE_ORDINATION, ACT_BEGIN_CREATE_ORDINATION, ACT_CREATE_ORDINATION,
+    ACT_SELECT_ORDINATION
+} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 
 class OrdinationsCreatorActions {
@@ -8,8 +11,12 @@ class OrdinationsCreatorActions {
         dispatcher.fireEnd(ACT_BEGIN_CREATE_ORDINATION);
     }
 
-    createOrdination(orders){
-        requestBuilder.post(ACT_CREATE_ORDINATION, 'ordinations', orders);
+    abortOrdinationCreation(){
+        dispatcher.fireEnd(ACT_ABORT_CREATE_ORDINATION);
+    }
+
+    createOrdination(ordination){
+        requestBuilder.post(ACT_CREATE_ORDINATION, 'ordinations', ordination);
     }
 
 }

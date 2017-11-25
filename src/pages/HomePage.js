@@ -1,10 +1,13 @@
 import React, {Component} from 'react';
-import RestaurantNav from '../components/RestaurantNav';
+import Page from "./Page";
+import RestaurantHomeNav from "../components/RestaurantHomeNav";
 
 class HomePage extends Component {
     render() {
         return (
-            <RestaurantNav/>
+            <Page title="Home">
+                <RestaurantHomeNav/>
+            </Page>
         );
     }
 }

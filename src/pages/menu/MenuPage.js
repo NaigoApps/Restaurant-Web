@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {SHOWN, TYPES} from "../../components/editors/EntityEditor";
+import {COMPONENTS, TYPES} from "../../components/editors/EntityEditor";
 import EntitiesEditor from "../../components/editors/EntitiesEditor";
 import menuPageActions from "./MenuPageActions";
 import menuPageStore from "./MenuPageStore";
@@ -8,6 +8,7 @@ import categoriesCreatorActions from "./CategoriesCreatorActions";
 import dishesEditorActions from "./DishesEditorActions";
 import dishesCreatorActions from "./DishesCreatorActions";
 import EntityEditor from "../../components/editors/EntityEditor";
+import Page from "../Page";
 
 export default class MenuPage extends Component {
     constructor(props) {
@@ -69,14 +70,14 @@ export default class MenuPage extends Component {
                     name: "location",
                     label: "Postazione",
                     options: this.state.locations,
-                    shown: [SHOWN.EDITOR],
+                    shown: [COMPONENTS.EDITOR],
                     renderer: l => l.name
                 },
                 {
                     type: TYPES.ENTITIES,
                     name: ["dish", "dishes"],
                     label: ["Piatto", "Piatti"],
-                    shown: [SHOWN.EDITOR],
+                    shown: [COMPONENTS.EDITOR],
                     components: {
                         creator: {
                             label: "Nuovo piatto",
@@ -111,13 +112,18 @@ export default class MenuPage extends Component {
                         {type: TYPES.FLOAT, name: "price", label: "Prezzo", unit: "€"},
                         {
                             type: TYPES.ENTITY,
-                            shown: [SHOWN.EDITOR],
+                            shown: [COMPONENTS.EDITOR],
                             name: "category",
                             label: "Categoria",
                             options: this.state.categories,
                             renderer: c => c.name
                         },
-                        {type: TYPES.ENUM, name: "status", label: "Stato", options: this.state.dishesStatuses}
+                        {
+                            type: TYPES.SELECT,
+                            name: "status",
+                            optionsProvider: () => this.state.dishesStatuses,
+                            label: "Stato"
+                        }
                     ]
                 }
             ]
@@ -132,13 +138,13 @@ export default class MenuPage extends Component {
         //     return <Button type="warning" commitAction={failureActions.removeMessage}/>;
         // }
         return (
-            <div className="container">
+            <Page title="Menu">
                 <EntitiesEditor
                     entities={this.state.categories}
                     selected={this.state.selectedCategory}
                     created={this.state.inCreationCategory}
                     descriptor={this.getCategoryDescriptor()}/>
-            </div>
+            </Page>
         );
     }
 }

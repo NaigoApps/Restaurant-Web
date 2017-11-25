@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import EveningSelectionForm from "../../components/EveningSelectionForm";
-import EntityEditor, {SHOWN, TYPES} from "../../components/editors/EntityEditor";
+import EntityEditor, {COMPONENTS, TYPES} from "../../components/editors/EntityEditor";
 import eveningActions from "../../actions/pages/EveningActions";
 import {beautifyDate, beautifyTime} from "../../components/widgets/inputs/DateInput";
-import Wizard from "../../components/widgets/wizard/Wizard";
-import EntitySelectionWizardPage from "../../components/widgets/wizard/EntitySelectionWizardPage";
 import Page from "../Page";
 import OrdinationCreator from "../../components/widgets/inputs/OrdinationCreator";
 import eveningPageStore from "./EveningPageStore";
@@ -13,9 +11,11 @@ import diningTablesCreatorActions from "./DiningTablesCreatorActions";
 import diningTablesEditorActions from "./DiningTablesEditorActions";
 import ordinationsCreatorActions from "./OrdinationsCreatorActions";
 import ordinationsEditorActions from "./OrdinationsEditorActions";
-import ordersCreatorActions from "./OrdersCreatorActions";
-import ordersEditorActions from "./OrdersEditorActions";
-import {findByUuid} from "../../utils/Utils";
+import DiningTableEditor from "../../components/DiningTableEditor";
+import Button from "../../widgets/Button";
+import eveningSelectionFormActions from "../../actions/pages/EveningSelectionFormActions";
+import FloatEditor from "../../components/widgets/inputs/FloatEditor";
+import eveningEditorActions from "./EveningEditorActions";
 
 export default class EveningPage extends Component {
     constructor(props) {
@@ -42,18 +42,62 @@ export default class EveningPage extends Component {
 
 
     render() {
-        return (
-            <Page>
-                <div className="row">
-                    <EveningSelectionForm eveningDate={this.state.date}/>
-                </div>
+        let evening = this.state.evening;
+        let pageContent;
+        if (evening) {
+            pageContent =
                 <div className="row top-sep">
                     <EntityEditor
                         entity={this.state.evening}
                         descriptor={this.getEveningDescriptor()}/>
                 </div>
+        } else {
+            pageContent =
+                <div className="jumbotron">
+                    <h1>Selezionare una serata</h1>
+                    <div className="row">
+                        <EveningSelectionForm eveningDate={this.state.date}/>
+                    </div>
+                </div>
+        }
+        let title;
+        if (evening) {
+            title = "Gestione serata " + beautifyDate(evening.day)
+        } else {
+            title = "Gestione serate";
+        }
+        let navContent;
+        if (evening) {
+            navContent = <span>
+                <form className="navbar-form navbar-left">
+                    <FloatEditor
+                        descriptor={this.getCoverChargeDescriptor()}
+                        value={evening.coverCharge}
+                        commitAction={eveningEditorActions.updateCoverCharge.bind(eveningEditorActions, evening.uuid)}/>
+                </form>
+                <form className="navbar-form navbar-left">
+                    <button className="btn btn-default" onClick={eveningSelectionFormActions.deselectEvening}>
+                        Cambia serata
+                    </button>
+                </form>
+            </span>;
+        }
+
+
+        return (
+            <Page title={title} navContent={navContent}>
+                {pageContent}
             </Page>
         );
+    }
+
+    getCoverChargeDescriptor() {
+        return {
+            name: "coverCharge",
+            label: "Coperto",
+            unit: "€",
+            isForNav: true
+        }
     }
 
     getEveningDescriptor() {
@@ -67,12 +111,6 @@ export default class EveningPage extends Component {
             undeletable: true,
             immediate: true,
             fields: [
-                {
-                    type: TYPES.FLOAT,
-                    name: "coverCharge",
-                    label: "Coperto",
-                    unit: "€"
-                },
                 this.getDiningTablesDescriptor.bind(this)()
             ]
         };
@@ -84,7 +122,8 @@ export default class EveningPage extends Component {
             name: ["diningTable", "diningTables"],
             label: ["Tavolo", "Tavoli"],
             entities: {
-                list: this.state.diningTables,
+                list: this.state.diningTables
+                    .sort((d1, d2) => d1.date.localeCompare(d2.date)),
                 selected: this.state.selectedDiningTable,
                 created: this.state.createdDiningTable
             },
@@ -94,13 +133,24 @@ export default class EveningPage extends Component {
                     actionsProvider: diningTablesCreatorActions
                 },
                 editor: {
+                    component: entity => <DiningTableEditor
+                        tables={this.state.tables}
+                        waiters={this.state.waiters}
+                        ordinations={this.state.ordinations.filter(ord => ord.table === entity.uuid)}
+                        categories={this.state.categories}
+                        dishes={this.state.dishes}
+                        phases={this.state.phases}
+                        diningTable={entity}
+                        selectedOrdination={this.state.selectedOrdination}
+                        editingOrdination={this.state.editingOrdination}
+                        createdOrdination={this.state.createdOrdination}/>,
                     actionsProvider: diningTablesEditorActions
                 }
             },
             renderer: {
                 name: this.renderDiningTable.bind(this)
             },
-            shown: [SHOWN.EDITOR],
+            shown: [COMPONENTS.EDITOR],
             fields: [
                 {type: TYPES.INT, name: "coverCharges", label: "Coperti"},
                 {
@@ -116,168 +166,17 @@ export default class EveningPage extends Component {
                     label: "Tavolo",
                     options: this.state.tables,
                     renderer: t => t.name
-                },
-                this.getOrdinationsDescriptor.bind(this)()
-            ]
-        }
-    }
-
-    getOrdinationsDescriptor() {
-        return {
-            type: TYPES.ENTITIES,
-            name: ["ordination", "ordinations"],
-            label: ["Comanda", "Comande"],
-            entities: {
-                list: this.state.ordinations,
-                selected: this.state.selectedOrdination,
-                created: this.state.createdOrdination
-            },
-            components: {
-                creator: {
-                    label: "Nuova comanda",
-                    component: (descriptor) => <OrdinationCreator
-                        descriptor={descriptor}
-                        table={this.state.selectedDiningTable}
-                        categories={this.state.categories}
-                        dishes={this.state.dishes}
-                    />,
-                    actionsProvider: ordinationsCreatorActions
-                },
-                editor: {
-                    actionsProvider: ordinationsEditorActions
-                }
-            },
-            renderer: {
-                name: this.renderOrdination.bind(this)
-            },
-            creator: (descriptor) => <OrdinationCreator
-                descriptor={descriptor}
-                categories={this.state.categories}
-                dishes={this.state.dishes}/>,
-            shown: [SHOWN.EDITOR],
-            fields: [
-                this.getOrdersDescriptor.bind(this)()
-            ]
-        }
-    }
-
-    getOrdersDescriptor() {
-        return {
-            type: TYPES.ENTITIES,
-            name: ["order", "orders"],
-            label: ["Ordine", "Ordini"],
-            entities: {
-                list: this.state.orders.filter(o => o.ordination === this.state.selectedOrdination),
-                selected: this.state.selectedOrder,
-                created: this.state.createdOrder
-            },
-            components: {
-                creator: {
-                    label: "Nuovo ordine",
-                    actionsProvider: ordersCreatorActions
-                },
-                editor: {
-                    actionsProvider: ordersEditorActions
-                }
-            },
-            renderer: {
-                name: o => findByUuid(this.state.dishes, o.dish).name
-            },
-            fields: [
-                // {
-                //     type: TYPES.CUSTOM,
-                //     name: "dish",
-                //     label: "Piatto",
-                //     customComponent: (descriptor) => this.dishSelectorWizard.bind(this)(descriptor),
-                //     options: this.state.dishes,
-                //     renderer: d => d.name
-                // },
-                {
-                    type: TYPES.FLOAT,
-                    size: 2,
-                    name: "price",
-                    label: "Prezzo",
-                    unit: "€"
-                },
-                // {
-                //     type: TYPES.ENTITY,
-                //     size: 2,
-                //     name: "phase",
-                //     label: "Fase",
-                //     options: this.state.phases,
-                //     entityRenderer: p => p.name
-                // },
-                // {
-                //     type: TYPES.STRING,
-                //     size: 3,
-                //     name: "test",
-                //     label: "Aggiunte"
-                // },
-                {
-                    type: TYPES.STRING,
-                    size: 2,
-                    name: "notes",
-                    label: "Note"
                 }
             ]
         }
-    }
-
-    dishSelectorWizard(descriptor) {
-        let pages = [
-            (wizardId, data) =>
-                <EntitySelectionWizardPage
-                    wizardId={wizardId}
-                    wizardData={data}
-                    title="Categoria"
-                    options={data => this.state.categories}
-                    label={cat => cat.name}
-                />
-            ,
-            (wizardId, data) =>
-                <EntitySelectionWizardPage
-                    wizardId={wizardId}
-                    wizardData={data}
-                    title="Piatto"
-                    options={data => this.findDishesByCategory(data[0])}
-                    label={dish => dish.name}
-                />
-
-        ];
-        return <Wizard
-            key={descriptor.name}
-            descriptor={descriptor}
-            pages={pages}
-            label={(data) => this.dishLabel(data)}
-            renderer={o => o ? o.name : ""}
-            makeData={(data) => {
-                return data[1].uuid
-            }}
-        />
-    }
-
-    dishLabel(data) {
-        if (data.length >= 2) {
-            return data[1].name;
-        }
-        return "Scegli";
-    }
-
-    findDishesByCategory(cat) {
-        return this.state.dishes.filter(d => d.category === cat.uuid);
-    }
-
-    printTest() {
-        // eveningPageActions.printTest();
     }
 
     renderDiningTable(dt) {
-        const tableName = dt.table ? this.state.tables.find(t => t.uuid === dt.table).name : "";
-        const waiterName = dt.waiter ? this.state.waiters.find(w => w.uuid === dt.waiter).name : "";
-        return tableName + " (" + waiterName + ")";
-    }
-
-    renderOrdination(o) {
-        return "Comanda delle " + beautifyTime(o.creationTime);
+        const table = this.state.tables.find(t => t.uuid === dt.table);
+        const tableName = table ? table.name : "";
+        const waiter = this.state.waiters.find(w => w.uuid === dt.waiter);
+        const waiterName = waiter ? waiter.name : "";
+        const createTime = beautifyTime(dt.date);
+        return createTime + " - " + tableName + " (" + waiterName + ")";
     }
 }

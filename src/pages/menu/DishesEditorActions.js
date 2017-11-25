@@ -9,6 +9,7 @@ import {
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import categoriesActions from "./CategoriesActions";
 import asyncActionBuilder from "../../actions/RequestBuilder";
+import categoriesEditorActions from "./CategoriesEditorActions";
 
 
 class DishesEditorActions {
@@ -46,8 +47,7 @@ class DishesEditorActions {
     }
 
     updateDishCategory(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_DISH, 'dishes/' + uuid + '/category', value)
-            .then(() => categoriesActions.selectCategory(value));
+        asyncActionBuilder.put(ACT_UPDATE_DISH, 'dishes/' + uuid + '/category', value);
     }
 
     deleteDish(dish) {

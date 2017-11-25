@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {empty} from "./EntityEditor";
 import EntitiesList from "../widgets/EntitiesList";
+import PaginatedEntitiesList from "../widgets/PaginatedEntitiesList";
 
 function camel(word) {
     return word.charAt(0).toUpperCase() + word.substr(1);
@@ -25,20 +26,20 @@ export default class EntitiesEditor extends Component {
         }
 
         return (
-            <div className="row">
-                <div className="col-sm-12">
-                    <div className="row">
+            <div className="col-sm-12">
+                <div className="row">
+                    <div className="col-sm-12">
                         {list}
                     </div>
-                    {createButton}
                 </div>
+                {createButton}
             </div>
         );
     }
 
     static makeComponentsList(descriptor) {
         if (descriptor.name && descriptor.name.length === 2) {
-            return <EntitiesList descriptor={descriptor}/>;
+            return <PaginatedEntitiesList descriptor={descriptor}/>;
         } else {
             console.error("No entity name provided");
         }
@@ -48,7 +49,8 @@ export default class EntitiesEditor extends Component {
         let createMethod = EntitiesEditor.resolveCreateMethod(descriptor);
         return (
             <div className="row text-center top-sep">
-                <button className="btn btn-success" onClick={createMethod}>{descriptor.components.creator.label || "Nuovo"}</button>
+                <button className="btn btn-success"
+                        onClick={createMethod}>{descriptor.components.creator.label || "Nuovo"}</button>
             </div>
         );
     }
