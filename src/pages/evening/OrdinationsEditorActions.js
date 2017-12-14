@@ -1,6 +1,7 @@
 import {
+    ACT_ABORT_EDIT_ORDINATION,
     ACT_BEGIN_CREATE_ORDINATION, ACT_BEGIN_EDIT_ORDINATION, ACT_DELETE_ORDINATION, ACT_EDIT_ORDINATION,
-    ACT_PRINT_ORDINATION,
+    ACT_PRINT_ORDINATION, ACT_PRINT_PARTIAL_BILL,
     ACT_SELECT_ORDINATION
 } from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
@@ -14,6 +15,10 @@ class OrdinationsEditorActions {
 
     beginOrdinationEditing(){
         dispatcher.fireEnd(ACT_BEGIN_EDIT_ORDINATION);
+    }
+
+    abortOrdinationEditing(){
+        dispatcher.fireEnd(ACT_ABORT_EDIT_ORDINATION);
     }
 
     selectOrdination(uuid){

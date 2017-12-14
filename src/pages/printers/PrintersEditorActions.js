@@ -23,6 +23,22 @@ class PrintersEditorActions {
         );
     }
 
+    updatePrinterMain(uuid, value) {
+        asyncActionBuilder.put(
+            ACT_UPDATE_PRINTER,
+            'printers/' + uuid + '/main',
+            value
+        );
+    }
+
+    updatePrinterLineCharacters(uuid, value) {
+        asyncActionBuilder.put(
+            ACT_UPDATE_PRINTER,
+            'printers/' + uuid + '/lineCharacters',
+            value
+        );
+    }
+
     deletePrinter(uuid) {
         asyncActionBuilder.remove(ACT_DELETE_PRINTER, 'printers', uuid);
     }

@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
-import applicationStore from "../stores/ApplicationStore";
 import applicationActions from "../actions/ApplicationActions";
+import NavButtonLink from "../widgets/NavButtonLink";
+import NavButton from "../widgets/NavButton";
+import Icon from "../widgets/Icon";
+import Button from "../widgets/Button";
 
 export const SIZES = {
     HIDDEN: "HIDDEN",
@@ -26,36 +29,33 @@ class RestaurantNav extends Component {
         super();
     }
 
-    toggleFullScreen(){
+    toggleFullScreen() {
         applicationActions.toggleFullScreen();
     }
 
     render() {
-        let linksComponents = <li>
-            <span className="navbar-brand">
-                <Link to={"/restaurant/"} replace={true}>
-                    <span className="glyphicon glyphicon-home"/>
-                </Link>
-            </span>
-        </li>;
 
         return (
-            <nav className="navbar navbar-default">
-                <div className="container-fluid">
-                    <div className="collapse navbar-collapse">
-                        <ul className="nav navbar-nav navbar-left">
-                            {linksComponents}
-                            <p className="navbar-text">{this.props.title}</p>
-                            {this.props.content}
-                        </ul>
-                        <ul className="nav navbar-nav navbar-right">
-                            <p className="navbar-text">
-                                <a className="clickable" onClick={this.toggleFullScreen.bind(this)}>
-                                    <span className="glyphicon glyphicon-resize-full"/>
-                                </a>
-                            </p>
-                        </ul>
-                    </div>
+            <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
+                <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <Icon name="gear"/>
+                </button>
+                <div id="navbar" className="collapse navbar-collapse">
+                    <NavButtonLink
+                        icon="home"
+                        path="/restaurant"
+                    />
+                    <ul className="navbar-nav mr-auto">
+                        <li className="nav-item"><a className="nav-link">{this.props.title}</a></li>
+                        {this.props.content}
+                    </ul>
+                    <ul className="navbar-nav ml-auto">
+                        <li className="nav-item">
+                            <NavButton
+                                icon="window-restore"
+                                commitAction={this.toggleFullScreen.bind(this)}/>
+                        </li>
+                    </ul>
                 </div>
             </nav>
         );

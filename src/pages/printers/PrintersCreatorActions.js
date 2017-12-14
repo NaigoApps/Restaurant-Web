@@ -1,5 +1,6 @@
 import {
-    ACT_BEGIN_CREATE_PRINTER, ACT_CREATE_PRINTER, ACT_DESELECT_PRINTER,
+    ACT_BEGIN_CREATE_PRINTER, ACT_CREATE_PRINTER, ACT_DESELECT_PRINTER, ACT_UPDATE_PRINTER_LINE_CHARACTERS,
+    ACT_UPDATE_PRINTER_MAIN,
     ACT_UPDATE_PRINTER_NAME
 } from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
@@ -13,6 +14,14 @@ class PrintersCreatorActions {
 
     updatePrinterName(uuid, name) {
         dispatcher.fireEnd(ACT_UPDATE_PRINTER_NAME, name);
+    }
+
+    updatePrinterMain(uuid, main){
+        dispatcher.fireEnd(ACT_UPDATE_PRINTER_MAIN, main);
+    }
+
+    updatePrinterLineCharacters(uuid, chars){
+        dispatcher.fireEnd(ACT_UPDATE_PRINTER_LINE_CHARACTERS, chars);
     }
 
     createPrinter(printer) {

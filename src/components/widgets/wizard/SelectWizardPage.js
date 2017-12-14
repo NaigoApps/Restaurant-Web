@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import graphWizardActions from "./GraphWizardActions";
 import GraphWizardPage from "./graph/GraphWizardPage";
+import Button from "../../../widgets/Button";
 
 export default class SelectWizardPage extends Component {
     constructor(props) {
@@ -8,24 +9,17 @@ export default class SelectWizardPage extends Component {
     }
 
     selectOption(option) {
-        graphWizardActions.setWizardData(option, this.props.identifier);
-    }
-
-    optionButtonClass(opt){
-        let classes = ["btn", "btn-lg"];
-        classes.push(opt === this.props.wizardData[this.props.identifier] ? "btn-primary" : "btn-default");
-        return classes.join(" ");
+        graphWizardActions.setWizardData(this.props.wizardId, option, this.props.identifier);
     }
 
     render() {
         let buttons = this.props.options.map((o, index) =>
             (
-                <button key={index}
-                        type="button"
-                        className={this.optionButtonClass(o)}
-                        onClick={this.selectOption.bind(this, o)}>
-                    {this.props.optionRenderer(o)}
-                </button>
+                <Button key={index}
+                        active={o === this.props.wizardData[this.props.identifier]}
+                        commitAction={this.selectOption.bind(this, o)}
+                        text={this.props.optionRenderer(o)}
+                />
             )
         );
 

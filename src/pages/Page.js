@@ -7,6 +7,8 @@ import RestaurantNav from "../components/RestaurantNav";
 import applicationStore from "../stores/ApplicationStore";
 
 import * as screenfull from 'screenfull';
+import Modal from "../widgets/modal/Modal";
+import Button from "../widgets/Button";
 
 export default class Page extends Component {
 
@@ -34,14 +36,16 @@ export default class Page extends Component {
 
     updateApplicationStatus() {
         let status = applicationStore.getState();
-        if(status.fullScreen){
+        if (!this.state.fullScreen && status.fullScreen) {
             if (screenfull.enabled) {
                 screenfull.request();
             }
-        }else{
+        } else if (this.state.fullScreen && !status.fullScreen) {
             screenfull.exit();
         }
-        this.setState(status);
+        this.setState({
+            fullScreen: status.fullScreen
+        });
     }
 
     updateErrorStatus() {
@@ -71,33 +75,25 @@ export default class Page extends Component {
 
     render() {
         return (
-            <div>
+            <div className="container-fluid main">
                 <RestaurantNav title={this.props.title} content={this.props.navContent}/>
-                <div className="container">
-                    {this.props.children}
-                    <div className="modal fade" id="error-modal" role="dialog">
-                        <div className="modal-dialog" role="document">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span></button>
-                                    <h4 className="modal-title text-danger text-center">
-                                        <span className="glyphicon glyphicon-warning-sign"/> Errore
-                                    </h4>
-                                </div>
-                                <div className="modal-body">
-                                    <div className="text-center text-danger">{this.state.errorMessage}</div>
-                                </div>
-                                <div className="modal-footer">
-                                    <button type="button"
-                                            className="btn btn-default"
-                                            data-dismiss="modal"
-                                            onClick={this.clearMessages}>Close
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                <div className="row under-nav top-sep">
+                    <div className="col-sm-12">
+                        {this.props.children}
                     </div>
+                    <Modal visible={!!this.state.errorMessage}>
+                        <div className="modal-header">
+                            <h4 className="modal-title text-danger text-center">
+                                <span className="glyphicon glyphicon-warning-sign"/> Errore
+                            </h4>
+                        </div>
+                        <div className="modal-body">
+                            <div className="text-center text-danger">{this.state.errorMessage}</div>
+                        </div>
+                        <div className="modal-footer">
+                            <Button text="Chiudi" commitAction={this.clearMessages}/>
+                        </div>
+                    </Modal>
                 </div>
             </div>
         )

@@ -26,8 +26,7 @@ export function beautifyTime(date) {
     return "";
 }
 
-export default class
-DateInput extends Component {
+export default class DateInput extends Component {
     constructor(props) {
         super(props);
         this.state = this.resetState(props)

@@ -12,13 +12,14 @@ export default class PaginatedButtonGroup extends Component {
     }
 
     render() {
-
+        const pageSize = this.props.pageSize || 10;
         const page = this.state.page;
         let pageButtons = this.buildPageButtons();
-        let buttons = distribute(React.Children.toArray(this.props.children), 9);
+        let buttons = distribute(React.Children.toArray(this.props.children), pageSize);
         if (buttons.length > 0) {
-            while (buttons[buttons.length - 1].length < 9) {
-                buttons[buttons.length - 1].push(<Button key={buttons[buttons.length - 1].length} disabled={true} text="&nbsp;"/>);
+            while (buttons[buttons.length - 1].length < pageSize) {
+                buttons[buttons.length - 1].push(<Button key={buttons[buttons.length - 1].length} disabled={true}
+                                                         text="&nbsp;"/>);
             }
         }
 
@@ -46,22 +47,46 @@ export default class PaginatedButtonGroup extends Component {
         });
     }
 
+    buildDefaultButtons(pages, page) {
+        return <div className="btn-group">
+            <Button disabled={page <= 0}
+                    commitAction={this.selectPage.bind(this, page - 1)}
+                    icon="arrow-left"/>
+            <Button disabled={page >= pages - 1}
+                    commitAction={this.selectPage.bind(this, page + 1)}
+                    icon="arrow-right"/>
+        </div>
+    }
+
+    buildNumberButtons(pages, page) {
+        let numbers = [];
+        for (let i = 0; i < pages; i++) {
+            numbers.push(i);
+        }
+        return <div className="btn-group">
+            {numbers.map(number => {
+                return <Button key={number}
+                               commitAction={this.selectPage.bind(this, number)}
+                               active={page === number}
+                               text={(number + 1).toString()}
+                />
+            })}
+        </div>
+    }
+
     buildPageButtons() {
         const page = this.state.page;
         const pages = React.Children.toArray(this.props.children).length / 10;
-        return <nav>
-            <ul className="pagination pagination-lg">
-                <li className={page <= 0 ? "disabled" : "clickable"}>
-                    <a onClick={this.selectPage.bind(this, page - 1)}>
-                        <span className="glyphicon glyphicon-arrow-left"/>
-                    </a>
-                </li>
-                <li className={page >= pages - 1 ? "disabled" : "clickable"}>
-                    <a onClick={this.selectPage.bind(this, page + 1)}>
-                        <span className="glyphicon glyphicon-arrow-right"/>
-                    </a>
-                </li>
-            </ul>
+
+        let buttons;
+        if (this.props.showNumbers) {
+            buttons = this.buildNumberButtons(pages, page);
+        } else {
+            buttons = this.buildDefaultButtons(pages, page);
+        }
+
+        return <nav className="top-sep">
+            {buttons}
         </nav>;
     }
 }

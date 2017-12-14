@@ -8,6 +8,9 @@ import KeyPad from "../../KeyPad";
 import QuantitySelector from "../../../../widgets/QuantitySelector";
 import EntitySelector from "../../../../widgets/EntitySelector";
 import OrdinationsUtils from "../../../../pages/evening/OrdinationsUtils";
+import Button from "../../../../widgets/Button";
+import Row from "../../../../widgets/Row";
+import Column from "../../../../widgets/Column";
 
 export default class OrderDishWizardPage extends Component {
     constructor(props) {
@@ -15,47 +18,44 @@ export default class OrderDishWizardPage extends Component {
     }
 
     setQuantity(value) {
-        graphWizardActions.setWizardData(value, "quantity");
+        graphWizardActions.setWizardData(this.props.wizardId, value, "quantity");
     }
 
     setPhase(value) {
-        graphWizardActions.setWizardData(value, "phases");
+        graphWizardActions.setWizardData(this.props.wizardId, value, "phases");
     }
 
     confirmDish(dish) {
         let wData = this.props.wizardData;
         if (dish && wData["quantity"]) {
             let quantity = parseInt(wData["quantity"]);
+            let newOrder;
             for (let i = 0; i < quantity; i++) {
-                wData["review"].push(OrdinationsUtils.makeOrder(
+                newOrder = OrdinationsUtils.makeOrder(
                     dish.uuid,
                     wData["phases"],
                     findByUuid(this.props.dishes, dish.uuid).price,
                     this.props.ordination ? this.props.ordination.uuid : null
-                ));
+                );
+                wData["review"].push(newOrder);
             }
-            graphWizardActions.setWizardData(wData["review"], "review");
-            graphWizardActions.setWizardData(null, "dishes");
-            graphWizardActions.setWizardData(1, "quantity");
+            graphWizardActions.setWizardData(this.props.wizardId, wData["review"], "review");
+            graphWizardActions.setWizardData(this.props.wizardId, null, "dishes");
+            graphWizardActions.setWizardData(this.props.wizardId, 1, "quantity");
+            graphWizardActions.setWizardData(this.props.wizardId, newOrder, "editing");
         }
-    }
-
-    optionButtonClass(opt) {
-        let classes = ["btn", "btn-lg"];
-        classes.push(opt.uuid === this.props.wizardData["dishes"] ? "btn-primary" : "btn-default");
-        return classes.join(" ");
     }
 
     render() {
 
         let buttons = this.props.options(this.props.wizardData).map(o => {
             return (
-                <button key={o.uuid}
-                        type="button"
-                        className={this.optionButtonClass(o)}
-                        onClick={this.confirmDish.bind(this, o)}>
-                    {this.props.label(o)}
-                </button>
+                <Button
+                    key={o.uuid}
+                    active={o.uuid === this.props.wizardData["dishes"]}
+                    commitAction={this.confirmDish.bind(this, o)}
+                    text={this.props.label(o)}
+                />
             );
         });
 
@@ -63,43 +63,46 @@ export default class OrderDishWizardPage extends Component {
             <GraphWizardPage
                 abortAction={this.props.abortAction}
                 confirmAction={this.props.confirmAction}>
-                <div className="row">
-                    <div className="col-sm-5 text-center">
-                        <PaginatedButtonGroup>
-                            {buttons}
-                        </PaginatedButtonGroup>
-                    </div>
-                    <div className="col-sm-7">
-                        <div className="well well-sm">
-                            <div className="row">
-                                <div className="col-sm-6">
-                                    <QuantitySelector
-                                        selected={this.props.wizardData["quantity"]}
-                                        numbers={[1, 2, 5, 10]}
-                                        commitAction={this.setQuantity.bind(this)}/>
-                                </div>
-                                <div className="col-sm-6">
-                                    <EntitySelector
-                                        title="Portata"
-                                        selected={this.props.wizardData["phases"]}
-                                        entities={this.props.phases}
-                                        renderer={p => p.name}
-                                        commitAction={this.setPhase.bind(this)}/>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <div className="well well-sm">
-                                    <OrdinationReview
-                                        dishes={this.props.dishes}
-                                        phases={this.props.phases}
-                                        orders={this.props.wizardData["review"]}/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <Row>
+                    <Column lg="5">
+                        <Row>
+                            <Column>
+                                <OrdinationReview
+                                    dishes={this.props.dishes}
+                                    phases={this.props.phases}
+                                    additions={this.props.additions}
+                                    orders={this.props.wizardData["review"]}/>
+                            </Column>
+                        </Row>
+                    </Column>
+                    <Column lg="7">
+                        <Row>
+                            <Column>
+                                <QuantitySelector
+                                    selected={this.props.wizardData["quantity"]}
+                                    numbers={[1, 2, 5, 10]}
+                                    commitAction={this.setQuantity.bind(this)}/>
+                            </Column>
+                            <Column>
+                                <EntitySelector
+                                    title="Portata"
+                                    selected={this.props.wizardData["phases"]}
+                                    entities={this.props.phases}
+                                    renderer={p => p.name}
+                                    commitAction={this.setPhase.bind(this)}/>
+                            </Column>
+                        </Row>
+                        <Row>
+                            <Column>
+                                <PaginatedButtonGroup
+                                    showNumbers={true}
+                                    pageSize={7}>
+                                    {buttons}
+                                </PaginatedButtonGroup>
+                            </Column>
+                        </Row>
+                    </Column>
+                </Row>
             </GraphWizardPage>
         )
     }

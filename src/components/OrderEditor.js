@@ -1,11 +1,5 @@
 import React, {Component} from 'react';
-import TextInput from "./widgets/inputs/TextInput";
-import DishesManagementComponent from "../old/DishesEditor";
-import menuManagementActions from "../pages/menu/CategoriesActions";
-import {findByUuid} from "../utils/Utils";
-import EntitySelectInput from "./widgets/inputs/EntitySelectInput";
 import TableEntitySelectInput from "./widgets/inputs/table/TableEntitySelectInput";
-import FloatInput from "./widgets/inputs/FloatInput";
 import TableFloatInput from "./widgets/inputs/table/TableFloatInput";
 import TableTextInput from "./widgets/inputs/table/TableTextInput";
 import ordersActions from "../pages/evening/OrdersActions";

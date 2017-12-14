@@ -29,7 +29,7 @@ export default class TextInputWizardPage extends Component {
         switch (char) {
             case BACKSPACE:
                 if (pos > 0) {
-                    graphWizardActions.setWizardData(text.slice(0, pos - 1) + text.slice(pos), this.props.identifier);
+                    graphWizardActions.setWizardData(this.props.wizardId, text.slice(0, pos - 1) + text.slice(pos), this.props.identifier);
                     input.focus();
                 }
                 break;
@@ -40,14 +40,14 @@ export default class TextInputWizardPage extends Component {
                 this.onRight();
                 break;
             default:
-                graphWizardActions.setWizardData(text.substr(0, pos) + char + text.substr(pos, text.length), this.props.identifier);
+                graphWizardActions.setWizardData(this.props.wizardId, text.substr(0, pos) + char + text.substr(pos, text.length), this.props.identifier);
                 input.focus();
                 break;
         }
     }
 
     onChange(evt) {
-        graphWizardActions.setWizardData(evt.target.value, this.props.identifier);
+        graphWizardActions.setWizardData(this.props.wizardId, evt.target.value, this.props.identifier);
     }
 
     onLeft() {

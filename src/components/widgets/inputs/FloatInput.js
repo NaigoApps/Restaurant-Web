@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import Keyboard, {BACKSPACE} from "./Keyboard";
 import {uuid} from "../../../utils/Utils";
 import $ from 'jquery';
+import {CANC} from "../KeyPad";
+import KeyPad from "../KeyPad";
 
 /**
  * Expects:
@@ -15,100 +16,82 @@ export default class FloatInput extends Component {
         this.state = this.resetState(props)
     }
 
-    componentWillReceiveProps(props) {
-        this.setState(this.resetState(props));
-    }
-
     resetState(props) {
         return {
-            uuid: "float_input_" + uuid(),
-            number: props.default || 0.0,
-            hasChanged: false
+            uuid: "float-input-" + uuid(),
+            text: props.default.toString() || "0"
         }
     }
 
-    numberChange(event) {
+    componentWillReceiveProps(props){
         this.setState({
-            number: event.target.value,
-            hasChanged: true
+            text: props.default.toString() || "0"
         });
     }
 
-    commitChange() {
-        if (this.state.hasChanged) {
-            if (this.props.commitAction) {
-                this.props.commitAction(this.state.number);
-            }
-            this.setState({
-                hasChanged: false
-            });
+    static isNumber(text) {
+        return !isNaN(parseFloat(text));
+    }
+
+    onChange(event) {
+        this.setState({
+            text: event.target.value
+        });
+        this.mayCommitChange(event.target.value);
+    }
+
+    mayCommitChange(text) {
+        if (FloatInput.isNumber(text) && this.props.commitAction) {
+            this.props.commitAction(text);
         }
     }
 
     onChar(char) {
+        let text = this.state.text;
         switch (char) {
-            case BACKSPACE:
-                this.setState(prevState => {
-                    return {
-                        number: parseInt(prevState.number.toString().slice(0, -1) || "0"),
-                        hasChanged: true
-                    };
-                });
+            case CANC:
+                text = "0";
                 break;
             default:
-                this.setState(prevState => {
-                    return {
-                        number: parseInt(prevState.number.toString() + char),
-                        hasChanged: true
-                    };
-                });
+                if(text === "0"){
+                    text = char;
+                }else {
+                    text += char;
+                }
                 break;
         }
-    }
 
-    showKeyboard() {
-        $("#" + this.state.uuid).modal("show");
-        $("#" + this.state.uuid).on("hide.bs.modal", this.commitChange.bind(this));
+        this.mayCommitChange(text);
+        this.setState({
+            text: text
+        });
     }
 
     render() {
-        const label = this.props.label;
-        const number = this.state.number;
+        const text = this.state.text;
         const placeholder = this.props.placeholder;
+        const disabled = this.props.disabled;
 
         return (
-            <div>
-                <div className="input-group">
-                    <span className="input-group-addon">{this.props.unit || ""}</span>
-                    <input
-                        className="form-control"
-                        placeholder={placeholder}
-                        type="number" value={number || "0"}
-                        onChange={this.numberChange.bind(this)}
-                        onBlur={this.commitChange.bind(this)}/>
-                    <span className="input-group-btn">
-                    <button type="button" className="btn btn-primary" onClick={this.showKeyboard.bind(this)}>
-                        <span className="glyphicon glyphicon-menu-down"/>
-                    </button>
-                </span>
-                </div>
-                <div className="modal fade" id={this.state.uuid}>
-                    <div className="modal-dialog modal-lg">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <div className="input-group">
-                                    <span className="input-group-addon">{this.props.unit || ""}</span>
-                                    <input
-                                        className="form-control"
-                                        placeholder={placeholder}
-                                        type="number" value={number || "0"}
-                                        readOnly={true}/>
-                                </div>
-                            </div>
-                            <div className="modal-body">
-                                <Keyboard onCharAction={this.onChar.bind(this)}
-                                          commitAction={this.commitChange.bind(this)}/>
-                            </div>
+            <div className="row">
+                <div className="col-sm-12">
+                    <div className="row">
+                        <div className="col-sm-12">
+                            <input
+                                id={this.state.uuid}
+                                className="form-control"
+                                placeholder={placeholder}
+                                type="text"
+                                disabled={disabled}
+                                value={text || ""}
+                                onChange={this.onChange.bind(this)}/>
+                        </div>
+                    </div>
+                    <div className="row top-sep">
+                        <div className="col-sm-12">
+                            <KeyPad
+                                disabled={disabled}
+                                onCharAction={this.onChar.bind(this)}/>
                         </div>
                     </div>
                 </div>

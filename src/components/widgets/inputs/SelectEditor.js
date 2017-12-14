@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import Wizard from "../wizard/Wizard";
 import SelectWizardPage from "../wizard/SelectWizardPage";
-import GraphWizardPage from "../wizard/graph/GraphWizardPage";
 import GraphWizard from "../wizard/GraphWizard";
 
 export default class SelectEditor extends Component {

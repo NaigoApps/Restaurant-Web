@@ -1,6 +1,6 @@
 import requestBuilder from "../../actions/RequestBuilder";
 import {
-    ACT_DELETE_DINING_TABLE, ACT_DESELECT_DINING_TABLE, ACT_SELECT_DINING_TABLE,
+    ACT_DELETE_DINING_TABLE, ACT_DESELECT_DINING_TABLE, ACT_PRINT_PARTIAL_BILL, ACT_SELECT_DINING_TABLE,
     ACT_UPDATE_DINING_TABLE
 } from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
@@ -43,6 +43,9 @@ class DiningTablesEditorActions {
         requestBuilder.remove(ACT_DELETE_DINING_TABLE, 'dining-tables', uuid);
     }
 
+    printPartialBill(uuid){
+        requestBuilder.post(ACT_PRINT_PARTIAL_BILL, 'dining-tables/print-partial-bill', uuid);
+    }
 }
 
 const diningTablesEditorActions = new DiningTablesEditorActions();

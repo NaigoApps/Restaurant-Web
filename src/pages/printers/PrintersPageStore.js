@@ -8,7 +8,7 @@ import {
     ACT_RETRIEVE_PRINTER_SERVICES,
     ACT_RETRIEVE_PRINTERS,
     ACT_SELECT_PRINTER,
-    ACT_UPDATE_PRINTER,
+    ACT_UPDATE_PRINTER, ACT_UPDATE_PRINTER_LINE_CHARACTERS, ACT_UPDATE_PRINTER_MAIN,
     ACT_UPDATE_PRINTER_NAME
 } from "../../actions/ActionTypes";
 import printersStore from "../../stores/PrintersStore";
@@ -25,6 +25,14 @@ class PrintersPageStore extends AbstractStore{
 
     setName(value){
         this.createdPrinter.name = value;
+    }
+
+    setMain(value){
+        this.createdPrinter.main = value;
+    }
+
+    setLineCharacters(value){
+        this.createdPrinter.lineCharacters = value;
     }
 
     handleCompletedAction(action){
@@ -58,6 +66,12 @@ class PrintersPageStore extends AbstractStore{
                 break;
             case ACT_UPDATE_PRINTER_NAME:
                 this.setName(action.body);
+                break;
+            case ACT_UPDATE_PRINTER_MAIN:
+                this.setMain(action.body);
+                break;
+            case ACT_UPDATE_PRINTER_LINE_CHARACTERS:
+                this.setLineCharacters(action.body);
                 break;
             default:
                 changed = false;

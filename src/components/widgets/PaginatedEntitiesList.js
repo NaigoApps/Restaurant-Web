@@ -5,6 +5,7 @@ import $ from 'jquery';
 import EntitiesList from "./EntitiesList";
 import TouchButton from "../../widgets/TouchButton";
 import TouchSpace from "../../widgets/TouchSpace";
+import Button from "../../widgets/Button";
 
 export default class PaginatedEntitiesList extends Component {
     constructor(props) {
@@ -14,106 +15,52 @@ export default class PaginatedEntitiesList extends Component {
         }
     }
 
-    panelType(descriptor, entity) {
-        let className = ["panel", "editor-body"];
-        if (descriptor.renderer.color) {
-            className.push("panel-" + descriptor.renderer.color(entity));
-        } else {
-            className.push("panel-default")
-        }
-        return className.join(" ");
-    }
-
     selectEntity(uuid) {
-        if (!uuid) {
-            EntitiesList.resolveDeselectMethod(this.props.descriptor)();
+        if (!uuid || this.props.selected === uuid) {
+            this.props.deselectMethod();
         }
-        if (this.props.descriptor.entities.selected !== uuid) {
-            EntitiesList.resolveSelectMethod(this.props.descriptor)(uuid);
-        } else {
-            EntitiesList.resolveDeselectMethod(this.props.descriptor)();
-        }
+        this.props.selectMethod(uuid);
     }
 
     isSelected(uuid) {
-        return uuid === this.props.descriptor.entities.selected;
-    }
-
-    getEditorComponent(entity) {
-        let editorComponent;
-        if (this.props.descriptor.components.editor.component) {
-            editorComponent = this.props.descriptor.components.editor.component(entity);
-        } else {
-            editorComponent = <EntityEditor
-                entity={entity}
-                descriptor={EntitiesList.makeEntityDescriptor(
-                    this.props.descriptor,
-                    this.props.descriptor.components.editor.actionsProvider,
-                    true)}/>;
-        }
-        return editorComponent;
+        return uuid === this.props.selected;
     }
 
     render() {
-        const descriptor = this.props.descriptor;
-        const entities = descriptor.entities.list;
-        const created = descriptor.entities.created;
-        const selected = descriptor.entities.selected;
+        const entities = this.props.entities;
+        const selected = this.props.selected;
+        const renderer = this.props.renderer;
 
         let entitiesList;
         let pageButtons;
 
-        if (!created) {
-            if (!selected) {
-                entitiesList = distribute(entities, 8);
+        entitiesList = distribute(entities, 9);
 
-                pageButtons = this.buildPageButtons(entitiesList);
+        pageButtons = this.buildPageButtons(entitiesList);
 
-                entitiesList = entitiesList.map((group, index) => {
-                    if (index === this.state.page) {
-                        let buttons = group.map(entity => {
-                            return (
-                                <TouchButton
-                                    key={entity.uuid}
-                                    text={descriptor.renderer.name(entity)}
-                                    type={descriptor.renderer.color ? descriptor.renderer.color(entity) : "default"}
-                                    commitAction={this.selectEntity.bind(this, entity.uuid)}/>
-                            );
-                        });
-                        while (buttons.length < 8) {
-                            buttons.push(<TouchSpace/>);
-                        }
-                        return buttons;
-                    }
-                    return null;
+        entitiesList = entitiesList.map((group, index) => {
+            if (index === this.state.page) {
+                let buttons = group.map(entity => {
+                    return (
+                        <Button
+                            key={entity.uuid}
+                            text={renderer.name(entity)}
+                            type={renderer.color ? renderer.color(entity) : "secondary"}
+                            commitAction={this.selectEntity.bind(this, entity.uuid)}/>
+                    );
                 });
-            } else {
-                entitiesList = this.getEditorComponent(findByUuid(entities, selected));
+                while (buttons.length < 8) {
+                    buttons.push(<TouchSpace/>);
+                }
+                return buttons;
             }
-        }
+            return null;
+        });
 
-
-        let creator;
-
-        if (created) {
-            if (descriptor.components.creator.component) {
-                creator = descriptor.components.creator.component(EntitiesList.makeEntityDescriptor(descriptor, descriptor.components.creator.actionsProvider, false));
-            } else {
-                creator = <EntityEditor
-                    entity={created}
-                    descriptor={EntitiesList.makeEntityDescriptor(
-                        descriptor,
-                        descriptor.components.creator.actionsProvider
-                        , false)}/>
-            }
-        }
 
         return <div className="row">
             <div className="col-sm-12">
-                <div className="row">
-                    {entitiesList}
-                    {creator}
-                </div>
+                {entitiesList}
             </div>
             <div className="col-sm-12">
                 {pageButtons}
@@ -132,7 +79,7 @@ export default class PaginatedEntitiesList extends Component {
             let btns = [];
             groups.forEach((group, index) => {
                 btns.push(
-                    <li className={this.state.page === index ? "clickable active" : "clickable"}>
+                    <li className={this.state.page === index ? "pagination-item clickable active" : "pagination-item clickable"}>
                         <a onClick={this.selectPage.bind(this, index)}>{index + 1}</a>
                     </li>
                 );
@@ -146,33 +93,4 @@ export default class PaginatedEntitiesList extends Component {
         return null;
     }
 
-    static makeEntityDescriptor(descriptor, actionsProvider, immediate) {
-        return {
-            name: descriptor.name[0],
-            renderer: descriptor.renderer,
-            actionsProvider: actionsProvider,
-            immediate: immediate,
-            fields: descriptor.fields,
-
-            customComponent: descriptor.customComponent
-        }
-    }
-
-    static resolveSelectMethod(descriptor) {
-        let selectMethod = descriptor.components.editor.actionsProvider['select' + camel(descriptor.name[0])];
-        if (!selectMethod) {
-            console.warn("Unresolved method select" + camel(descriptor.name[0]));
-            selectMethod = foo;
-        }
-        return selectMethod;
-    }
-
-    static resolveDeselectMethod(descriptor) {
-        let deselectMethod = descriptor.components.editor.actionsProvider['deselect' + camel(descriptor.name[0])];
-        if (!deselectMethod) {
-            console.warn("Unresolved method deselect" + camel(descriptor.name[0]));
-            deselectMethod = foo;
-        }
-        return deselectMethod;
-    }
 }

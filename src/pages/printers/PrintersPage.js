@@ -44,7 +44,8 @@ export default class PrintersPage extends Component {
             name: ["printer", "printers"],
             label: ["Stampante", "Stampanti"],
             renderer: {
-                name: p => p.name
+                name: p => p.name,
+                color: p => p.main ? "success" : "default"
             },
             entities: {
                 list: this.state.printers,
@@ -65,6 +66,16 @@ export default class PrintersPage extends Component {
                     name: "name",
                     optionsProvider: () => this.state.services,
                     label: "Nome"
+                },
+                {
+                    type: TYPES.BOOLEAN,
+                    name: "main",
+                    label: "Principale"
+                },
+                {
+                    type: TYPES.INT,
+                    name: "lineCharacters",
+                    label: "Lunghezza riga"
                 }
             ]
         };

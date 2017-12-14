@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Wizard from "../wizard/Wizard";
 import TextInputWizardPage from "../wizard/TextInputWizardPage";
 import GraphWizard from "../wizard/GraphWizard";
 

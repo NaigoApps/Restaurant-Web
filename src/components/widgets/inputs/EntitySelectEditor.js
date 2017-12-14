@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Wizard from "../wizard/Wizard";
 import SelectWizardPage from "../wizard/SelectWizardPage";
 import {findByUuid} from "../../../utils/Utils";
 import GraphWizard from "../wizard/GraphWizard";

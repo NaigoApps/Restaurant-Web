@@ -24,17 +24,13 @@ export default class OrdinationCreator extends Component {
         ordinationsCreatorActions.abortOrdinationCreation();
     }
 
-    resetQuantity(wData) {
-        graphWizardActions.setWizardData("", "quantity");
-    }
-
     render() {
         const descriptor = this.props.descriptor;
 
         return <div className="panel-body">
             <div className="form">
                 <OrdersEditor
-                    autoShow={true}
+                    visible={true}
                     categories={this.props.categories}
                     dishes={this.props.dishes}
                     phases={this.props.phases}

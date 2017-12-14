@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './css/custom-theme/jquery-ui-1.10.0.custom.css';
-import {Switch, Route} from "react-router";
+import {Route, Switch} from "react-router";
 import {BrowserRouter} from "react-router-dom";
 
 import HomePage from './pages/HomePage';
@@ -14,12 +14,13 @@ import TablesPage from "./pages/tables/TablesPage";
 import AdditionsPage from "./pages/additions/AdditionsPage";
 import PrintersPage from "./pages/printers/PrintersPage";
 import LocationsPage from "./pages/locations/LocationsPage";
-import RestaurantNav from "./components/RestaurantNav";
 
 var $ = require('jquery');
 global.jQuery = $;
+global.Tether = require('tether');
 require('bootstrap/dist/js/bootstrap.min');
 require('bootstrap/dist/css/bootstrap.min.css');
+require('font-awesome/css/font-awesome.min.css');
 require('./css/index.css');
 ReactDOM.render(
     <BrowserRouter>

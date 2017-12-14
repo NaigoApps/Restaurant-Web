@@ -16,7 +16,7 @@ export default class KeyboardButton extends Component {
     }
 
     computeStyle() {
-        let style = "btn btn-lg btn-default keyboard-character ";
+        let style = "btn btn-lg btn-secondary keyboard-character ";
         switch (this.props.size) {
             case SIZES.XSMALL:
                 style += "xs";
@@ -41,6 +41,7 @@ export default class KeyboardButton extends Component {
     }
 
     render() {
+        const disabled = this.props.disabled;
         let style = this.computeStyle();
         let content;
         if(this.props.char){
@@ -50,6 +51,7 @@ export default class KeyboardButton extends Component {
         }
         let c = this.props.char;
         let button = <button
+            disabled={disabled}
             type="button"
             key={this.state.uuid}
             className={style}

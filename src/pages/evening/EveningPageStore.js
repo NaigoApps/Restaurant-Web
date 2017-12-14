@@ -1,26 +1,47 @@
 import AbstractStore from "../../stores/AbstractStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
-    ACT_ABORT_CREATE_ORDINATION, ACT_ASK_SELECTED_EVENING,
-    ACT_BEGIN_CREATE_ADDITION, ACT_BEGIN_CREATE_DINING_TABLE, ACT_BEGIN_CREATE_ORDER, ACT_BEGIN_CREATE_ORDINATION,
+    ACT_ABORT_CREATE_ORDINATION,
+    ACT_ABORT_EDIT_ORDINATION,
+    ACT_ASK_SELECTED_EVENING,
+    ACT_BEGIN_CREATE_DINING_TABLE,
+    ACT_BEGIN_CREATE_ORDER,
+    ACT_BEGIN_CREATE_ORDINATION,
     ACT_BEGIN_EDIT_ORDINATION,
-    ACT_CREATE_ADDITION, ACT_CREATE_DINING_TABLE, ACT_CREATE_ORDER, ACT_CREATE_ORDINATION,
-    ACT_DELETE_ADDITION, ACT_DELETE_DINING_TABLE, ACT_DELETE_ORDER, ACT_DELETE_ORDINATION,
-    ACT_DESELECT_ADDITION, ACT_DESELECT_DINING_TABLE, ACT_DESELECT_DISH, ACT_DESELECT_EVENING, ACT_DESELECT_ORDER,
+    ACT_CREATE_DINING_TABLE,
+    ACT_CREATE_ORDER,
+    ACT_CREATE_ORDINATION,
+    ACT_DELETE_DINING_TABLE,
+    ACT_DELETE_ORDER,
+    ACT_DELETE_ORDINATION,
+    ACT_DESELECT_DINING_TABLE,
+    ACT_DESELECT_EVENING,
+    ACT_DESELECT_ORDER,
     ACT_DESELECT_ORDINATION,
-    ACT_RETRIEVE_ADDITIONS, ACT_RETRIEVE_CATEGORIES, ACT_RETRIEVE_DINING_TABLES, ACT_RETRIEVE_ORDERS,
-    ACT_RETRIEVE_ORDINATIONS, ACT_RETRIEVE_PHASES,
+    ACT_EDIT_ORDINATION,
+    ACT_PRINT_ORDINATION,
+    ACT_RETRIEVE_ADDITIONS,
+    ACT_RETRIEVE_CATEGORIES,
+    ACT_RETRIEVE_DINING_TABLES,
+    ACT_RETRIEVE_ORDERS,
+    ACT_RETRIEVE_ORDINATIONS,
+    ACT_RETRIEVE_PHASES,
     ACT_RETRIEVE_RESTAURANT_TABLES,
     ACT_RETRIEVE_WAITERS,
-    ACT_SELECT_ADDITION, ACT_SELECT_DINING_TABLE, ACT_SELECT_EVENING, ACT_SELECT_ORDER, ACT_SELECT_ORDINATION,
-    ACT_UPDATE_ADDITION,
-    ACT_UPDATE_ADDITION_GENERIC,
-    ACT_UPDATE_ADDITION_NAME,
-    ACT_UPDATE_ADDITION_PRICE, ACT_UPDATE_DINING_TABLE, ACT_UPDATE_DINING_TABLE_CREATOR_COVER_CHARGES,
+    ACT_SELECT_DINING_TABLE,
+    ACT_SELECT_EVENING,
+    ACT_SELECT_ORDER,
+    ACT_SELECT_ORDINATION,
+    ACT_UPDATE_DINING_TABLE,
+    ACT_UPDATE_DINING_TABLE_CREATOR_COVER_CHARGES,
     ACT_UPDATE_DINING_TABLE_CREATOR_TABLE,
-    ACT_UPDATE_DINING_TABLE_CREATOR_WAITER, ACT_UPDATE_EVENING,
-    ACT_UPDATE_EVENING_DATE, ACT_UPDATE_ORDER, ACT_UPDATE_ORDER_DESCRIPTION, ACT_UPDATE_ORDER_DISH,
-    ACT_UPDATE_ORDER_PHASE, ACT_UPDATE_ORDER_PRICE
+    ACT_UPDATE_DINING_TABLE_CREATOR_WAITER,
+    ACT_UPDATE_EVENING,
+    ACT_UPDATE_ORDER,
+    ACT_UPDATE_ORDER_DESCRIPTION,
+    ACT_UPDATE_ORDER_DISH,
+    ACT_UPDATE_ORDER_PHASE,
+    ACT_UPDATE_ORDER_PRICE
 } from "../../actions/ActionTypes";
 import additionsStore from "../../generic/AdditionsStore";
 import eveningStore from "../../stores/EveningStore";
@@ -61,7 +82,8 @@ class EveningPageStore extends AbstractStore{
             tablesStore.getToken(),
             categoriesStore.getToken(),
             dishesStore.getToken(),
-            phasesStore.getToken()
+            phasesStore.getToken(),
+            additionsStore.getToken()
         ]);
         switch (action.type) {
             case ACT_RETRIEVE_DINING_TABLES:
@@ -71,10 +93,11 @@ class EveningPageStore extends AbstractStore{
             case ACT_RETRIEVE_RESTAURANT_TABLES:
             case ACT_RETRIEVE_CATEGORIES:
             case ACT_RETRIEVE_PHASES:
+            case ACT_RETRIEVE_ADDITIONS:
             case ACT_ASK_SELECTED_EVENING:
             case ACT_SELECT_EVENING:
-            case ACT_DESELECT_EVENING:
             case ACT_UPDATE_EVENING:
+            case ACT_PRINT_ORDINATION:
                 break;
             case ACT_CREATE_DINING_TABLE:
                 this.selectedDiningTable = action.body.uuid;
@@ -122,6 +145,12 @@ class EveningPageStore extends AbstractStore{
                 this.createdOrdination = null;
                 this.editingOrdination = true;
                 break;
+            case ACT_ABORT_EDIT_ORDINATION:
+                this.editingOrdination = false;
+                break;
+            case ACT_EDIT_ORDINATION:
+                this.editingOrdination = false;
+                break;
             case ACT_BEGIN_CREATE_ORDER:
                 this.selectedOrder = null;
                 this.createdOrder = this.buildOrder();
@@ -138,6 +167,7 @@ class EveningPageStore extends AbstractStore{
                 this.selectedOrder = action.body;
                 this.createdOrder = null;
                 break;
+            case ACT_DESELECT_EVENING:
             case ACT_DESELECT_DINING_TABLE:
                 this.selectedDiningTable = null;
                 this.createdDiningTable = null;
@@ -215,7 +245,7 @@ class EveningPageStore extends AbstractStore{
     }
 
     getState(){
-        return {
+        return JSON.parse(JSON.stringify({
             date: eveningSelectionFormStore.getDate(),
 
             evening: eveningStore.getEvening(),
@@ -237,8 +267,9 @@ class EveningPageStore extends AbstractStore{
             tables: tablesStore.getAllTables(),
             categories: categoriesStore.getAllCategories(),
             dishes: dishesStore.getAllActiveDishes(),
-            phases: phasesStore.getPhases()
-        }
+            phases: phasesStore.getPhases(),
+            additions: additionsStore.getAdditions()
+        }));
     }
 
 }

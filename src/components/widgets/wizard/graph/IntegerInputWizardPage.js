@@ -5,6 +5,8 @@ import graphWizardActions from "../GraphWizardActions";
 import KeyPad from "../../KeyPad";
 import GraphWizardPage from "./GraphWizardPage";
 import {uuid} from "../../../../utils/Utils";
+import Row from "../../../../widgets/Row";
+import Column from "../../../../widgets/Column";
 
 export default class IntegerInputWizardPage extends Component {
     constructor(props) {
@@ -38,19 +40,19 @@ export default class IntegerInputWizardPage extends Component {
         switch (char) {
             case CANC:
                 if (pos > 0) {
-                    graphWizardActions.setWizardData("", this.props.identifier);
+                    graphWizardActions.setWizardData(this.props.wizardId, "", this.props.identifier);
                     input.focus();
                 }
                 break;
             default:
-                graphWizardActions.setWizardData(text.substr(0, pos) + char + text.substr(pos, text.length), this.props.identifier);
+                graphWizardActions.setWizardData(this.props.wizardId, text.substr(0, pos) + char + text.substr(pos, text.length), this.props.identifier);
                 input.focus();
                 break;
         }
     }
 
     onChange(evt) {
-        graphWizardActions.setWizardData(evt.target.value, this.props.identifier);
+        graphWizardActions.setWizardData(this.props.wizardId, this.props.uuid, evt.target.value, this.props.identifier);
     }
 
     render() {
@@ -59,8 +61,8 @@ export default class IntegerInputWizardPage extends Component {
 
         return (
             <GraphWizardPage>
-                <div className="row">
-                    <div className="col-sm-12">
+                <Row>
+                    <Column>
                         <input
                             id={this.state.uuid}
                             className="form-control"
@@ -68,13 +70,13 @@ export default class IntegerInputWizardPage extends Component {
                             type="text"
                             value={text || ""}
                             onChange={this.onChange.bind(this)}/>
-                    </div>
-                </div>
-                <div className="row top-sep">
-                    <div className="col-sm-12">
+                    </Column>
+                </Row>
+                <Row>
+                    <Column>
                         <KeyPad onCharAction={this.onChar.bind(this)}/>
-                    </div>
-                </div>
+                    </Column>
+                </Row>
             </GraphWizardPage>
         )
     }

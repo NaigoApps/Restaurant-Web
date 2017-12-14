@@ -28,16 +28,18 @@ export default class EveningSelectionForm extends Component {
         const date = this.state.date;
 
         return (
-            <div>
-                <div className="row">
-                    <div className="col-sm-8 col-sm-offset-2">
-                        <div className="row">
+            <div className="row">
+                <div className="col-sm-12">
+                    <div className="row">
+                        <div className="col-sm-12">
                             <DateInput
                                 label="Selezione serata"
                                 commitAction={this.onDateChange.bind(this)}
                                 default={date}/>
                         </div>
-                        <div className="row top-sep text-center">
+                    </div>
+                    <div className="row top-sep text-center">
+                        <div className="col-sm-12">
                             <Button
                                 text="Ok"
                                 type="info"

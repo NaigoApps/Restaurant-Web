@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import Row from "../../../../widgets/Row";
+import Column from "../../../../widgets/Column";
 
 /**
  * function canEnter(data) -> true if page can be accessed
@@ -22,11 +24,11 @@ export default class GraphWizardPage extends Component {
 
     render() {
         return (
-            <div className="row">
-                <div className="col-sm-12">
+            <Row>
+                <Column>
                     {this.props.children}
-                </div>
-            </div>
+                </Column>
+            </Row>
         )
     }
 

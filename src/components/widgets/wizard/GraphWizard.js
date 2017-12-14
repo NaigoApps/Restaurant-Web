@@ -1,21 +1,14 @@
 import React, {Component} from 'react';
-import {uuid} from "../../../utils/Utils";
-import $ from 'jquery';
-import wizardStore from "./WizardStore";
-import wizardActions from "./WizardActions";
 import graphWizardStore from "./GraphWizardStore";
 import graphWizardActions from "./GraphWizardActions";
 import Button from "../../../widgets/Button";
 import GraphWizardPage from "./graph/GraphWizardPage";
-
-/**
- * function initializer -> provides initial wizard data
- * boolean autoShow -> if true wizard modal will show after mount
- * string label -> label of wizard button
- * function renderer(data) -> text to output as review
- * function commitAction -> called when user confirms wizard
- * function abortAction -> called when user aborts
- */
+import Modal from "../../../widgets/modal/Modal";
+import {uuid} from "../../../utils/Utils";
+import Icon from "../../../widgets/Icon";
+import NavPills from "../../../widgets/NavPills";
+import NavElement from "../../../widgets/NavElement";
+import Row from "../../../widgets/Row";
 
 export default class GraphWizard extends Component {
     constructor(props) {
@@ -23,9 +16,7 @@ export default class GraphWizard extends Component {
 
         this.state = {
             uuid: "gw_" + uuid(),
-            confirmed: false,
-            page: null,
-            data: {}
+            data: []
         };
 
         this.updateWizard = this.updateWizard.bind(this);
@@ -34,27 +25,24 @@ export default class GraphWizard extends Component {
 
     componentDidMount() {
         graphWizardStore.addChangeListener(this.updateWizard);
-        $('#' + this.state.uuid).on('hide.bs.modal', this.mayAbort.bind(this));
-        if (this.props.autoShow) {
+        if (this.props.visible) {
             this.openWizard();
         }
     }
 
-    mayAbort() {
-        if (!this.state.confirmed) {
-            if (this.props.abortAction) {
-                this.props.abortAction();
-            }
+    openWizard() {
+        graphWizardActions.reset(this.state.uuid, this.initialWizardData(), this.props.initialPage);
+        graphWizardActions.open(this.state.uuid);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (!prevProps.visible && this.props.visible) {
+            this.openWizard();
         }
     }
 
     componentWillUnmount() {
         graphWizardStore.removeChangeListener(this.updateWizard);
-    }
-
-    openWizard() {
-        graphWizardActions.reset(this.initialWizardData(), this.props.initialPage);
-        $("#" + this.state.uuid).modal("show");
     }
 
     initialWizardData() {
@@ -67,24 +55,24 @@ export default class GraphWizard extends Component {
 
     confirmAction() {
         this.props.commitAction(this.state.data);
-        $("#" + this.state.uuid).modal("hide");
+        graphWizardActions.confirm(this.state.uuid);
     }
 
     abortAction() {
-        this.setState({
-            confirmed: false
-        });
-        $("#" + this.state.uuid).modal("hide");
+        graphWizardActions.abort(this.state.uuid);
+        if (this.props.abortAction) {
+            this.props.abortAction();
+        }
     }
 
     updateWizard(state) {
-        this.setState(state);
+        this.setState((prevState, props) => (state.get(prevState.uuid)));
     }
 
     movePage(pageProps) {
-        graphWizardActions.movePage(pageProps.identifier);
+        graphWizardActions.movePage(this.state.uuid, pageProps.identifier);
         if (pageProps.onEnter) {
-            pageProps.onEnter(this.state.data);
+            pageProps.onEnter(this.state.uuid, this.state.data);
         }
     }
 
@@ -142,31 +130,33 @@ export default class GraphWizard extends Component {
     }
 
     buildDefaultContent() {
-        return <div className="form-horizontal">
-            <div className="form-group">
-                <label className="control-label col-sm-2">{this.props.label}</label>
-                <div className="col-sm-10">
-                    <div className="input-group">
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={this.openWizard.bind(this)}>
-                            {this.props.renderer(this.initialWizardData())} <span
-                            className="glyphicon glyphicon-pencil"/>
-                        </button>
-                    </div>
-                </div>
+        if (this.props.hideForm) {
+            return <div className="form-horizontal">
+                {this.buildModal()}
+            </div>;
+        }
+        return <div className="form-group row">
+            <label className="col-form-label col-sm-2">{this.props.label}</label>
+            <div className="col-sm-10">
+                <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={this.openWizard.bind(this)}>
+                    {this.props.renderer(this.initialWizardData())} <Icon name="pencil"/>
+                </button>
             </div>
             {this.buildModal()}
         </div>;
     }
+
 
     buildModal() {
 
         const pageName = this.state.page;
 
         let pages = React.Children.map(this.props.children, (child) => React.cloneElement(child, {
-            wizardData: this.state.data
+            wizardData: this.state.data,
+            wizardId: this.state.uuid
         }));
 
         const currentPage = React.Children.toArray(pages).find(page => page.props.identifier === pageName);
@@ -180,45 +170,41 @@ export default class GraphWizard extends Component {
         }
 
         let nav = React.Children.map(this.props.children, (child) => {
-            return <li role="presentation" className="active">
+            return <NavElement>
                 <button type="button"
                         className={this.getPageButtonClass(child.props)}
                         disabled={child.props.canEnter ? !child.props.canEnter(this.state.data) : false}
                         onClick={this.movePage.bind(this, child.props)}>
                     {child.props.name}
-                    <span className={child.props.icon ? "glyphicon glyphicon-" + child.props.icon : ""}/>
+                    <Icon name={child.props.icon}/>
                 </button>
-            </li>;
+            </NavElement>;
         });
 
         let navContainer;
         if (nav.length > 1) {
             navContainer = <div className="modal-header">
-                <ul className="nav nav-pills">
+                <NavPills>
                     {nav}
-                </ul>
+                </NavPills>
             </div>;
         }
 
-        return <div className="modal fade" id={this.state.uuid}>
-            <div className="modal-dialog modal-lg">
-                <div className="modal-content">
-                    {navContainer}
-                    <div className="modal-body">
-                        {currentPage}
+        return <Modal visible={this.props.visible || this.state.open}>
+            {navContainer}
+            <div className="modal-body">
+                {currentPage}
+            </div>
+            <div className="modal-footer">
+                <div className="col-sm-12">
+                    <div className="row">
+                        {review}
                     </div>
-                    <div className="modal-footer">
-                        <div className="col-sm-12">
-                            <div className="row">
-                                {review}
-                            </div>
-                            <div className="row text-center">
-                                {this.buildAbortButton()}{this.buildConfirmButton()}
-                            </div>
-                        </div>
-                    </div>
+                    <Row justify="center">
+                        {this.buildAbortButton()}{this.buildConfirmButton()}
+                    </Row>
                 </div>
             </div>
-        </div>
+        </Modal>
     }
 }

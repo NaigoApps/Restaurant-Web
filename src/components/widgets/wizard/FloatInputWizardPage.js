@@ -33,19 +33,19 @@ export default class FloatInputWizardPage extends Component {
         switch (char) {
             case CANC:
                 if (pos > 0) {
-                    graphWizardActions.setWizardData("", this.props.identifier);
+                    graphWizardActions.setWizardData(this.props.wizardId, "", this.props.identifier);
                     input.focus();
                 }
                 break;
             default:
-                graphWizardActions.setWizardData(text.substr(0, pos) + char + text.substr(pos, text.length), this.props.identifier);
+                graphWizardActions.setWizardData(this.props.wizardId, text.substr(0, pos) + char + text.substr(pos, text.length), this.props.identifier);
                 input.focus();
                 break;
         }
     }
 
     onChange(evt) {
-        graphWizardActions.setWizardData(evt.target.value, this.props.identifier);
+        graphWizardActions.setWizardData(this.props.wizardId, evt.target.value, this.props.identifier);
     }
 
     render() {

@@ -1,5 +1,5 @@
 import {
-    ACT_CREATE_ORDINATION,
+    ACT_CREATE_ORDINATION, ACT_DELETE_ORDINATION, ACT_EDIT_ORDINATION, ACT_PRINT_ORDINATION,
     ACT_RETRIEVE_ORDINATIONS,
     ACT_SELECT_DINING_TABLE,
     ACT_SELECT_ORDINATION
@@ -58,6 +58,14 @@ class OrdinationsStore extends AbstractEntityStore {
                 break;
             case ACT_CREATE_ORDINATION:
                 this.createData(action.body);
+                break;
+
+            case ACT_EDIT_ORDINATION:
+            case ACT_PRINT_ORDINATION:
+                this.updateData(action.body);
+                break;
+            case ACT_DELETE_ORDINATION:
+                this.deleteData(action.body);
                 break;
             case ACT_SELECT_DINING_TABLE:
                 this.selectedDiningTable = action.body;
