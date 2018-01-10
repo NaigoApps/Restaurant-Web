@@ -1,5 +1,5 @@
 import AbstractStore from "../../stores/AbstractStore";
-import waitersStore from "../../generic/WaitersStore";
+import waitersStore from "../../stores/generic/WaitersStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
     ACT_BEGIN_CREATE_RESTAURANT_TABLE,
@@ -11,7 +11,7 @@ import {
     ACT_UPDATE_RESTAURANT_TABLE,
     ACT_UPDATE_RESTAURANT_TABLE_CREATOR_NAME
 } from "../../actions/ActionTypes";
-import tablesStore from "../../generic/TablesStore";
+import tablesStore from "../../stores/generic/TablesStore";
 
 const EVT_TABLES_PAGE_STORE_CHANGED = "EVT_TABLES_PAGE_STORE_CHANGED";
 
@@ -73,7 +73,7 @@ class TablesPageStore extends AbstractStore{
 
     getState(){
         return {
-            tables: tablesStore.getAllTables(),
+            tables: tablesStore.getAllTables().getPayload(),
 
             selectedTable: this.selectedTable,
             inCreationTable: this.inCreationTable

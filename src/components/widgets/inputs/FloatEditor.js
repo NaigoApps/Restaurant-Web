@@ -12,22 +12,21 @@ export default class FloatEditor extends Component {
     }
 
     render() {
-        const descriptor = this.props.descriptor;
+        const label = this.props.label;
         const value = this.props.value;
         const placeholder = this.props.placeholder;
 
         return <GraphWizard
-            isForNav={descriptor.isForNav}
             isValid={(wData) => wData && FloatEditor.isFloat(wData["float_page"])}
             hideReview={true}
             initialPage="float_page"
-            label={descriptor.label}
+            label={label}
             renderer={(wData) => wData["float_page"] ? wData["float_page"] + "€" : ""}
             commitAction={this.onWizardConfirm.bind(this)}>
             <FloatInputWizardPage
                 identifier="float_page"
                 initializer={value ? value.toString() : ""}
-                name={this.props.descriptor.label}
+                name={label}
                 placeholder={placeholder}
             />
         </GraphWizard>;

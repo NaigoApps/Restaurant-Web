@@ -18,7 +18,7 @@ export default class QuantitySelector extends Component {
         let buttons = this.props.numbers.map(number => {
             return <Button key={number}
                            active={number === this.props.selected}
-                           text={"X " + number}
+                           text={number}
                            commitAction={this.selectQuantity.bind(this, number)}/>
         });
 

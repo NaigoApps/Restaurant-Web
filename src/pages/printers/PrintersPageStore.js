@@ -12,6 +12,7 @@ import {
     ACT_UPDATE_PRINTER_NAME
 } from "../../actions/ActionTypes";
 import printersStore from "../../stores/PrintersStore";
+import AbstractEntityStore from "../../stores/generic/AbstractEntityStore";
 
 const EVT_PRINTERS_PAGE_STORE_CHANGED = "EVT_PRINTERS_PAGE_STORE_CHANGED";
 
@@ -36,8 +37,10 @@ class PrintersPageStore extends AbstractStore{
     }
 
     handleCompletedAction(action){
-        let changed = true;
         dispatcher.waitFor([printersStore.getToken()]);
+
+        let changed = AbstractEntityStore.areLoaded([printersStore]);
+
         switch (action.type) {
             case ACT_RETRIEVE_PRINTER_SERVICES:
             case ACT_RETRIEVE_PRINTERS:
@@ -82,13 +85,15 @@ class PrintersPageStore extends AbstractStore{
 
     buildPrinter(){
         return {
-            name: ""
+            name: "",
+            main: false,
+            lineCharacters: 0
         };
     }
 
     getState(){
         return {
-            printers: printersStore.getPrinters(),
+            printers: printersStore.getPrinters().getPayload(),
             services: printersStore.getServices(),
 
             selectedPrinter: this.selectedPrinter,

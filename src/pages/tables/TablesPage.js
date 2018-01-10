@@ -1,12 +1,15 @@
 import React, {Component} from 'react';
-import {ACTIONS, TYPES} from "../../components/editors/EntityEditor";
-import EntitiesEditor from "../../components/editors/EntitiesEditor";
-import tablesStore from "../../generic/TablesStore";
-import tablesActions from "../../generic/TablesActions";
 import tablesPageStore from "./TablesPageStore";
-import TablesEditor from "./TablesEditor";
 import tablesPageActions from "./TablesPageActions";
 import Page from "../Page";
+import {findByUuid} from "../../utils/Utils";
+import tablesEditorActions from "./TablesEditorActions";
+import TableEditor from "../locations/TableEditor";
+import TableCreator from "../locations/TableCreator";
+import TablesNavigator from "../locations/TablesNavigator";
+import NavElementLink from "../../widgets/NavElementLink";
+import NavElement from "../../widgets/NavElement";
+import NavPills from "../../widgets/NavPills";
 
 export default class TablesPage extends Component {
 
@@ -32,18 +35,64 @@ export default class TablesPage extends Component {
     }
 
     render() {
-        const tables = this.state.tables;
-        const selectedTable = this.state.selectedTable;
-        const inCreationTable = this.state.inCreationTable;
-
+        let navContent = TablesPage.makeNavContent(this.state);
+        let pageContent = TablesPage.makePageContent(this.state);
         return (
-
             <Page title="Tavoli">
-                <TablesEditor
-                    tables={tables}
-                    selected={selectedTable}
-                    created={inCreationTable}/>
+                {navContent}
+                {pageContent}
             </Page>
         )
+    }
+
+    static makePageContent(state) {
+        if (state.selectedTable) {
+            return <TableEditor data={TablesPage.makeTableEditorDescriptor(state)}/>
+        } else if (state.createdTable) {
+            return <TableCreator data={TablesPage.makeTableCreatorDescriptor(state)}/>
+        } else {
+            return <TablesNavigator data={state}/>
+        }
+    }
+
+    static makeTableEditorDescriptor(data) {
+        return {
+            table: findByUuid(data.tables, data.selectedTable)
+        }
+    }
+
+    static makeTableCreatorDescriptor(data) {
+        return {
+            tablw: data.createdTable
+        }
+    }
+
+    static makeNavContent(state) {
+        let elements = [];
+        elements.push(<NavElementLink
+            key="settings"
+            text="Impostazioni"
+            href="/restaurant/settings"
+        />);
+        elements.push(<NavElement
+            key="tables"
+            text="Tavoli"
+            active={!state.selectedTable && !state.createdTable}
+            commitAction={tablesEditorActions.deselectTable}
+        />);
+        if (state.selectedTable) {
+            elements.push(<NavElement
+                key="selected"
+                text={findByUuid(state.tables, state.selectedTable).name}
+                active={true}
+            />);
+        } else if (state.createdTable) {
+            elements.push(<NavElement
+                key="selected"
+                text={state.createdTable.name || "Nuovo tavolo"}
+                active={true}
+            />);
+        }
+        return <NavPills>{elements}</NavPills>;
     }
 }

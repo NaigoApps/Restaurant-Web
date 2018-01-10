@@ -12,7 +12,8 @@ export default class SelectEditor extends Component {
     }
 
     render() {
-        const descriptor = this.props.descriptor;
+        const label = this.props.label;
+        const options = this.props.options;
         const value = this.props.value;
 
         return (
@@ -20,14 +21,14 @@ export default class SelectEditor extends Component {
                 isValid={data => !!data["select_page"]}
                 hideReview={true}
                 initialPage="select_page"
-                label={descriptor.label}
+                label={label}
                 renderer={wData => wData["select_page"]}
                 commitAction={this.onWizardConfirm.bind(this)}>
                 <SelectWizardPage
                     identifier="select_page"
                     initializer={value}
-                    name={this.props.descriptor.label}
-                    options={descriptor.optionsProvider()}
+                    name={label}
+                    options={options}
                     optionRenderer={opt => opt}
                 />
             </GraphWizard>

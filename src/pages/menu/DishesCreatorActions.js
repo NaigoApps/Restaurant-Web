@@ -23,15 +23,15 @@ class DishesCreatorActions {
         );
     }
 
-    updateDishName(uuid, name){
+    updateDishName(name){
         dispatcher.fireEnd(ACT_UPDATE_DISH_CREATOR_NAME, name);
     }
 
-    updateDishDescription(uuid, desc){
+    updateDishDescription(desc){
         dispatcher.fireEnd(ACT_UPDATE_DISH_CREATOR_DESCRIPTION, desc);
     }
 
-    updateDishPrice(uuid, price){
+    updateDishPrice(price){
         dispatcher.fireEnd(ACT_UPDATE_DISH_CREATOR_PRICE, price);
     }
 

@@ -1,27 +1,25 @@
 import React from 'react';
 import diningTablesEditorActions from "./DiningTablesEditorActions";
-import EntitySelectEditor from "../../components/widgets/inputs/EntitySelectEditor";
-import IntegerEditor from "../../components/widgets/inputs/IntegerEditor";
 import Button from "../../widgets/Button";
 import {findByUuid, uuid} from "../../utils/Utils";
-import {beautifyTime} from "../../components/widgets/inputs/DateInput";
-import OrdinationEditor from "../../components/OrdinationEditor";
-import ordinationsCreatorActions from "./OrdinationsCreatorActions";
-import OrdinationCreator from "../../components/widgets/inputs/OrdinationCreator";
-import ordinationsEditorActions from "./OrdinationsEditorActions";
 import ButtonGroup from "../../widgets/ButtonGroup";
-import OrdinationReview from "../../components/OrdinationReview";
 import OrdinationsUtils from "./OrdinationsUtils";
-import ordinationsActions from "./OrdinationsActions";
-import PaginatedLines from "../../widgets/PaginatedLines";
+import Scrollable from "../../components/widgets/Scrollable";
+import Column from "../../widgets/Column";
+import Row from "../../widgets/Row";
+import DiningTableClosingView from "./DiningTableClosingView";
 
 export default class DiningTableReview extends React.Component {
     constructor(props) {
         super(props);
     }
 
-    printPartialBill(){
-        diningTablesEditorActions.printPartialBill(this.props.table.uuid);
+    printPartialBill() {
+        diningTablesEditorActions.printPartialBill(this.props.data.table.uuid);
+    }
+
+    beginDiningTableClosing() {
+        diningTablesEditorActions.beginDiningTableClosing();
     }
 
     static getReviewContent(props) {
@@ -33,34 +31,38 @@ export default class DiningTableReview extends React.Component {
         });
         orders = OrdinationsUtils.implode(orders);
         let ordersComponents = orders.map(o => {
-            return <div key={o.order.dish + uuid()}>
-                <p className="col-sm-8 text-left">{o.quantity} {findByUuid(props.dishes, o.order.dish).name}</p>
-                <p className="col-sm-4 text-right">{OrdinationsUtils.formatPrice(o.price)}</p>
-            </div>;
+            return <Row key={o.order.dish + uuid()}>
+                <Column sm="10">{o.quantity} {findByUuid(props.dishes, o.order.dish).name}</Column>
+                <Column sm="2" right={true}>{OrdinationsUtils.formatPrice(o.price)}</Column>
+            </Row>;
         });
-        return <PaginatedLines>
+        return <Scrollable>
             {ordersComponents}
-        </PaginatedLines>;
+        </Scrollable>;
     }
 
     render() {
 
-        return <div className="form top-sep">
-            <div className="row">
-                <div className="col-sm-12">
-                    {DiningTableReview.getReviewContent(this.props)}
-                </div>
-            </div>
-            <div className="row top-sep">
-                <div className="col-sm-12">
-                    <ButtonGroup>
-                        <Button text="Stampa pre-conto" icon="print"
-                                commitAction={this.printPartialBill.bind(this)}/>
-                        <Button text="Conto" icon="euro"
-                                commitAction={this.printPartialBill.bind(this)}/>
-                    </ButtonGroup>
-                </div>
-            </div>
-        </div>;
+        return <Row topSpaced grow>
+            <Column>
+                {DiningTableReview.getReviewContent(this.props.data)}
+            </Column>
+            <Column>
+                <ButtonGroup>
+                    <Button text="Stampa pre-conto" icon="print"
+                            commitAction={this.printPartialBill.bind(this)}/>
+                    <Button text="Conto" icon="euro"
+                            commitAction={this.beginDiningTableClosing.bind(this)}/>
+                </ButtonGroup>
+                <DiningTableClosingView
+                    dishes={this.props.data.dishes}
+                    additions={this.props.data.additions}
+                    table={this.props.data.diningTable}
+                    ordinations={this.props.data.ordinations}
+                    invoice={this.props.data.currentInvoice}
+                    visible={this.props.data.closingDiningTable}
+                />
+            </Column>
+        </Row>;
     }
 }

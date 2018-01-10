@@ -1,6 +1,7 @@
 import {
     ACT_BEGIN_CREATE_WAITER,
-    ACT_CREATE_WAITER, ACT_DESELECT_WAITER,
+    ACT_CREATE_WAITER,
+    ACT_DESELECT_WAITER,
     ACT_UPDATE_WAITER_CF,
     ACT_UPDATE_WAITER_NAME,
     ACT_UPDATE_WAITER_STATUS,
@@ -15,19 +16,19 @@ class WaitersCreatorActions {
         dispatcher.fireEnd(ACT_BEGIN_CREATE_WAITER);
     }
 
-    updateWaiterName(uuid, name) {
+    updateWaiterName(name) {
         dispatcher.fireEnd(ACT_UPDATE_WAITER_NAME, name);
     }
 
-    updateWaiterSurname(uuid, surname) {
+    updateWaiterSurname(surname) {
         dispatcher.fireEnd(ACT_UPDATE_WAITER_SURNAME, surname);
     }
 
-    updateWaiterCf(uuid, cf) {
+    updateWaiterCf(cf) {
         dispatcher.fireEnd(ACT_UPDATE_WAITER_CF, cf);
     }
 
-    updateWaiterStatus(uuid, status) {
+    updateWaiterStatus(status) {
         dispatcher.fireEnd(ACT_UPDATE_WAITER_STATUS, status);
     }
 

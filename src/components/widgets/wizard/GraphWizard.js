@@ -5,10 +5,10 @@ import Button from "../../../widgets/Button";
 import GraphWizardPage from "./graph/GraphWizardPage";
 import Modal from "../../../widgets/modal/Modal";
 import {uuid} from "../../../utils/Utils";
-import Icon from "../../../widgets/Icon";
 import NavPills from "../../../widgets/NavPills";
 import NavElement from "../../../widgets/NavElement";
 import Row from "../../../widgets/Row";
+import Column from "../../../widgets/Column";
 
 export default class GraphWizard extends Component {
     constructor(props) {
@@ -80,25 +80,19 @@ export default class GraphWizard extends Component {
         return React.Children.count(this.props.children);
     }
 
-    getPageButtonClass(page) {
-        let classes = ["btn", "navbar-btn"];
-        if (this.state.page === page.identifier) {
-            classes.push("active");
-        }
-        if (page.type) {
-            classes.push("btn-" + page.type);
-        } else {
-            classes.push("btn-default")
-        }
-        return classes.join(" ");
-    }
-
     render() {
         if (this.props.isForNav) {
             return this.buildNavContent();
         } else {
             return this.buildDefaultContent();
         }
+    }
+
+    renderData() {
+        if (this.props.renderer) {
+            return this.props.renderer(this.initialWizardData());
+        }
+        return "";
     }
 
     buildAbortButton() {
@@ -118,13 +112,11 @@ export default class GraphWizard extends Component {
 
     buildNavContent() {
         return <div className="form-group">
-            <button
-                type="button"
-                className="btn btn-primary"
-                onClick={this.openWizard.bind(this)}>
-                {this.props.label} {this.props.renderer(this.initialWizardData())} <span
-                className="glyphicon glyphicon-pencil"/>
-            </button>
+            <Button
+                commitAction={this.openWizard.bind(this)}
+                text={this.props.label + " " + this.renderData()}
+                icon="pencil"
+            />
             {this.buildModal()}
         </div>;
     }
@@ -138,12 +130,11 @@ export default class GraphWizard extends Component {
         return <div className="form-group row">
             <label className="col-form-label col-sm-2">{this.props.label}</label>
             <div className="col-sm-10">
-                <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={this.openWizard.bind(this)}>
-                    {this.props.renderer(this.initialWizardData())} <Icon name="pencil"/>
-                </button>
+                <Button
+                    commitAction={this.openWizard.bind(this)}
+                    text={this.renderData()}
+                    icon="pencil"
+                />
             </div>
             {this.buildModal()}
         </div>;
@@ -170,19 +161,16 @@ export default class GraphWizard extends Component {
         }
 
         let nav = React.Children.map(this.props.children, (child) => {
-            return <NavElement>
-                <button type="button"
-                        className={this.getPageButtonClass(child.props)}
-                        disabled={child.props.canEnter ? !child.props.canEnter(this.state.data) : false}
-                        onClick={this.movePage.bind(this, child.props)}>
-                    {child.props.name}
-                    <Icon name={child.props.icon}/>
-                </button>
-            </NavElement>;
+            return <NavElement
+                text={child.props.name}
+                active={this.state.page === child.props.identifier}
+                commitAction={this.movePage.bind(this, child.props)}
+                disabled={child.props.canEnter ? !child.props.canEnter(this.state.data) : false}
+            />;
         });
 
         let navContainer;
-        if (nav.length > 1) {
+        if (nav && nav.length > 1) {
             navContainer = <div className="modal-header">
                 <NavPills>
                     {nav}
@@ -190,20 +178,22 @@ export default class GraphWizard extends Component {
             </div>;
         }
 
-        return <Modal visible={this.props.visible || this.state.open}>
+        return <Modal visible={this.props.visible || this.state.open} lg={this.props.size === "lg"}>
             {navContainer}
-            <div className="modal-body">
-                {currentPage}
+            <div className="modal-body d-flex">
+                <Column>
+                    {currentPage}
+                </Column>
             </div>
             <div className="modal-footer">
-                <div className="col-sm-12">
-                    <div className="row">
+                <Column>
+                    <Row>
                         {review}
-                    </div>
+                    </Row>
                     <Row justify="center">
                         {this.buildAbortButton()}{this.buildConfirmButton()}
                     </Row>
-                </div>
+                </Column>
             </div>
         </Modal>
     }

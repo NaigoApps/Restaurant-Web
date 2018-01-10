@@ -11,6 +11,13 @@ export default class Modal extends Component {
     }
 
     componentDidMount(){
+        let component = this;
+        $("#" + this.state.uuid).on("shown.bs.modal", function () {
+            $("body").trigger("css-update");
+        });
+        $("#" + this.state.uuid).on("hidden.bs.modal", function () {
+            $("body").trigger("css-update");
+        });
         if(this.props.visible){
             $("#" + this.state.uuid).modal("show");
         }
@@ -34,11 +41,19 @@ export default class Modal extends Component {
         return classes.join(" ");
     }
 
+    static modalDialogClass(props){
+        let classes = ["modal-dialog"];
+        if(props.lg){
+            classes.push("modal-lg");
+        }
+        return classes.join(" ");
+    }
+
     render() {
         return (
             <div className={Modal.modalClass(this.props)} id={this.state.uuid} data-backdrop="static"
                  data-keyboard="false">
-                <div className="modal-dialog modal-lg">
+                <div className={Modal.modalDialogClass(this.props)}>
                     <div className="modal-content">
                         {this.props.children}
                     </div>

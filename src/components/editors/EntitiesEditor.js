@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {empty} from "./EntityEditor";
-import EntitiesList from "../widgets/EntitiesList";
 import PaginatedEntitiesList from "../widgets/PaginatedEntitiesList";
+import {foo} from "../../utils/Utils";
 
 function camel(word) {
     return word.charAt(0).toUpperCase() + word.substr(1);
@@ -58,7 +57,7 @@ export default class EntitiesEditor extends Component {
     static resolveCreateMethod(descriptor) {
         let createMethod = descriptor.components.creator.actionsProvider[EntitiesEditor.beginCreation(descriptor.name[0])];
         if (!createMethod) {
-            createMethod = empty;
+            createMethod = foo;
             console.warn("Cannot find method " + EntitiesEditor.beginCreation(descriptor.name[0]));
         }
         return createMethod;

@@ -3,6 +3,9 @@ import {findByUuid, uuid} from "../utils/Utils";
 import OrdinationsUtils from "../pages/evening/OrdinationsUtils";
 import Scrollable from "./widgets/Scrollable";
 import PaginatedLines from "../widgets/PaginatedLines";
+import Column from "../widgets/Column";
+import Row from "../widgets/Row";
+import Button from "../widgets/Button";
 
 export default class OrdinationReview extends React.Component {
     constructor(props) {
@@ -11,23 +14,23 @@ export default class OrdinationReview extends React.Component {
 
     renderOrder(order) {
         let result = order.quantity + " " +
-            this.props.dishes.find(d => d.uuid === order.order.dish).name + " ";
+            this.props.data.dishes.find(d => d.uuid === order.order.dish).name + " ";
 
         order.order.additions.forEach(uuid => {
-            let addition = findByUuid(this.props.additions, uuid);
+            let addition = findByUuid(this.props.data.additions, uuid);
             if (addition) {
                 result += addition.name + " "
             }
         });
 
-        return <div key={order.order.dish + uuid()} className="row">
-            <div className="col-sm-8">
+        return <Row key={order.order.dish + uuid()}>
+            <Column sm="10">
                 <p className="text-left">{result}</p>
-            </div>
-            <div className="col-sm-4">
+            </Column>
+            <Column sm="2">
                 <p className="text-right">{OrdinationsUtils.formatPrice(order.price)}</p>
-            </div>
-        </div>
+            </Column>
+        </Row>
     }
 
     renderOrders(orders) {
@@ -35,27 +38,28 @@ export default class OrdinationReview extends React.Component {
         let phasesComponents = [];
         let ordersEditor = phaseOrders.forEach((orders, phase) => {
             orders = OrdinationsUtils.implode(orders);
-            orders = OrdinationsUtils.sortByDish(orders, this.props.dishes);
-            let ordersRenderer = orders.map(o => this.renderOrder(o));
+            orders = OrdinationsUtils.sortByDish(orders, this.props.data.dishes);
             phasesComponents.push(<div key={phase}>
-                <p><b>{findByUuid(this.props.phases, phase).name}</b></p>
+                <p><b>{findByUuid(this.props.data.phases, phase).name}</b></p>
             </div>);
+
+            let ordersRenderer = orders.map(o => this.renderOrder(o));
 
             ordersRenderer.forEach(component => {
                 phasesComponents.push(component);
             });
         });
-        return <div className="col-sm-12">
-            <PaginatedLines>
+        return <Column>
+            <Scrollable>
                 {phasesComponents}
-            </PaginatedLines>
-        </div>;
+            </Scrollable>
+        </Column>;
     }
 
     render() {
-        return <div className="row">
-            {this.renderOrders(this.props.orders)}
-        </div>;
+        return <Row grow>
+            {this.renderOrders(this.props.data.orders)}
+        </Row>;
     }
 
 }

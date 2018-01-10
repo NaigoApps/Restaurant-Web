@@ -6,6 +6,17 @@ import React, {Component} from 'react';
  * - changeAction: action to throw on change
  */
 
+export function isToday(date){
+    let now = new Date();
+    return date.getDate() === now.getDate() &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear();
+}
+
+export function daysInMonth(month, year){
+    return new Date(year, month + 1, 0).getDate();
+}
+
 export function formatDate(date) {
     let formattedDate = new Date(date);
     formattedDate.setMinutes(date.getMinutes() - date.getTimezoneOffset());

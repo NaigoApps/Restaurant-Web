@@ -3,10 +3,10 @@ import {
     ACT_ASK_SELECTED_EVENING,
     ACT_RETRIEVE_ACTIVE_WAITERS,
     ACT_RETRIEVE_CURRENT_MENU,
-    ACT_RETRIEVE_RESTAURANT_TABLES, ACT_RETRIEVE_WAITERS, ACT_SELECT_EVENING,
-    ACT_UPDATE_EVENING, ACT_UPDATE_EVENING_COVER_CHARGE
+    ACT_RETRIEVE_RESTAURANT_TABLES,
+    ACT_RETRIEVE_WAITERS,
+    ACT_UPDATE_EVENING
 } from "../ActionTypes";
-import diningTablesActions from "../../pages/evening/DiningTablesActions";
 
 class EveningActions {
 
@@ -36,8 +36,7 @@ class EveningActions {
     }
 
     retrieveSelectedEvening() {
-        asyncActionBuilder.get(ACT_ASK_SELECTED_EVENING, 'evenings/selected')
-            .then(diningTablesActions.retrieveDiningTables);
+        asyncActionBuilder.get(ACT_ASK_SELECTED_EVENING, 'evenings/selected');
     }
 
     printTest() {

@@ -12,7 +12,7 @@ import {
     ACT_UPDATE_ADDITION_NAME,
     ACT_UPDATE_ADDITION_PRICE
 } from "../../actions/ActionTypes";
-import additionsStore from "../../generic/AdditionsStore";
+import additionsStore from "../../stores/generic/AdditionsStore";
 
 const EVT_ADDITIONS_PAGE_STORE_CHANGED = "EVT_ADDITIONS_PAGE_STORE_CHANGED";
 
@@ -90,10 +90,10 @@ class AdditionsPageStore extends AbstractStore{
 
     getState(){
         return {
-            additions: additionsStore.getAdditions(),
+            additions: additionsStore.getAdditions().getPayload(),
 
             selectedAddition: this.selectedAddition,
-            inCreationAddition: this.inCreationAddition
+            createdAddition: this.inCreationAddition
         }
     }
 

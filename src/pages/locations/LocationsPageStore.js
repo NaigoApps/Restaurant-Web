@@ -82,8 +82,8 @@ class LocationsPageStore extends AbstractStore{
 
     getState(){
         return {
-            locations: locationsStore.getLocations(),
-            printers: printersStore.getPrinters(),
+            locations: locationsStore.getLocations().getPayload(),
+            printers: printersStore.getPrinters().getPayload(),
 
             selectedLocation: this.selectedLocation,
             createdLocation: this.createdLocation

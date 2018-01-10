@@ -1,5 +1,5 @@
 import AbstractStore from "../../stores/AbstractStore";
-import waitersStore from "../../generic/WaitersStore";
+import waitersStore from "../../stores/generic/WaitersStore";
 import waiterStatusesStore from "../../generic/WaiterStatusesStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
@@ -63,6 +63,7 @@ class WaitersPageStore extends AbstractStore{
                 this.inCreationWaiter = null;
                 break;
             case ACT_UPDATE_WAITER_NAME:
+                console.log("Set name to " + action.body);
                 this.setName(action.body);
                 break;
             case ACT_UPDATE_WAITER_SURNAME:
@@ -92,11 +93,11 @@ class WaitersPageStore extends AbstractStore{
 
     getState(){
         return {
-            waiters: waitersStore.getWaiters(),
-            waiterStatuses: waiterStatusesStore.getWaiterStatuses(),
+            waiters: waitersStore.getWaiters().getPayload(),
+            waiterStatuses: waiterStatusesStore.getWaiterStatuses().getPayload(),
 
             selectedWaiter: this.selectedWaiter,
-            inCreationWaiter: this.inCreationWaiter
+            createdWaiter: this.inCreationWaiter
         }
     }
 

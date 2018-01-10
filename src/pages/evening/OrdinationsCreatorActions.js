@@ -1,7 +1,7 @@
 import requestBuilder from "../../actions/RequestBuilder";
 import {
-    ACT_ABORT_CREATE_ORDINATION, ACT_BEGIN_CREATE_ORDINATION, ACT_CREATE_ORDINATION,
-    ACT_SELECT_ORDINATION
+    ACT_ABORT_CREATE_ORDINATION, ACT_BEGIN_CREATE_ORDINATION,
+    ACT_CREATE_ORDINATION
 } from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 
@@ -15,8 +15,8 @@ class OrdinationsCreatorActions {
         dispatcher.fireEnd(ACT_ABORT_CREATE_ORDINATION);
     }
 
-    createOrdination(ordination){
-        requestBuilder.post(ACT_CREATE_ORDINATION, 'ordinations', ordination);
+    createOrdination(table, dishes){
+        requestBuilder.post(ACT_CREATE_ORDINATION, 'dining-tables/' + table + '/ordinations', dishes);
     }
 
 }

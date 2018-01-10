@@ -1,17 +1,17 @@
 import {ACT_RETRIEVE_DISH_STATUSES} from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
-import AbstractEntityStore from "../AbstractEntityStore";
+import AbstractDataStore from "../AbstractDataStore";
 
 export const EVT_DISHES_STATUSES_STORE_CHANGED = "EVT_DISHES_STATUSES_STORE_CHANGED";
 
-class DishesStatusesStore extends AbstractEntityStore {
+class DishesStatusesStore extends AbstractDataStore{
 
     constructor(){
         super(EVT_DISHES_STATUSES_STORE_CHANGED);
     }
 
     getDishesStatuses() {
-        return this.getLazyData().getPayload();
+        return this.getData();
     }
 
     handleStartedAction(action){
@@ -31,7 +31,7 @@ class DishesStatusesStore extends AbstractEntityStore {
         let changed = true;
         switch (action.type) {
             case ACT_RETRIEVE_DISH_STATUSES:
-                this.setSimpleData(action.body);
+                this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;
             default:

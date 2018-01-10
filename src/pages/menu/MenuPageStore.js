@@ -11,13 +11,14 @@ import {
     ACT_UPDATE_ADDITION,
     ACT_UPDATE_ADDITION_GENERIC,
     ACT_UPDATE_ADDITION_NAME,
-    ACT_UPDATE_ADDITION_PRICE, ACT_UPDATE_CATEGORY, ACT_UPDATE_CATEGORY_CREATOR_NAME, ACT_UPDATE_DISH,
+    ACT_UPDATE_ADDITION_PRICE, ACT_UPDATE_CATEGORY, ACT_UPDATE_CATEGORY_CREATOR_LOCATION,
+    ACT_UPDATE_CATEGORY_CREATOR_NAME, ACT_UPDATE_DISH,
     ACT_UPDATE_DISH_CREATOR_DESCRIPTION,
     ACT_UPDATE_DISH_CREATOR_NAME, ACT_UPDATE_DISH_CREATOR_PRICE
 } from "../../actions/ActionTypes";
-import additionsStore from "../../generic/AdditionsStore";
-import categoriesStore from "../../generic/CategoriesStore";
-import dishesStore from "../../generic/DishesStore";
+import additionsStore from "../../stores/generic/AdditionsStore";
+import categoriesStore from "../../stores/generic/CategoriesStore";
+import dishesStore from "../../stores/generic/DishesStore";
 import dishesStatusesStore from "../../stores/generic/DishesStatusesStore";
 import locationsStore from "../../stores/LocationsStore";
 
@@ -35,19 +36,23 @@ class MenuPageStore extends AbstractStore{
 
     getState(){
         return {
-            categories: categoriesStore.getAllCategories(),
-            selectedCategory: this.selectedCategory,
-            inCreationCategory: this.inCreationCategory,
+            categories: categoriesStore.getCategories().getPayload(),
             dishes: dishesStore.getDishesByCategory(this.selectedCategory),
+            dishesStatuses: dishesStatusesStore.getDishesStatuses().getPayload(),
+            locations: locationsStore.getLocations().getPayload(),
             selectedDish: this.selectedDish,
-            inCreationDish: this.inCreationDish,
-            dishesStatuses: dishesStatusesStore.getDishesStatuses(),
-            locations: locationsStore.getLocations()
+            createdDish: this.inCreationDish,
+            selectedCategory: this.selectedCategory,
+            createdCategory: this.inCreationCategory
         }
     }
 
     setCategoryName(value){
         this.inCreationCategory.name = value;
+    }
+
+    setCategoryLocation(value){
+        this.inCreationCategory.location = value;
     }
 
     setDishName(value){
@@ -123,6 +128,9 @@ class MenuPageStore extends AbstractStore{
             case ACT_UPDATE_CATEGORY_CREATOR_NAME:
                 this.setCategoryName(action.body);
                 break;
+            case ACT_UPDATE_CATEGORY_CREATOR_LOCATION:
+                this.setCategoryLocation(action.body);
+                break;
             case ACT_UPDATE_DISH_CREATOR_NAME:
                 this.setDishName(action.body);
                 break;
@@ -142,6 +150,7 @@ class MenuPageStore extends AbstractStore{
     buildCategory(){
         return {
             name: "",
+            location: null,
             dishes: []
         };
     }

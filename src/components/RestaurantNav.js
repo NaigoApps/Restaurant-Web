@@ -12,17 +12,6 @@ export const SIZES = {
     MAIN: "MAIN"
 };
 
-export const LINKS = [
-    {path: "", replace: true, label: "Home", size: SIZES.HIDDEN},
-    {path: "printers", label: "Stampanti", icon: "print"},
-    {path: "locations", label: "Postazioni", icon: "map-marker"},
-    {path: "tables", label: "Tavoli", icon: "record"},
-    {path: "waiters", label: "Camerieri", icon: "user"},
-    {path: "additions", label: "Varianti", icon: "pencil"},
-    {path: "menu", label: "Menu", icon: "apple"},
-    {path: "evening", label: "Serate", size: SIZES.MAIN, icon: "list-alt"},
-];
-
 class RestaurantNav extends Component {
 
     constructor() {
@@ -36,7 +25,7 @@ class RestaurantNav extends Component {
     render() {
 
         return (
-            <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
+            <nav className="navbar navbar-toggleable-md navbar-light bg-faded fixed-top">
                 <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
                     <Icon name="gear"/>
                 </button>

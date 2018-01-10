@@ -13,7 +13,9 @@ export default class EntitySelectEditor extends Component {
     }
 
     render() {
-        const descriptor = this.props.descriptor;
+        const renderer = this.props.renderer;
+        const options = this.props.options;
+        const label = this.props.label;
         const value = this.props.value;
 
         return (
@@ -21,11 +23,11 @@ export default class EntitySelectEditor extends Component {
                 isValid={wData => !!wData["select_page"]}
                 hideReview={true}
                 initialPage="select_page"
-                label={descriptor.label}
+                label={label}
                 renderer={wData => {
-                    let option = findByUuid(descriptor.options, wData["select_page"]);
+                    let option = findByUuid(options, wData["select_page"]);
                     if (option) {
-                        return descriptor.renderer(option);
+                        return renderer(option);
                     }
                     return "?";
                 }}
@@ -33,8 +35,8 @@ export default class EntitySelectEditor extends Component {
                 <SelectWizardPage
                     identifier="select_page"
                     initializer={value}
-                    options={descriptor.options}
-                    optionRenderer={opt => opt ? descriptor.renderer(opt) : ""}
+                    options={options}
+                    optionRenderer={opt => opt ? renderer(opt) : ""}
                 />
             </GraphWizard>
         );

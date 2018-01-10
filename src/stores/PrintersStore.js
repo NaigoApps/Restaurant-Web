@@ -1,4 +1,4 @@
-import AbstractEntityStore from "./AbstractEntityStore";
+import AbstractEntityStore from "./generic/AbstractEntityStore";
 import {
     ACT_CREATE_PRINTER, ACT_DELETE_PRINTER, ACT_RETRIEVE_PRINTER_SERVICES, ACT_RETRIEVE_PRINTERS,
     ACT_UPDATE_PRINTER
@@ -14,7 +14,7 @@ class PrintersStore extends AbstractEntityStore {
     }
 
     getPrinters(){
-        return this.getLazyData().getPayload();
+        return this.getData();
     }
 
     getServices(){

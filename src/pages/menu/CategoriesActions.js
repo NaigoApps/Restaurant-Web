@@ -1,7 +1,7 @@
 import requestBuilder from "../../actions/RequestBuilder";
 import {ACT_RETRIEVE_CATEGORIES} from "../../actions/ActionTypes";
 import dishesActions from "./DishesActions";
-import categoriesStore from "../../generic/CategoriesStore";
+import categoriesStore from "../../stores/generic/CategoriesStore";
 
 
 class CategoriesActions {

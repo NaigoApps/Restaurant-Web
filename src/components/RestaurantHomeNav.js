@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
-import {LINKS, SIZES} from "./RestaurantNav";
-import applicationActions from "../actions/ApplicationActions";
+import {SIZES} from "./RestaurantNav";
 import FullPageLink from "../widgets/FullPageLink";
+import Row from "../widgets/Row";
 
 export default class RestaurantHomeNav extends Component {
 
@@ -20,10 +19,10 @@ export default class RestaurantHomeNav extends Component {
 
     render() {
         return (
-            <div className="home-links-container">
-                <FullPageLink path="" icon="gears" text="Impostazioni"/>
+            <Row>
+                <FullPageLink path="settings" icon="gears" text="Impostazioni"/>
                 <FullPageLink path="evening" icon="calendar" text="Serate"/>
-            </div>
+            </Row>
         );
     }
 }

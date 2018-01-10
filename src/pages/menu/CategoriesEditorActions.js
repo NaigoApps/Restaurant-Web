@@ -20,7 +20,6 @@ class CategoriesEditorActions {
 
     selectCategory(category) {
         dispatcher.fireEnd(ACT_SELECT_CATEGORY, category);
-        dishesActions.retrieveDishesByCategory(category);
     }
 
     deselectCategory() {

@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import EntityEditor, {BUTTONS} from "../editors/EntityEditor";
-import {camel, distribute, findByUuid, foo, repartite} from "../../utils/Utils";
-import $ from 'jquery';
-import EntitiesList from "./EntitiesList";
-import TouchButton from "../../widgets/TouchButton";
-import TouchSpace from "../../widgets/TouchSpace";
+import {BUTTONS} from "../editors/EntityEditor";
+import {distribute} from "../../utils/Utils";
 import Button from "../../widgets/Button";
+import Row from "../../widgets/Row";
+import Column from "../../widgets/Column";
+import ButtonGroup from "../../widgets/ButtonGroup";
+import GridButton from "../../widgets/GridButton";
+import ColumnSpace from "../../widgets/ColumnSpace";
 
 export default class PaginatedEntitiesList extends Component {
     constructor(props) {
@@ -29,43 +30,67 @@ export default class PaginatedEntitiesList extends Component {
     render() {
         const entities = this.props.entities;
         const selected = this.props.selected;
-        const renderer = this.props.renderer;
+        const renderer = PaginatedEntitiesList.rendererFromProps(this.props.renderer);
+
+        const rows = this.props.rows || 3;
+        const cols = this.props.cols || 3;
+        const pageSize = rows * cols;
 
         let entitiesList;
         let pageButtons;
 
-        entitiesList = distribute(entities, 9);
+        entitiesList = distribute(entities, pageSize);
 
         pageButtons = this.buildPageButtons(entitiesList);
 
         entitiesList = entitiesList.map((group, index) => {
             if (index === this.state.page) {
-                let buttons = group.map(entity => {
-                    return (
-                        <Button
-                            key={entity.uuid}
-                            text={renderer.name(entity)}
-                            type={renderer.color ? renderer.color(entity) : "secondary"}
-                            commitAction={this.selectEntity.bind(this, entity.uuid)}/>
-                    );
+                let rowsGroups = distribute(group, cols);
+                let rowsComps = rowsGroups.map((row, index) => {
+                    let buttons = row.map(entity => {
+                        return (
+                            <Column key={entity.uuid} type={renderer.color ? renderer.color(entity) : "secondary"} bordered>
+                                <GridButton
+                                    text={renderer.name(entity)}
+                                    commitAction={this.selectEntity.bind(this, entity.uuid)}/>
+                            </Column>
+                        );
+                    });
+
+                    while (buttons.length < cols) {
+                        buttons.push(<ColumnSpace key={buttons.length}/>);
+                    }
+
+                    return <Row key={index}>{buttons}</Row>
                 });
-                while (buttons.length < 8) {
-                    buttons.push(<TouchSpace/>);
+
+                while (rowsComps.length < rows) {
+                    rowsComps.push(
+                        <Row key={rowsComps.length}>
+                            <ColumnSpace/>
+                        </Row>);
                 }
-                return buttons;
+
+                return rowsComps;
             }
             return null;
         });
 
 
-        return <div className="row">
-            <div className="col-sm-12">
-                {entitiesList}
-            </div>
-            <div className="col-sm-12">
-                {pageButtons}
-            </div>
-        </div>;
+        return <Row>
+            <Column>
+                <Row>
+                    <Column>
+                        {entitiesList}
+                    </Column>
+                </Row>
+                <Row topSpaced>
+                    <Column>
+                        {pageButtons}
+                    </Column>
+                </Row>
+            </Column>
+        </Row>;
     }
 
     selectPage(index) {
@@ -79,18 +104,33 @@ export default class PaginatedEntitiesList extends Component {
             let btns = [];
             groups.forEach((group, index) => {
                 btns.push(
-                    <li className={this.state.page === index ? "pagination-item clickable active" : "pagination-item clickable"}>
-                        <a onClick={this.selectPage.bind(this, index)}>{index + 1}</a>
-                    </li>
+                    <Button
+                        key={index}
+                        active={this.state.page === index}
+                        commitAction={this.selectPage.bind(this, index)}
+                        text={index + 1}
+                    />
                 );
             });
             return <nav>
-                <ul className="pagination pagination-lg">
+                <ButtonGroup>
                     {btns}
-                </ul>
+                </ButtonGroup>
             </nav>
         }
         return null;
     }
 
+    static rendererFromProps(renderer) {
+        if (typeof renderer === "function") {
+            return {
+                name: renderer
+            };
+        } else if (renderer.name) {
+            return renderer;
+        }
+        return {
+            name: () => "???"
+        }
+    }
 }

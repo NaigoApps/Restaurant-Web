@@ -28,18 +28,22 @@ export default class DiningTableCreator extends React.Component {
     getTableDataEditorContent() {
         return <div className="form top-sep">
             <IntegerEditor
-                descriptor={DiningTableCreator.getCoverChargesDescriptor()}
-                value={this.props.diningTable.coverCharges}
+                label="Coperti"
+                value={this.props.data.diningTable.coverCharges}
                 commitAction={this.coverChargesChange.bind(this)}
             />
             <EntitySelectEditor
-                descriptor={DiningTableCreator.getWaitersDescriptor(this.props.waiters)}
-                value={this.props.diningTable.waiter}
+                label="Cameriere"
+                options={this.props.data.waiters}
+                renderer={waiter => waiter.name}
+                value={this.props.data.diningTable.waiter}
                 commitAction={this.waiterChange.bind(this)}
             />
             <EntitySelectEditor
-                descriptor={DiningTableCreator.getTablesDescriptor(this.props.tables)}
-                value={this.props.diningTable.table}
+                label="Tavolo"
+                options={this.props.data.tables}
+                renderer={table => table.name}
+                value={this.props.data.diningTable.table}
                 commitAction={this.tableChange.bind(this)}
             />
         </div>
@@ -49,7 +53,7 @@ export default class DiningTableCreator extends React.Component {
 
         let editorContent = this.getTableDataEditorContent();
 
-        let table = this.props.diningTable;
+        let table = this.props.data.diningTable;
 
         return <div className="row">
             <div className="col-sm-12">
@@ -93,31 +97,6 @@ export default class DiningTableCreator extends React.Component {
         </div>
 
 
-    }
-
-    static getCoverChargesDescriptor() {
-        return {
-            name: "coverCharges",
-            label: "Coperti"
-        };
-    }
-
-    static getWaitersDescriptor(waiters) {
-        return {
-            name: "waiter",
-            label: "Cameriere",
-            options: waiters,
-            renderer: w => w.name
-        };
-    }
-
-    static getTablesDescriptor(tables) {
-        return {
-            name: "table",
-            label: "Tavolo",
-            options: tables,
-            renderer: t => t.name
-        };
     }
 
 }

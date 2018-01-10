@@ -1,12 +1,11 @@
 import React from 'react';
-import {findByUuid, foo, uuid} from "../utils/Utils";
-import {beautifyTime} from "./widgets/inputs/DateInput";
 import Button from "../widgets/Button";
 import ordinationsEditorActions from "../pages/evening/OrdinationsEditorActions";
 import ButtonGroup from "../widgets/ButtonGroup";
 import OrdersEditor from "./widgets/inputs/OrdersEditor";
-import OrdinationsUtils from "../pages/evening/OrdinationsUtils";
 import OrdinationReview from "./OrdinationReview";
+import Row from "../widgets/Row";
+import Column from "../widgets/Column";
 
 export default class OrdinationEditor extends React.Component {
     constructor(props) {
@@ -18,33 +17,52 @@ export default class OrdinationEditor extends React.Component {
     }
 
     onWizardOk(orders) {
-        ordinationsEditorActions.editOrdination(this.props.ordination.uuid, orders);
+        ordinationsEditorActions.editOrdination(this.props.data.ordination.uuid, orders);
     }
 
     onWizardAbort() {
         ordinationsEditorActions.abortOrdinationEditing();
     }
 
-    getOrdersEditor(ordination) {
+    static makeOrdinationReviewDescriptor(props) {
+        return {
+            dishes: props.dishes,
+            phases: props.phases,
+            additions: props.additions,
+            orders: props.ordination.orders
+        }
+    }
+
+    static makeOrdersEditorDescriptor(props) {
+        return {
+            categories: props.categories,
+            dishes: props.dishes,
+            phases: props.phases,
+            additions: props.additions,
+            orders: props.ordination.orders
+        }
+    }
+
+    getPrintButtonType() {
+        if (this.props.data.ordination && this.props.data.ordination.dirty) {
+            return "warning";
+        }
+        return "default";
+    }
+
+    render() {
         let ordersEditor;
+        let ordination = this.props.data.ordination;
         if (ordination) {
-            ordersEditor = <OrdinationReview
-                dishes={this.props.dishes}
-                phases={this.props.phases}
-                additions={this.props.additions}
-                orders={ordination.orders}/>;
-            return <div className="row">
-                <div className="col-sm-12">
+            ordersEditor = <OrdinationReview data={OrdinationEditor.makeOrdinationReviewDescriptor(this.props.data)}/>;
+            return <Row grow>
+                <Column>
                     {ordersEditor}
-                    <div className="row top-sep">
-                        <div className="col-sm-12">
+                    <Row topSpaced>
+                        <Column>
                             <OrdersEditor
-                                visible={this.props.editingOrdination}
-                                categories={this.props.categories}
-                                dishes={this.props.dishes}
-                                phases={this.props.phases}
-                                additions={this.props.additions}
-                                orders={this.props.ordination.orders}
+                                data={OrdinationEditor.makeOrdersEditorDescriptor(this.props.data)}
+                                visible={this.props.data.editingOrdination}
                                 commitAction={this.onWizardOk.bind(this)}
                                 abortAction={this.onWizardAbort}/>
                             <ButtonGroup>
@@ -56,23 +74,12 @@ export default class OrdinationEditor extends React.Component {
                                         type={this.getPrintButtonType.bind(this)()}
                                         commitAction={this.printOrdination.bind(this, ordination)}/>
                             </ButtonGroup>
-                        </div>
-                    </div>
-                </div>
-            </div>;
+                        </Column>
+                    </Row>
+                </Column>
+            </Row>;
         }
         return <div/>;
-    }
-
-    getPrintButtonType() {
-        if (this.props.ordination && this.props.ordination.dirty) {
-            return "warning";
-        }
-        return "default";
-    }
-
-    render() {
-        return this.getOrdersEditor(this.props.ordination);
     }
 
     printOrdination(ordination) {

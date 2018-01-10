@@ -6,18 +6,29 @@ export default class NavElement extends Component {
     }
 
     clickAction(){
-        if(this.props.commitAction){
+        if(this.props.commitAction && !this.props.disabled){
             this.props.commitAction();
         }
     }
 
+    static getClassName(props){
+        let classes = ["nav-link"];
+        if(props.active){
+            classes.push("active");
+        }
+        if(props.disabled){
+            classes.push("not-allowed");
+        }
+        return classes.join(" ");
+    }
+
     render() {
         const text = this.props.text;
-        const active = this.props.active
+        const active = this.props.active;
 
         return (
                 <li className="nav-item" onClick={this.clickAction.bind(this)}>
-                    <a className={active ? "nav-link active" : "nav-link"} href="#">{text}</a>
+                    <a className={NavElement.getClassName(this.props)} href="#">{text}</a>
                 </li>
         );
     }

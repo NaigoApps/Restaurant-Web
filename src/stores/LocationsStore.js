@@ -1,4 +1,3 @@
-import EntityStore from "./EntityStore";
 import {
     ACT_CREATE_LOCATION,
     ACT_DELETE_LOCATION,
@@ -6,7 +5,7 @@ import {
     ACT_UPDATE_LOCATION
 } from "../actions/ActionTypes";
 import {STATUSES} from "./LazyData";
-import AbstractEntityStore from "./AbstractEntityStore";
+import AbstractEntityStore from "./generic/AbstractEntityStore";
 
 const EVT_LOCATIONS_STORE_CHANGED = "EVT_LOCATIONS_STORE_CHANGED";
 
@@ -17,13 +16,12 @@ class LocationsStore extends AbstractEntityStore {
 
 
     getLocations() {
-        return this.getLazyData()
-            .getPayload();
+        return this.getData();
     }
 
-    handleStartedAction(action){
+    handleStartedAction(action) {
         let changed = true;
-        switch (action.type){
+        switch (action.type) {
             case ACT_RETRIEVE_LOCATIONS:
                 this.setStatus(STATUSES.LOADING);
                 break;

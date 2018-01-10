@@ -24,7 +24,7 @@ export default class GraphWizardPage extends Component {
 
     render() {
         return (
-            <Row>
+            <Row grow>
                 <Column>
                     {this.props.children}
                 </Column>

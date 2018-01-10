@@ -1,6 +1,6 @@
 import {ACT_RETRIEVE_PHASES} from "../actions/ActionTypes";
 import {STATUSES} from "./LazyData";
-import AbstractEntityStore from "./AbstractEntityStore";
+import AbstractEntityStore from "./generic/AbstractEntityStore";
 
 const EVT_PHASES_STORE_CHANGED = "EVT_PHASES_STORE_CHANGED";
 
@@ -10,7 +10,7 @@ class PhasesStore extends AbstractEntityStore {
     }
 
     getPhases(){
-        return this.getLazyData().getPayload();
+        return this.getData();
     }
 
 

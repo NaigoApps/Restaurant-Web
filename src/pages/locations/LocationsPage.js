@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
 import Page from "../Page";
-import EntitiesEditor from "../../components/editors/EntitiesEditor";
-import {COMPONENTS, TYPES} from "../../components/editors/EntityEditor";
 import locationsPageStore from "./LocationsPageStore";
 import locationsPageActions from "./LocationsPageActions";
-import locationsCreatorActions from "./LocationsCreatorActions";
 import locationsEditorActions from "./LocationsEditorActions";
-import locationsActions from "../../generic/LocationsActions";
 import {findByUuid} from "../../utils/Utils";
+import LocationEditor from "./LocationEditor";
+import LocationCreator from "./LocationCreator";
+import LocationsNavigator from "./LocationsNavigator";
+import NavElementLink from "../../widgets/NavElementLink";
+import NavElement from "../../widgets/NavElement";
+import NavPills from "../../widgets/NavPills";
 
 export default class LocationsPage extends Component {
 
@@ -33,59 +35,66 @@ export default class LocationsPage extends Component {
     }
 
     render() {
-
+        let navContent = LocationsPage.makeNavContent(this.state);
+        let pageContent = LocationsPage.makePageContent(this.state);
         return (
-
             <Page title="Postazioni">
-                <EntitiesEditor descriptor={this.getLocationsDescriptor()}/>
+                {navContent}
+                {pageContent}
             </Page>
         )
     }
 
-    locationRenderer(l){
-        let printer = findByUuid(this.state.printers, l.printer);
-        if(printer) {
-            return l.name + " (Stampante " + printer.name + ")";
-        }else{
-            return l.name;
+    static makePageContent(state) {
+        if (state.selectedLocation) {
+            return <LocationEditor data={LocationsPage.makeLocationEditorDescriptor(state)}/>
+        } else if (state.createdLocation) {
+            return <LocationCreator data={LocationsPage.makeLocationCreatorDescriptor(state)}/>
+        } else {
+            return <LocationsNavigator data={state}/>
         }
     }
 
-    getLocationsDescriptor() {
+    static makeLocationEditorDescriptor(data) {
         return {
-            name: ["location", "locations"],
-            label: ["Postazione", "Postazioni"],
-            renderer: {
-                name: this.locationRenderer.bind(this)
-            },
-            entities: {
-                list: this.state.locations,
-                selected: this.state.selectedLocation,
-                created: this.state.createdLocation
-            },
-            components: {
-                creator: {
-                    actionsProvider: locationsCreatorActions
-                },
-                editor: {
-                    actionsProvider: locationsEditorActions
-                }
-            },
-            crudActionsProvider: locationsActions,
-            fields: [
-                {
-                    type: TYPES.STRING,
-                    name: "name",
-                    label: "Nome"
-                },
-                {
-                    type: TYPES.ENTITY,
-                    name: "printer",
-                    label: "Stampante",
-                    options: this.state.printers,
-                    renderer: p => p.name
-                },
-            ]
-        };
+            location: findByUuid(data.locations, data.selectedLocation),
+            printers: data.printers
+        }
+    }
+
+    static makeLocationCreatorDescriptor(data) {
+        return {
+            location: data.createdLocation,
+            printers: data.printers
+        }
+    }
+
+    static makeNavContent(state) {
+        let elements = [];
+        elements.push(<NavElementLink
+            key="settings"
+            text="Impostazioni"
+            href="/restaurant/settings"
+        />);
+        elements.push(<NavElement
+            key="locations"
+            text="Postazioni"
+            active={!state.selectedLocation && !state.createdLocation}
+            commitAction={locationsEditorActions.deselectLocation}
+        />);
+        if (state.selectedLocation) {
+            elements.push(<NavElement
+                key="selected"
+                text={findByUuid(state.locations, state.selectedLocation).name}
+                active={true}
+            />);
+        } else if (state.createdLocation) {
+            elements.push(<NavElement
+                key="selected"
+                text={state.createdLocation.name || "Nuova postazione"}
+                active={true}
+            />);
+        }
+        return <NavPills>{elements}</NavPills>;
     }
 }

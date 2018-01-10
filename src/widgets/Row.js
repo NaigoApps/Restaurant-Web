@@ -14,10 +14,22 @@ export default class Row extends Component {
     getCss(){
         let classes = ["row"];
         if(this.props.align){
-            classes.push("align-items-" + this.props.align);
+            classes.push("align-self-" + this.props.align);
         }
         if(this.props.justify){
             classes.push("justify-content-" + this.props.justify)
+        }
+        if(this.props.topSpaced){
+            classes.push("top-sep");
+        }
+        if(this.props.fullHeight){
+            classes.push("h-100");
+        }
+        if(this.props.grow){
+            classes.push("flex-grow");
+        }
+        if(this.props.underNav){
+            classes.push("under-nav");
         }
         return classes.join(" ");
     }

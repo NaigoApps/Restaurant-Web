@@ -23,15 +23,15 @@ class AdditionsCreatorActions {
         asyncActionBuilder.post(ACT_CREATE_ADDITION, "additions", addition)
     }
 
-    updateAdditionName(uuid, name) {
+    updateAdditionName(name) {
         dispatcher.fireEnd(ACT_UPDATE_ADDITION_NAME, name)
     }
 
-    updateAdditionPrice(uuid, price) {
+    updateAdditionPrice(price) {
         dispatcher.fireEnd(ACT_UPDATE_ADDITION_PRICE, price)
     }
 
-    updateAdditionGeneric(uuid, generic) {
+    updateAdditionGeneric(generic) {
         dispatcher.fireEnd(ACT_UPDATE_ADDITION_GENERIC, generic)
     }
 }

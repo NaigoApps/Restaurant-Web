@@ -30,18 +30,6 @@ export default class DiningTableEditor extends React.Component {
         };
     }
 
-    coverChargesChange(value) {
-        diningTablesEditorActions.updateDiningTableCoverCharges(this.props.diningTable.uuid, value);
-    }
-
-    waiterChange(waiter) {
-        diningTablesEditorActions.updateDiningTableWaiter(this.props.diningTable.uuid, waiter);
-    }
-
-    tableChange(table) {
-        diningTablesEditorActions.updateDiningTableTable(this.props.diningTable.uuid, table);
-    }
-
     deleteDiningTable() {
         // eveningActions.deleteDiningTable(this.state.diningTable);
     }
@@ -60,96 +48,105 @@ export default class DiningTableEditor extends React.Component {
         });
     }
 
-    getTableDataEditorContent() {
+    getTableDataEditorContent(props) {
+        let uuid = props.diningTable.uuid;
+
         return <form className="top-sep">
             <IntegerEditor
-                descriptor={DiningTableEditor.getCoverChargesDescriptor()}
-                value={this.props.diningTable.coverCharges}
-                commitAction={this.coverChargesChange.bind(this)}
+                label="Coperti"
+                value={props.diningTable.coverCharges}
+                commitAction={result => diningTablesEditorActions.updateDiningTableCoverCharges(uuid, result)}
             />
             <EntitySelectEditor
-                descriptor={DiningTableEditor.getWaitersDescriptor(this.props.waiters)}
-                value={this.props.diningTable.waiter}
-                commitAction={this.waiterChange.bind(this)}
+                label="Cameriere"
+                options={props.waiters}
+                renderer={w => w.name}
+                value={props.diningTable.waiter}
+                commitAction={result => diningTablesEditorActions.updateDiningTableWaiter(uuid, result)}
             />
             <EntitySelectEditor
-                descriptor={DiningTableEditor.getTablesDescriptor(this.props.tables)}
-                value={this.props.diningTable.table}
-                commitAction={this.tableChange.bind(this)}
+                label="Tavolo"
+                options={props.tables}
+                renderer={t => t.name}
+                value={props.diningTable.table}
+                commitAction={result => diningTablesEditorActions.updateDiningTableTable(uuid, result)}
             />
         </form>
     }
 
-    getOrdinationsEditorContent() {
+    getOrdinationsEditorContent(props) {
         let ordinationEditor;
         let ordinationsNav;
-        if (this.props.createdOrdination) {
-            ordinationEditor = <OrdinationCreator
-                table={this.props.diningTable.uuid}
-                categories={this.props.categories}
-                dishes={this.props.dishes}
-                phases={this.props.phases}
-                additions={this.props.additions}
-            />;
+        if (props.createdOrdination) {
+            ordinationEditor = <OrdinationCreator data={DiningTableEditor.makeOrdinationCreatorDescriptor(props)}/>;
         } else {
-            if (this.props.selectedOrdination) {
-                ordinationEditor = <OrdinationEditor
-                    categories={this.props.categories}
-                    dishes={this.props.dishes}
-                    phases={this.props.phases}
-                    additions={this.props.additions}
-                    editingOrdination={this.props.editingOrdination}
-                    ordination={findByUuid(this.props.ordinations, this.props.selectedOrdination)}/>;
+            if (props.selectedOrdination) {
+                ordinationEditor = <OrdinationEditor data={DiningTableEditor.makeOrdinationEditorDescriptor(props)}/>;
             }
-            let ordinationsNavContent = this.props.ordinations.map(o => {
-                return <button
-                    type="button"
-                    className={o.uuid === this.props.selectedOrdination ? "btn btn-primary" : "btn btn-default"}
+            let ordinationsNavContent = props.diningTable.ordinations.map(o => {
+                return <Button
                     key={o.uuid}
-                    onClick={this.selectOrdination.bind(this, o.uuid)}>{beautifyTime(o.creationTime)}</button>;
+                    active={o.uuid === props.selectedOrdination}
+                    commitAction={this.selectOrdination.bind(this, o.uuid)}
+                    text={beautifyTime(o.creationTime)}
+                />
             });
             ordinationsNav = <ButtonGroup vertical={true} size="lg">{ordinationsNavContent}</ButtonGroup>;
         }
         let creatorButton;
-        if (!this.props.createdOrdination) {
+        if (!props.createdOrdination) {
             creatorButton = <Button text="Nuova comanda" type="info" commitAction={this.createOrdination.bind(this)}/>;
         }
-        return <Column className="form top-sep">
-            <Row>
+        return <Column>
+            <Row topSpaced grow>
+                <Column sm="2">
+                    {ordinationsNav}
+                </Column>
                 <Column>
-                    <Row>
-                        <Column sm="1">
-                            {ordinationsNav}
-                        </Column>
-                        <Column sm="11">
-                            {ordinationEditor}
-                        </Column>
-                    </Row>
+                    {ordinationEditor}
                 </Column>
             </Row>
             <Row>
-                <Column centered={true}>
+                <Column centered>
                     {creatorButton}
                 </Column>
             </Row>
         </Column>
     }
 
+    static makeOrdinationCreatorDescriptor(props) {
+        return {
+            table: props.diningTable.uuid,
+            categories: props.categories,
+            dishes: props.dishes,
+            phases: props.phases,
+            additions: props.additions
+        }
+    }
+
+    static makeOrdinationEditorDescriptor(props) {
+        return {
+            categories: props.categories,
+            dishes: props.dishes,
+            phases: props.phases,
+            additions: props.additions,
+            editingOrdination: props.editingOrdination,
+            ordination: findByUuid(props.diningTable.ordinations, props.selectedOrdination)
+        }
+    }
+
     getOrdersEditor(ordination) {
+        let props = this.props.data;
         let ordersEditor = ordination.orders.map(o => {
-            return <div className="row">{findByUuid(this.props.dishes, o.dish).name}</div>;
+            return <div className="row">{findByUuid(props.dishes, o.dish).name}</div>;
         });
         return <div>
             {ordersEditor}
         </div>;
     }
 
-    getFinalReviewEditorContent() {
-        return <DiningTableReview
-            dishes={this.props.dishes}
-            additions={this.props.additions}
-            table={this.props.diningTable}
-            ordinations={this.props.ordinations}/>
+    getFinalReviewEditorContent(props) {
+        return <DiningTableReview data={DiningTableEditor.makeDiningTableReviewDescriptor(props)}/>
     }
 
     render() {
@@ -158,36 +155,23 @@ export default class DiningTableEditor extends React.Component {
 
         let editorContent;
         if (tab === TABLE_DATA) {
-            editorContent = this.getTableDataEditorContent();
+            editorContent = this.getTableDataEditorContent(this.props.data);
         } else if (tab === ORDINATIONS) {
-            editorContent = this.getOrdinationsEditorContent();
+            editorContent = this.getOrdinationsEditorContent(this.props.data);
         } else {
-            editorContent = this.getFinalReviewEditorContent();
+            editorContent = this.getFinalReviewEditorContent(this.props.data);
         }
 
-        return <Row>
-            <Column>
+        let navContent = DiningTableEditor.makeNavContent(this.props.data);
+
+        return <Row fullHeight>
+            <Column rows>
                 <Row>
                     <Column>
-                        <NavPills>
-                            <NavElement
-                                text="Selezione serata"
-                                active={false}
-                                commitAction={eveningSelectionFormActions.deselectEvening}
-                            />
-                            <NavElement
-                                text="Elenco tavoli"
-                                active={false}
-                                commitAction={diningTablesEditorActions.deselectDiningTable}
-                            />
-                            <NavElement
-                                text={this.getEditorTitle.bind(this)()}
-                                active={true}
-                            />
-                        </NavPills>
+                        {navContent}
                     </Column>
                 </Row>
-                <Row>
+                <Row topSpaced grow>
                     <Column>
                         <NavTabs>
                             <NavElement text="Comande"
@@ -209,38 +193,47 @@ export default class DiningTableEditor extends React.Component {
 
     }
 
-    getEditorTitle() {
-        let table = findByUuid(this.props.tables, this.props.diningTable.table);
-        let waiter = findByUuid(this.props.waiters, this.props.diningTable.waiter);
-        if (table && waiter) {
-            return table.name + " (" + beautifyTime(this.props.diningTable.date) + ") - " + waiter.name;
+    static makeNavContent(props) {
+        return <NavPills>
+            <NavElement
+                text="Selezione serata"
+                active={false}
+                commitAction={eveningSelectionFormActions.deselectEvening}
+            />
+            <NavElement
+                text="Elenco tavoli"
+                active={false}
+                commitAction={diningTablesEditorActions.deselectDiningTable}
+            />
+            <NavElement
+                text={DiningTableEditor.renderTableNavElement(props)}
+                active={true}
+            />
+        </NavPills>
+    }
+
+    static makeDiningTableReviewDescriptor(props) {
+        return {
+            dishes: props.dishes,
+            additions: props.additions,
+            table: props.diningTable,
+            ordinations: props.diningTable.ordinations,
+            currentInvoice: props.currentInvoice,
+            closingDiningTable: props.closingDiningTable,
         }
-        return null;
     }
 
-    static getCoverChargesDescriptor() {
-        return {
-            name: "coverCharges",
-            label: "Coperti"
-        };
+    static renderTableNavElement(props) {
+        let table = findByUuid(props.tables, props.diningTable.table);
+        let waiter = findByUuid(props.waiters, props.diningTable.waiter);
+        return DiningTableEditor.renderDiningTable(table, waiter, props.diningTable);
     }
 
-    static getWaitersDescriptor(waiters) {
-        return {
-            name: "waiter",
-            label: "Cameriere",
-            options: waiters,
-            renderer: w => w.name
-        };
-    }
-
-    static getTablesDescriptor(tables) {
-        return {
-            name: "table",
-            label: "Tavolo",
-            options: tables,
-            renderer: t => t.name
-        };
+    static renderDiningTable(table, waiter, diningTable) {
+        if (table && waiter) {
+            return table.name + " (" + beautifyTime(diningTable.openingTime) + ") - " + waiter.name;
+        }
+        return "?";
     }
 
 }

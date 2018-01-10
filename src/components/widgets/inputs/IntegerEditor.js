@@ -16,7 +16,7 @@ export default class IntegerEditor extends Component {
     }
 
     render() {
-        const descriptor = this.props.descriptor;
+        const label = this.props.label;
         const value = this.props.value;
         const placeholder = this.props.placeholder;
 
@@ -24,10 +24,11 @@ export default class IntegerEditor extends Component {
             isValid={(wData) => wData && IntegerEditor.isInteger(wData["int_page"])}
             hideReview={true}
             initialPage="int_page"
-            label={descriptor.label}
+            label={label}
             renderer={(wData) => wData ? wData["int_page"] : ""}
             commitAction={this.onWizardConfirm.bind(this)}>
             <IntegerInputGraphWizardPage
+                name={label}
                 identifier="int_page"
                 placeholder={placeholder}
                 initializer={value ? value.toString() : ""}

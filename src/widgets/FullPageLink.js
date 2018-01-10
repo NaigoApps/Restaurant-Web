@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import Icon from "./Icon";
+import Column from "./Column";
 
 /**
  * Expects:
@@ -27,21 +28,23 @@ export default class FullPageLink extends Component {
         }
         let text = this.props.text;
         return (
-            <div onClick={this.clickAction.bind(this)} className="home-link">
-                <Link
-                    className="full-size"
-                    to={"/restaurant/" + path}
-                    replace={true}>
-                    <div className="full-size">
-                        <div className="text-center top-sep">
-                            {icon}
+            <Column>
+                <div onClick={this.clickAction.bind(this)}>
+                    <Link
+                        className="full-size"
+                        to={"/restaurant/" + path}
+                        replace={true}>
+                        <div className="full-size">
+                            <div className="text-center top-sep">
+                                {icon}
+                            </div>
+                            <h3 className="text-center">
+                                {text}
+                            </h3>
                         </div>
-                        <h3 className="text-center">
-                            {text}
-                        </h3>
-                    </div>
-                </Link>
-            </div>
+                    </Link>
+                </div>
+            </Column>
         );
     }
 

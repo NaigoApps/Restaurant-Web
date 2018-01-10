@@ -9,6 +9,8 @@ import applicationStore from "../stores/ApplicationStore";
 import * as screenfull from 'screenfull';
 import Modal from "../widgets/modal/Modal";
 import Button from "../widgets/Button";
+import Row from "../widgets/Row";
+import Column from "../widgets/Column";
 
 export default class Page extends Component {
 
@@ -77,10 +79,10 @@ export default class Page extends Component {
         return (
             <div className="container-fluid main">
                 <RestaurantNav title={this.props.title} content={this.props.navContent}/>
-                <div className="row under-nav top-sep">
-                    <div className="col-sm-12">
+                <Row fullHeight underNav>
+                    <Column>
                         {this.props.children}
-                    </div>
+                    </Column>
                     <Modal visible={!!this.state.errorMessage}>
                         <div className="modal-header">
                             <h4 className="modal-title text-danger text-center">
@@ -94,7 +96,7 @@ export default class Page extends Component {
                             <Button text="Chiudi" commitAction={this.clearMessages}/>
                         </div>
                     </Modal>
-                </div>
+                </Row>
             </div>
         )
     }

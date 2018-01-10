@@ -1,17 +1,17 @@
 import {ACT_RETRIEVE_WAITER_STATUSES} from "../actions/ActionTypes";
-import LazyData, {STATUSES} from "../stores/LazyData";
-import AbstractEntityStore from "../stores/AbstractEntityStore";
+import {STATUSES} from "../stores/LazyData";
+import AbstractDataStore from "../stores/AbstractDataStore";
 
 export const EVT_WAITER_STATUSES_STORE_CHANGED = "EVT_WAITER_STATUSES_STORE_CHANGED";
 
-class WaiterStatusesStore extends AbstractEntityStore {
+class WaiterStatusesStore extends AbstractDataStore {
 
     constructor() {
         super(EVT_WAITER_STATUSES_STORE_CHANGED);
     }
 
     getWaiterStatuses() {
-        return this.getLazyData().getPayload();
+        return this.getData();
     }
 
     handleStartedAction(action){
@@ -31,7 +31,7 @@ class WaiterStatusesStore extends AbstractEntityStore {
         let changed = true;
         switch (action.type) {
             case ACT_RETRIEVE_WAITER_STATUSES:
-                this.setSimpleData(action.body);
+                this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;
             default:

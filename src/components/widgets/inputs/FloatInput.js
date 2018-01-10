@@ -42,7 +42,7 @@ export default class FloatInput extends Component {
 
     mayCommitChange(text) {
         if (FloatInput.isNumber(text) && this.props.commitAction) {
-            this.props.commitAction(text);
+            this.props.commitAction(parseFloat(text));
         }
     }
 

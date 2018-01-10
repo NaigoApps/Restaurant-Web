@@ -1,11 +1,16 @@
 import requestBuilder from "../../actions/RequestBuilder";
 import {
-    ACT_DELETE_DINING_TABLE, ACT_DESELECT_DINING_TABLE, ACT_PRINT_PARTIAL_BILL, ACT_SELECT_DINING_TABLE,
+    ACT_ABORT_DINING_TABLE_CLOSING,
+    ACT_BEGIN_DINING_TABLE_CLOSING,
+    ACT_CLOSE_ORDERS,
+    ACT_DELETE_DINING_TABLE,
+    ACT_DESELECT_DINING_TABLE,
+    ACT_OPEN_ORDERS,
+    ACT_PRINT_PARTIAL_BILL,
+    ACT_SELECT_DINING_TABLE,
     ACT_UPDATE_DINING_TABLE
 } from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
-import ordinationsActions from "./OrdinationsActions";
-import ordersActions from "./OrdersActions";
 
 class DiningTablesEditorActions {
 
@@ -31,8 +36,6 @@ class DiningTablesEditorActions {
 
     selectDiningTable(table) {
         dispatcher.fireEnd(ACT_SELECT_DINING_TABLE, table);
-        ordinationsActions.retrieveOrdinations();
-        ordersActions.retrieveOrders();
     }
 
     deselectDiningTable() {
@@ -43,8 +46,24 @@ class DiningTablesEditorActions {
         requestBuilder.remove(ACT_DELETE_DINING_TABLE, 'dining-tables', uuid);
     }
 
-    printPartialBill(uuid){
+    printPartialBill(uuid) {
         requestBuilder.post(ACT_PRINT_PARTIAL_BILL, 'dining-tables/print-partial-bill', uuid);
+    }
+
+    beginDiningTableClosing() {
+        dispatcher.fireEnd(ACT_BEGIN_DINING_TABLE_CLOSING);
+    }
+
+    closeOrders(order, quantity) {
+        dispatcher.fireEnd(ACT_CLOSE_ORDERS, {order: order, quantity: quantity})
+    }
+
+    openOrders(order, quantity) {
+        dispatcher.fireEnd(ACT_OPEN_ORDERS, {order: order, quantity: quantity})
+    }
+
+    abortDiningTableClosing() {
+        dispatcher.fireEnd(ACT_ABORT_DINING_TABLE_CLOSING);
     }
 }
 

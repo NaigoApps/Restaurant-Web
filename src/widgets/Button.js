@@ -20,17 +20,17 @@ export default class Button extends Component {
 
     getClassName() {
         let classes = ["btn"];
-        if (this.props.type && ! this.props.active) {
+        if (this.props.type && !this.props.active) {
             classes.push("btn-" + this.props.type)
-        } else if(this.props.active){
+        } else if (this.props.active) {
             classes.push("btn-primary");
-        }else{
+        } else {
             classes.push("btn-secondary");
         }
         if (this.props.size) {
             classes.push("btn-" + this.props.size)
         }
-        if(this.props.fullSize){
+        if (this.props.fullSize) {
             classes.push("col-sm-12");
         }
         return classes.join(" ");
@@ -38,17 +38,26 @@ export default class Button extends Component {
 
     render() {
         let text = this.props.text;
-        let glyphicon;
-        if (this.props.icon) {
-            glyphicon = <Icon name={this.props.icon}/>;
+        let icon = this.props.icon;
+
+        let content;
+        if (text && icon) {
+            content = <span>{text} &nbsp; <Icon name={icon}/></span>;
+        } else if (text) {
+            content = text;
+        } else if (icon) {
+            content = <Icon name={icon}/>
+        } else {
+            content = <span>&nbsp;</span>
         }
+
         return (
             <button
                 type="button"
                 className={this.getClassName()}
                 onClick={this.clickAction.bind(this)}
-                disabled={this.props.disabled}>
-                {text} {glyphicon}
+                disabled={!!this.props.disabled}>
+                {content}
             </button>
         );
     }

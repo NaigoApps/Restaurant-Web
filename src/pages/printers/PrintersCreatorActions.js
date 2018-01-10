@@ -12,15 +12,15 @@ class PrintersCreatorActions {
         dispatcher.fireEnd(ACT_BEGIN_CREATE_PRINTER);
     }
 
-    updatePrinterName(uuid, name) {
+    updatePrinterName(name) {
         dispatcher.fireEnd(ACT_UPDATE_PRINTER_NAME, name);
     }
 
-    updatePrinterMain(uuid, main){
+    updatePrinterMain(main){
         dispatcher.fireEnd(ACT_UPDATE_PRINTER_MAIN, main);
     }
 
-    updatePrinterLineCharacters(uuid, chars){
+    updatePrinterLineCharacters(chars){
         dispatcher.fireEnd(ACT_UPDATE_PRINTER_LINE_CHARACTERS, chars);
     }
 

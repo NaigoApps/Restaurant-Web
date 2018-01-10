@@ -12,18 +12,25 @@ export function findByUuid(array, uuid) {
     return array.find(e => e.uuid === uuid);
 }
 
+export function findIndexByUuid(array, uuid) {
+    return array.findIndex(e => e.uuid === uuid);
+
+}
+
 export function distribute(array, value) {
     let result = [];
     let partition = [];
-    array.forEach(element => {
-        if (partition.length >= value) {
+    if(array) {
+        array.forEach(element => {
+            if (partition.length >= value) {
+                result.push(partition);
+                partition = [];
+            }
+            partition.push(element);
+        });
+        if (partition.length > 0) {
             result.push(partition);
-            partition = [];
         }
-        partition.push(element);
-    });
-    if(partition.length > 0){
-        result.push(partition);
     }
     return result;
 }

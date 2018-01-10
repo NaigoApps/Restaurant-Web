@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
-import {distribute, uuid} from "../utils/Utils";
+import {distribute} from "../utils/Utils";
 import Button from "./Button";
 import ButtonGroup from "./ButtonGroup";
+import Row from "./Row";
+import Column from "./Column";
 
 export default class PaginatedButtonGroup extends Component {
     constructor(props) {
@@ -18,27 +20,39 @@ export default class PaginatedButtonGroup extends Component {
         let buttons = distribute(React.Children.toArray(this.props.children), pageSize);
         if (buttons.length > 0) {
             while (buttons[buttons.length - 1].length < pageSize) {
-                buttons[buttons.length - 1].push(<Button key={buttons[buttons.length - 1].length} disabled={true}
-                                                         text="&nbsp;"/>);
+                buttons[buttons.length - 1].push(
+                    <Button
+                        key={buttons[buttons.length - 1].length}
+                        disabled={true}
+                        text="&nbsp;"/>);
+            }
+        } else {
+            buttons = [[]];
+            for (let i = 0; i < pageSize; i++) {
+                buttons[0].push(
+                    <Button
+                        key={buttons[0].length}
+                        disabled={true}
+                        text="&nbsp;"/>);
             }
         }
 
-        return <div className="row">
-            <div className="col-sm-12">
-                <div className="row">
-                    <div className="col-sm-12">
+        return <Row>
+            <Column>
+                <Row>
+                    <Column>
                         <ButtonGroup vertical={true} justified={true}>
                             {buttons[page]}
                         </ButtonGroup>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-sm-12">
+                    </Column>
+                </Row>
+                <Row>
+                    <Column>
                         {pageButtons}
-                    </div>
-                </div>
-            </div>
-        </div>;
+                    </Column>
+                </Row>
+            </Column>
+        </Row>;
     }
 
     selectPage(index) {
@@ -76,7 +90,9 @@ export default class PaginatedButtonGroup extends Component {
 
     buildPageButtons() {
         const page = this.state.page;
-        const pages = React.Children.toArray(this.props.children).length / 10;
+        const pageSize = this.props.pageSize || 10;
+        let pages = parseInt((React.Children.toArray(this.props.children).length - 1) / pageSize + 1);
+        pages = Math.max(pages, 1);
 
         let buttons;
         if (this.props.showNumbers) {

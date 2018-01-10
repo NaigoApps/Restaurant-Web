@@ -1,10 +1,9 @@
 import React from 'react';
 import EntitySelectInput from "../widgets/inputs/EntitySelectInput";
-import ordinationsActions from "../../pages/evening/OrdinationsActions";
 
 export default class OrdinationCreatorView extends React.Component {
     /**
-     *
+     *\
      * @param props = {tables}
      */
     constructor(props) {
@@ -21,9 +20,10 @@ export default class OrdinationCreatorView extends React.Component {
     }
 
     createOrdination() {
-        ordinationsActions.createOrdination({
-            table : this.state.table
-        });
+        alert("ordinationcreatorview.createordination");
+        // ordinationsActions.createOrdination({
+        //     table : this.state.table
+        // });
     }
 
     render() {
