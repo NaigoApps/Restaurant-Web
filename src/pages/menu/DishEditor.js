@@ -16,41 +16,43 @@ export default class DishEditor extends React.Component {
 
     render() {
         let props = this.props.data;
-        let uuid = props.dish.uuid;
+        let dish = props.get('dish');
+        let uuid = dish.get('uuid');
 
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.dish}
-                    abortMethod={dishesEditorActions.deleteDish}
-                    render={dish => dish.name}>
+                    entity={dish}
+                    deleteMethod={dishesEditorActions.deleteDish}
+                    valid={props.get('dish').get('name') && props.get('dish').get('status') && props.get('dish').get('category')}
+                    render={dish => dish.get('name')}>
                     <TextEditor
                         label="Nome"
-                        value={props.dish.name}
+                        value={dish.get('name')}
                         commitAction={result => dishesEditorActions.updateDishName(uuid, result)}
                     />
                     <TextEditor
                         label="Descrizione"
-                        value={props.dish.description}
+                        value={dish.get('description')}
                         commitAction={result => dishesEditorActions.updateDishDescription(uuid, result)}
                     />
                     <FloatEditor
                         label="Prezzo"
-                        value={props.dish.price}
+                        value={dish.get('price')}
                         commitAction={result => dishesEditorActions.updateDishPrice(uuid, result)}
                     />
                     <SelectEditor
                         label="Stato"
-                        value={props.dish.status}
-                        options={props.dishesStatuses}
-                        commitAction={result => dishesEditorActions.updateDishPrice(uuid, result)}
+                        value={dish.get('status')}
+                        options={props.get('dishStatuses')}
+                        commitAction={result => dishesEditorActions.updateDishStatus(uuid, result)}
                     />
                     <EntitySelectEditor
                         label="Categoria"
-                        options={props.categories}
-                        renderer={cat => cat.name}
-                        value={props.dish.category}
+                        options={props.get('categories')}
+                        renderer={cat => cat.get('name')}
+                        value={dish.get('category')}
                         commitAction={result => dishesEditorActions.updateDishCategory(uuid, result)}
                     />
                 </EntityEditor>

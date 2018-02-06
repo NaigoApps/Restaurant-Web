@@ -5,12 +5,14 @@ import {
 } from "../actions/ActionTypes";
 import {STATUSES} from "./LazyData";
 
+const {fromJS, List} = require('immutable');
+
 export const EVT_PRINTERS_STORE_CHANGED = "EVT_PRINTERS_STORE_CHANGED";
 
 class PrintersStore extends AbstractEntityStore {
     constructor() {
         super(EVT_PRINTERS_STORE_CHANGED);
-        this.services = [];
+        this.services = List();
     }
 
     getPrinters(){

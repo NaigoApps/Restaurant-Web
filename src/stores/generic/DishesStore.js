@@ -17,8 +17,8 @@ class DishesStore extends AbstractEntityStore {
 
     getDishesByCategory(uuid) {
         return this.getData().getPayload()
-            .filter(d => d.category === uuid)
-            .sort((d1, d2) => strcmp(d1.name.toUpperCase(), d2.name.toUpperCase()));
+            .filter(d => d.get('category') === uuid)
+            .sort((d1, d2) => d1.get('name').toUpperCase().localeCompare(d2.get('name').toUpperCase()));
     }
 
     handleStartedAction(action) {

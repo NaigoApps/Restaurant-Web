@@ -30,6 +30,9 @@ export default class Button extends Component {
         if (this.props.size) {
             classes.push("btn-" + this.props.size)
         }
+        if (this.props.fullHeight) {
+            classes.push("full-height")
+        }
         if (this.props.fullSize) {
             classes.push("col-sm-12");
         }

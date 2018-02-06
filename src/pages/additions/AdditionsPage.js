@@ -13,6 +13,8 @@ import NavElement from "../../widgets/NavElement";
 import NavPills from "../../widgets/NavPills";
 import {findByUuid} from "../../utils/Utils";
 
+const {Map} = require('immutable');
+
 export default class AdditionsPage extends Component {
 
     constructor(props) {
@@ -38,8 +40,8 @@ export default class AdditionsPage extends Component {
 
 
     render() {
-        let navContent = AdditionsPage.makeNavContent(this.state);
-        let pageContent = AdditionsPage.makePageContent(this.state);
+        let navContent = AdditionsPage.makeNavContent(this.state.data);
+        let pageContent = AdditionsPage.makePageContent(this.state.data);
         return (
             <Page title="Varianti">
                 {navContent}
@@ -49,9 +51,9 @@ export default class AdditionsPage extends Component {
     }
 
     static makePageContent(state) {
-        if (state.selectedAddition) {
+        if (state.get('selectedAddition')) {
             return <AdditionEditor data={AdditionsPage.makeAdditionEditorDescriptor(state)}/>
-        } else if (state.createdAddition) {
+        } else if (state.get('createdAddition')) {
             return <AdditionCreator data={AdditionsPage.makeAdditionCreatorDescriptor(state)}/>
         } else {
             return <AdditionsNavigator data={state}/>
@@ -59,15 +61,15 @@ export default class AdditionsPage extends Component {
     }
 
     static makeAdditionEditorDescriptor(data) {
-        return {
-            addition: findByUuid(data.additions, data.selectedAddition)
-        }
+        return Map({
+            addition: findByUuid(data.get('additions'), data.get('selectedAddition'))
+        })
     }
 
     static makeAdditionCreatorDescriptor(data) {
-        return {
-            addition: data.createdAddition
-        }
+        return Map({
+            addition: data.get('createdAddition')
+        })
     }
 
     static makeNavContent(state) {
@@ -80,19 +82,19 @@ export default class AdditionsPage extends Component {
         elements.push(<NavElement
             key="additions"
             text="Varianti"
-            active={!state.selectedAddition && !state.createdAddition}
+            active={!state.get('selectedAddition') && !state.get('createdAddition')}
             commitAction={additionsEditorActions.deselectAddition}
         />);
-        if (state.selectedAddition) {
+        if (state.get('selectedAddition')) {
             elements.push(<NavElement
                 key="selected"
-                text={findByUuid(state.additions, state.selectedAddition).name}
+                text={findByUuid(state.get('additions'), state.get('selectedAddition')).get('name')}
                 active={true}
             />);
-        } else if (state.createdAddition) {
+        } else if (state.get('createdAddition')) {
             elements.push(<NavElement
                 key="selected"
-                text={state.createdAddition.name || "Nuova variante"}
+                text={state.get('createdAddition').get('name') || "Nuova variante"}
                 active={true}
             />);
         }

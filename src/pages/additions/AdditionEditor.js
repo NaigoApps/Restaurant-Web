@@ -14,28 +14,30 @@ export default class AdditionEditor extends React.Component {
 
     render() {
         let props = this.props.data;
-        let uuid = props.addition.uuid;
+        let addition = props.get('addition');
+        let uuid = addition.get('uuid');
 
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.addition}
-                    abortMethod={additionsEditorActions.deleteAddition}
-                    render={addition => addition.name}>
+                    valid={addition.get('name')}
+                    entity={addition}
+                    deleteMethod={additionsEditorActions.deleteAddition}
+                    render={addition => addition.get('name')}>
                     <TextEditor
                         label="Nome"
-                        value={props.addition.name}
+                        value={addition.get('name')}
                         commitAction={result => additionsEditorActions.updateAdditionName(uuid, result)}
                     />
                     <BooleanEditor
-                        label="Principale"
-                        value={props.addition.generic}
+                        label="Generica"
+                        value={addition.get('generic')}
                         commitAction={result => additionsEditorActions.updateAdditionGeneric(uuid, result)}
                     />
                     <FloatEditor
                         label="Prezzo"
-                        value={props.addition.price}
+                        value={addition.get('price')}
                         commitAction={result => additionsEditorActions.updateAdditionPrice(uuid, result)}
                     />
                 </EntityEditor>

@@ -14,6 +14,8 @@ import CategoryCreator from "./CategoryCreator";
 import DishCreator from "./DishCreator";
 import DishEditor from "./DishEditor";
 
+const {Map} = require('immutable');
+
 export default class MenuPage extends Component {
     constructor(props) {
         super(props);
@@ -37,8 +39,8 @@ export default class MenuPage extends Component {
     }
 
     render() {
-        let navContent = MenuPage.makeNavContent(this.state);
-        let pageContent = MenuPage.makePageContent(this.state);
+        let navContent = MenuPage.makeNavContent(this.state.data);
+        let pageContent = MenuPage.makePageContent(this.state.data);
         return (
             <Page title="Menu">
                 {navContent}
@@ -48,13 +50,13 @@ export default class MenuPage extends Component {
     }
 
     static makePageContent(state) {
-        if (state.selectedDish) {
+        if (state.get('selectedDish')) {
             return <DishEditor data={MenuPage.makeDishEditorDescriptor(state)}/>;
-        } else if (state.createdDish) {
+        } else if (state.get('createdDish')) {
             return <DishCreator data={MenuPage.makeDishCreatorDescriptor(state)}/>;
-        } else if (state.selectedCategory) {
+        } else if (state.get('selectedCategory')) {
             return <CategoryEditor data={MenuPage.makeCategoryEditorDescriptor(state)}/>
-        } else if (state.createdCategory) {
+        } else if (state.get('createdCategory')) {
             return <CategoryCreator data={MenuPage.makeCategoryCreatorDescriptor(state)}/>
         } else {
             return <CategoriesNavigator data={state}/>
@@ -62,33 +64,33 @@ export default class MenuPage extends Component {
     }
 
     static makeCategoryEditorDescriptor(data) {
-        return {
-            category: findByUuid(data.categories, data.selectedCategory),
-            dishes: data.dishes,
-            dishesStatuses: data.dishesStatuses,
-            locations: data.locations
-        }
+        return Map({
+            category: findByUuid(data.get('categories'), data.get('selectedCategory')),
+            dishes: data.get('dishes'),
+            dishesStatuses: data.get('dishesStatuses'),
+            locations: data.get('locations')
+        })
     }
 
     static makeCategoryCreatorDescriptor(data) {
-        return {
-            category: data.createdCategory,
-            locations: data.locations
-        }
+        return Map({
+            category: data.get('createdCategory'),
+            locations: data.get('locations')
+        })
     }
 
     static makeDishCreatorDescriptor(data) {
-        return {
-            dish: data.createdDish
-        }
+        return Map({
+            dish: data.get('createdDish')
+        })
     }
 
     static makeDishEditorDescriptor(data) {
-        return {
-            dish: findByUuid(data.dishes, data.selectedDish),
-            categories: data.categories,
-            dishStatuses: data.dishStatuses
-        }
+        return Map({
+            dish: findByUuid(data.get('dishes'), data.get('selectedDish')),
+            categories: data.get('categories'),
+            dishStatuses: data.get('dishStatuses')
+        })
     }
 
     static makeNavContent(state) {
@@ -101,27 +103,28 @@ export default class MenuPage extends Component {
         elements.push(<NavElement
             key="categories"
             text="Categorie"
-            active={!state.selectedCategory && !state.createdCategory && !state.selectedDish && !state.createdDish}
+            active={!state.get('selectedCategory') && !state.get('createdCategory') &&
+            !state.get('selectedDish ') && !state.get('createdDish')}
             commitAction={categoriesEditorActions.deselectCategory}
         />);
-        if (state.selectedCategory) {
+        if (state.get('selectedCategory')) {
             elements.push(<NavElement
                 key="selected-cat"
-                text={MenuPage.categoryName(findByUuid(state.categories, state.selectedCategory))}
+                text={MenuPage.categoryName(findByUuid(state.get('categories'), state.get('selectedCategory')))}
                 commitAction={dishesEditorActions.deselectDish}
-                active={!state.selectedDish && !state.createdDish}
+                active={!state.get('selectedDish') && !state.get('createdDish')}
             />);
         }
-        if (state.selectedDish) {
+        if (state.get('selectedDish')) {
             elements.push(<NavElement
                 key="selected-dish"
-                text={MenuPage.dishName(findByUuid(state.dishes, state.selectedDish))}
+                text={MenuPage.dishName(findByUuid(state.get('dishes'), state.get('selectedDish')))}
                 active={true}
             />);
-        } else if (state.createdDish) {
+        } else if (state.get('createdDish')) {
             elements.push(<NavElement
                 key="created-dish"
-                text={state.createdDish.name || "Nuovo piatto"}
+                text={state.get('createdDish').get('name') || "Nuovo piatto"}
                 active={true}
             />);
         }
@@ -129,10 +132,10 @@ export default class MenuPage extends Component {
     }
 
     static categoryName(cat) {
-        return cat ? cat.name : "?";
+        return cat ? cat.get('name') : "?";
     }
 
     static dishName(dish) {
-        return dish ? dish.name : "?";
+        return dish ? dish.get('name') : "?";
     }
 }

@@ -7,17 +7,18 @@ import Page from "../Page";
 import OrdinationCreator from "../../components/widgets/inputs/OrdinationCreator";
 import eveningPageStore from "./EveningPageStore";
 import eveningPageActions from "./EveningPageActions";
-import diningTablesCreatorActions from "./DiningTablesCreatorActions";
-import diningTablesEditorActions from "./DiningTablesEditorActions";
+import diningTablesCreatorActions from "./tables/DiningTablesCreatorActions";
+import diningTablesEditorActions from "./tables/DiningTablesEditorActions";
 import ordinationsCreatorActions from "./OrdinationsCreatorActions";
 import ordinationsEditorActions from "./OrdinationsEditorActions";
-import DiningTableEditor from "./DiningTableEditor";
+import DiningTableEditor from "./tables/DiningTableEditor";
 import Button from "../../widgets/Button";
 import eveningSelectionFormActions from "../../actions/pages/EveningSelectionFormActions";
 import FloatEditor from "../../components/widgets/inputs/FloatEditor";
 import eveningEditorActions from "./EveningEditorActions";
 import PaginatedEntitiesList from "../../components/widgets/PaginatedEntitiesList";
 import EveningEditor from "./EveningEditor";
+import EveningNav from "./EveningNav";
 
 export default class EveningPage extends Component {
     constructor(props) {
@@ -44,11 +45,12 @@ export default class EveningPage extends Component {
 
 
     render() {
-        let pageContent = EveningPage.makePageContent(this.state);
-        let title = EveningPage.makeTitle(this.state);
+        let pageContent = EveningPage.makePageContent(this.state.data);
+        let title = EveningPage.makeTitle(this.state.data);
 
         return (
             <Page title={title}>
+                <EveningNav data={this.state.data}/>
                 {pageContent}
             </Page>
         );
@@ -56,17 +58,17 @@ export default class EveningPage extends Component {
 
     static makeTitle(state) {
         let title = "Gestione serata";
-        if (state.evening) {
-            title += " " + beautifyDate(state.evening.day);
+        if (state.get('evening')) {
+            title += " " + beautifyDate(state.get('evening').get('day'));
         }
         return title;
     }
 
     static makePageContent(state) {
-        if (state.evening) {
+        if (state.get('evening')) {
             return <EveningEditor data={state}/>;
         } else {
-            return <EveningSelectionForm eveningDate={state.date}/>;
+            return <EveningSelectionForm/>;
         }
     }
 }

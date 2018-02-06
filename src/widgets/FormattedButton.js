@@ -46,13 +46,9 @@ export default class FormattedButton extends Component {
                 className={this.getClassName()}
                 onClick={this.clickAction.bind(this)}
                 disabled={!!this.props.disabled}>
-                <Row>
-                    <Column left>
-                        {left}
-                    </Column>
-                    <Column right>
-                        {right}
-                    </Column>
+                <Row justify="between">
+                    <Column left>{left}</Column>
+                    <Column right auto>{right}</Column>
                 </Row>
             </button>
         );

@@ -18,8 +18,10 @@ export default class DishesNavigator extends Component {
         return [<Row key="list" topSpaced>
             <Column>
                 <PaginatedEntitiesList
-                    entities={props.dishes}
-                    renderer={dish => dish.name}
+                    rows={6}
+                    cols={3}
+                    entities={props.get('dishes')}
+                    renderer={dish => dish.get('name')}
                     selectMethod={dishesEditorActions.selectDish}
                     deselectMethod={dishesEditorActions.deselectDish}
                 />

@@ -18,8 +18,10 @@ export default class AdditionsNavigator extends Component {
         return [<Row key="list" topSpaced>
             <Column>
                 <PaginatedEntitiesList
-                    entities={props.additions}
-                    renderer={addition => addition.name}
+                    rows={9}
+                    cols={3}
+                    entities={props.get('additions')}
+                    renderer={addition => addition.get('name')}
                     selectMethod={additionsEditorActions.selectAddition}
                     deselectMethod={additionsEditorActions.deselectAddition}
                 />

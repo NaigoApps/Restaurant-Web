@@ -22,6 +22,8 @@ import dishesStore from "../../stores/generic/DishesStore";
 import dishesStatusesStore from "../../stores/generic/DishesStatusesStore";
 import locationsStore from "../../stores/LocationsStore";
 
+const {Map} = require('immutable');
+
 const EVT_MENU_PAGE_STORE_CHANGED = "EVT_MENU_PAGE_STORE_CHANGED";
 
 class MenuPageStore extends AbstractStore{
@@ -35,36 +37,39 @@ class MenuPageStore extends AbstractStore{
     }
 
     getState(){
-        return {
+        let result= Map({
             categories: categoriesStore.getCategories().getPayload(),
             dishes: dishesStore.getDishesByCategory(this.selectedCategory),
-            dishesStatuses: dishesStatusesStore.getDishesStatuses().getPayload(),
+            dishStatuses: dishesStatusesStore.getDishesStatuses().getPayload(),
             locations: locationsStore.getLocations().getPayload(),
             selectedDish: this.selectedDish,
             createdDish: this.inCreationDish,
             selectedCategory: this.selectedCategory,
             createdCategory: this.inCreationCategory
-        }
+        });
+        return {
+            data: result
+        };
     }
 
     setCategoryName(value){
-        this.inCreationCategory.name = value;
+        this.inCreationCategory = this.inCreationCategory.set('name', value);
     }
 
     setCategoryLocation(value){
-        this.inCreationCategory.location = value;
+        this.inCreationCategory = this.inCreationCategory.set('location', value);
     }
 
     setDishName(value){
-        this.inCreationDish.name = value;
+        this.inCreationDish = this.inCreationDish.set('name', value);
     }
 
     setDishPrice(value){
-        this.inCreationDish.price = value;
+        this.inCreationDish = this.inCreationDish.set('price', value);
     }
 
     setDishDescription(value){
-        this.inCreationDish.description = value;
+        this.inCreationDish = this.inCreationDish.set('description', value);
     }
 
     handleCompletedAction(action){
@@ -77,19 +82,19 @@ class MenuPageStore extends AbstractStore{
             case ACT_RETRIEVE_LOCATIONS:
                 break;
             case ACT_CREATE_CATEGORY:
-                this.selectedCategory = action.body.uuid;
+                this.selectedCategory = action.body.get('uuid');
                 this.inCreationCategory = null;
                 break;
             case ACT_CREATE_DISH:
-                this.selectedDish = action.body.uuid;
+                this.selectedDish = action.body.get('uuid');
                 this.inCreationDish = null;
                 break;
             case ACT_UPDATE_CATEGORY:
-                this.selectedCategory = action.body.uuid;
+                this.selectedCategory = action.body.get('uuid');
                 break;
             case ACT_UPDATE_DISH:
-                this.selectedDish = action.body.uuid;
-                this.selectedCategory = action.body.category;
+                this.selectedDish = action.body.get('uuid');
+                this.selectedCategory = action.body.get('category');
                 break;
             case ACT_DELETE_CATEGORY:
                 this.selectedCategory = null;
@@ -106,13 +111,13 @@ class MenuPageStore extends AbstractStore{
                 this.inCreationDish = this.buildDish();
                 break;
             case ACT_SELECT_CATEGORY:
-                this.selectedCategory = action.body;
+                this.selectedCategory = action.body.get('uuid');
                 this.selectedDish = null;
                 this.inCreationCategory = null;
                 this.inCreationDish = null;
                 break;
             case ACT_SELECT_DISH:
-                this.selectedDish = action.body;
+                this.selectedDish = action.body.get('uuid');
                 this.inCreationDish = null;
                 break;
             case ACT_DESELECT_CATEGORY:
@@ -148,20 +153,20 @@ class MenuPageStore extends AbstractStore{
     }
 
     buildCategory(){
-        return {
+        return Map({
             name: "",
             location: null,
             dishes: []
-        };
+        });
     }
 
     buildDish(){
-        return {
+        return Map({
             name: "",
             price: 0.0,
             description: "",
             category: this.selectedCategory
-        };
+        });
     }
 
 }

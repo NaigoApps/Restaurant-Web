@@ -12,6 +12,8 @@ import printersEditorActions from "./PrintersEditorActions";
 import NavPills from "../../widgets/NavPills";
 import NavElementLink from "../../widgets/NavElementLink";
 
+const {fromJS} = require('immutable');
+
 export default class PrintersPage extends Component {
 
     constructor(props) {
@@ -36,8 +38,8 @@ export default class PrintersPage extends Component {
     }
 
     render() {
-        let navContent = PrintersPage.makeNavContent(this.state);
-        let pageContent = PrintersPage.makePageContent(this.state);
+        let navContent = this.makeNavContent();
+        let pageContent = this.makePageContent();
         return (
             <Page title="Stampanti">
                 {navContent}
@@ -46,8 +48,10 @@ export default class PrintersPage extends Component {
         )
     }
 
-    static makeNavContent(state) {
+    makeNavContent() {
+        let state = this.state.data;
         let elements = [];
+        let editingPrinter = findByUuid(state.get('printers'), state.get('selectedPrinter'));
         elements.push(<NavElementLink
             key="settings"
             text="Impostazioni"
@@ -56,29 +60,30 @@ export default class PrintersPage extends Component {
         elements.push(<NavElement
             key="printers"
             text="Stampanti"
-            active={!state.selectedPrinter && !state.createdPrinter}
+            active={!state.get('selectedPrinter') && !state.get('createdPrinter')}
             commitAction={printersEditorActions.deselectPrinter}
         />);
-        if(state.selectedPrinter){
+        if(editingPrinter){
             elements.push(<NavElement
                 key="selected"
-                text={findByUuid(state.printers, state.selectedPrinter).name}
+                text={editingPrinter.get('name')}
                 active={true}
             />);
-        }else if(state.createdPrinter){
+        }else if(state.get('createdPrinter')){
             elements.push(<NavElement
                 key="selected"
-                text={state.createdPrinter.name || "Nuova stampante"}
+                text={state.get('createdPrinter').get('name') || "Nuova stampante"}
                 active={true}
             />);
         }
         return <NavPills>{elements}</NavPills>;
     }
 
-    static makePageContent(state) {
-        if (state.selectedPrinter) {
+    makePageContent() {
+        let state = this.state.data;
+        if (state.get('selectedPrinter')) {
             return <PrinterEditor data={PrintersPage.makePrinterEditorDescriptor(state)}/>
-        } else if (state.createdPrinter) {
+        } else if (state.get('createdPrinter')) {
             return <PrinterCreator data={PrintersPage.makePrinterCreatorDescriptor(state)}/>
         } else {
             return <PrintersNavigator data={state}/>
@@ -86,17 +91,17 @@ export default class PrintersPage extends Component {
     }
 
     static makePrinterEditorDescriptor(data) {
-        return {
-            printer: findByUuid(data.printers, data.selectedPrinter),
-            services: data.services
-        }
+        return fromJS({
+            printer: findByUuid(data.get('printers'), data.get('selectedPrinter')),
+            services: data.get('services')
+        })
     }
 
     static makePrinterCreatorDescriptor(data) {
-        return {
-            printer: data.createdPrinter,
-            services: data.services
-        }
+        return fromJS({
+            printer: data.get('createdPrinter'),
+            services: data.get('services')
+        })
     }
 
 }

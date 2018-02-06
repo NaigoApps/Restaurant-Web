@@ -8,6 +8,8 @@ import {
     ACT_UPDATE_WAITER, ACT_UPDATE_WAITER_CF, ACT_UPDATE_WAITER_NAME, ACT_UPDATE_WAITER_STATUS, ACT_UPDATE_WAITER_SURNAME
 } from "../../actions/ActionTypes";
 
+const {Map} = require('immutable');
+
 const EVT_WAITERS_PAGE_STORE_CHANGED = "EVT_WAITERS_PAGE_STORE_CHANGED";
 
 class WaitersPageStore extends AbstractStore{
@@ -19,19 +21,19 @@ class WaitersPageStore extends AbstractStore{
     }
 
     setName(value){
-        this.inCreationWaiter.name = value;
+        this.inCreationWaiter = this.inCreationWaiter.set('name', value);
     }
 
     setSurname(value){
-        this.inCreationWaiter.surname = value;
+        this.inCreationWaiter = this.inCreationWaiter.set('surname', value);
     }
 
     setCf(value){
-        this.inCreationWaiter.cf = value;
+        this.inCreationWaiter = this.inCreationWaiter.set('cf', value);
     }
 
     setStatus(value){
-        this.inCreationWaiter.status = value;
+        this.inCreationWaiter = this.inCreationWaiter.set('status', value);
     }
 
     handleCompletedAction(action){
@@ -41,11 +43,11 @@ class WaitersPageStore extends AbstractStore{
             case ACT_RETRIEVE_WAITERS:
                 break;
             case ACT_CREATE_WAITER:
-                this.selectedWaiter = action.body.uuid;
+                this.selectedWaiter = action.body.get('uuid');
                 this.inCreationWaiter = null;
                 break;
             case ACT_UPDATE_WAITER:
-                this.selectedWaiter = action.body.uuid;
+                this.selectedWaiter = action.body.get('uuid');
                 break;
             case ACT_DELETE_WAITER:
                 this.selectedWaiter = null;
@@ -55,7 +57,7 @@ class WaitersPageStore extends AbstractStore{
                 this.inCreationWaiter = this.buildWaiter();
                 break;
             case ACT_SELECT_WAITER:
-                this.selectedWaiter = action.body;
+                this.selectedWaiter = action.body.get('uuid');
                 this.inCreationWaiter = null;
                 break;
             case ACT_DESELECT_WAITER:
@@ -63,7 +65,6 @@ class WaitersPageStore extends AbstractStore{
                 this.inCreationWaiter = null;
                 break;
             case ACT_UPDATE_WAITER_NAME:
-                console.log("Set name to " + action.body);
                 this.setName(action.body);
                 break;
             case ACT_UPDATE_WAITER_SURNAME:
@@ -83,21 +84,24 @@ class WaitersPageStore extends AbstractStore{
     }
 
     buildWaiter(){
-        return {
+        return Map({
             name: "",
             surname: "",
             cf: "",
             status: ""
-        };
+        });
     }
 
     getState(){
-        return {
+        let value = Map({
             waiters: waitersStore.getWaiters().getPayload(),
             waiterStatuses: waiterStatusesStore.getWaiterStatuses().getPayload(),
 
             selectedWaiter: this.selectedWaiter,
             createdWaiter: this.inCreationWaiter
+        });
+        return {
+            data: value
         }
     }
 

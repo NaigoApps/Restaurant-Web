@@ -1,17 +1,19 @@
 import React, {Component} from 'react';
 import ordinationsCreatorActions from "../../../pages/evening/OrdinationsCreatorActions";
 import OrdersEditor from "./OrdersEditor";
+import {findByUuid} from "../../../utils/Utils";
 
 export default class OrdinationCreator extends Component {
     constructor(props) {
         super(props);
     }
 
-    onWizardOk(orders) {
-        ordinationsCreatorActions.createOrdination(this.props.data.table, orders);
+    onWizardOk() {
+        let table = this.props.data.get('editingTable');
+        ordinationsCreatorActions.createOrdination(table.get('uuid'), this.props.data.get('editingOrders'));
     }
 
-    onWizardAbort(data) {
+    onWizardAbort() {
         ordinationsCreatorActions.abortOrdinationCreation();
     }
 
@@ -19,7 +21,7 @@ export default class OrdinationCreator extends Component {
         return <div className="panel-body">
             <div className="form">
                 <OrdersEditor
-                    data={OrdinationCreator.makeOrdersEditorDescriptor(this.props.data)}
+                    data={this.props.data}
                     visible={true}
                     commitAction={this.onWizardOk.bind(this)}
                     abortAction={this.onWizardAbort}/>
@@ -27,21 +29,11 @@ export default class OrdinationCreator extends Component {
         </div>
     }
 
-    static makeOrdersEditorDescriptor(props) {
-        return {
-            categories: props.categories,
-            dishes: props.dishes,
-            phases: props.phases,
-            additions: props.additions,
-            orders: []
-        }
-    }
-
     renderWizardData(wData) {
         if (wData["dishes"]) {
             return wData["quantity"] + " x " +
-                this.props.dishes.find(d => d.uuid === wData["dishes"]).name +
-                " (" + this.props.phases.find(f => f.uuid === wData["phases"]).name + ")";
+                findByUuid(this.props.get('dishes'), wData["dishes"]).name +
+                " (" + findByUuid(this.props.get('phases'), wData["phases"]).name + ")";
         }
         return null;
     }

@@ -10,40 +10,40 @@ export default class Modal extends Component {
         }
     }
 
-    componentDidMount(){
+    componentDidMount() {
         let component = this;
-        $("#" + this.state.uuid).on("shown.bs.modal", function () {
-            $("body").trigger("css-update");
-        });
-        $("#" + this.state.uuid).on("hidden.bs.modal", function () {
-            $("body").trigger("css-update");
-        });
-        if(this.props.visible){
+        $("#" + this.state.uuid).on("shown.bs.modal", () => this.props.onModalShown && this.props.onModalShown());
+
+        $("#" + this.state.uuid).on("hidden.bs.modal", () => this.props.onModalHidden && this.props.onModalHidden());
+
+        if (this.props.visible) {
             $("#" + this.state.uuid).modal("show");
         }
     }
 
-    componentDidUpdate(prevProps, prevState){
-        if(!prevProps.visible && this.props.visible){
+    componentDidUpdate(prevProps, prevState) {
+        if (!prevProps.visible && this.props.visible) {
             $("#" + this.state.uuid).modal("show");
-        }else if(prevProps.visible && !this.props.visible){
+        } else if (prevProps.visible && !this.props.visible) {
             $("#" + this.state.uuid).modal("hide");
         }
     }
 
-    componentWillUnmount(){
-        $("#" + this.state.uuid).modal("hide");
+    componentWillUnmount() {
+        if (this.props.visible) {
+            $("#" + this.state.uuid).modal("hide");
+        }
     }
 
 
-    static modalClass(props){
+    static modalClass(props) {
         let classes = ["modal", "fade"];
         return classes.join(" ");
     }
 
-    static modalDialogClass(props){
+    static modalDialogClass(props) {
         let classes = ["modal-dialog"];
-        if(props.lg){
+        if (props.lg) {
             classes.push("modal-lg");
         }
         return classes.join(" ");

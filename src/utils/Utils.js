@@ -9,12 +9,31 @@ export function strcmp(s1, s2) {
 }
 
 export function findByUuid(array, uuid) {
-    return array.find(e => e.uuid === uuid);
+    return array.find(e => {
+        return e.get('uuid') === uuid;
+    });
 }
 
 export function findIndexByUuid(array, uuid) {
-    return array.findIndex(e => e.uuid === uuid);
+    return array.findIndex(e => e.get('uuid') === uuid);
 
+}
+
+export function collectionsEquals(l1, l2){
+    if(l1 === l2 || l1 && !l2 || l2 && !l1){
+        return false;
+    }
+    if(l1.size !== l2.size){
+        return false;
+    }
+    let ok = true;
+    l1.forEach(element => {
+        ok &= l2.contains(element);
+    });
+    l2.forEach(element => {
+        ok &= l1.contains(element);
+    });
+    return ok;
 }
 
 export function distribute(array, value) {

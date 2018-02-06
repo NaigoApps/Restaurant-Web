@@ -18,8 +18,8 @@ export default class WaitersNavigator extends Component {
         return [<Row key="list" topSpaced>
             <Column>
                 <PaginatedEntitiesList
-                    entities={props.waiters}
-                    renderer={waiter => waiter.name}
+                    entities={props.get('waiters')}
+                    renderer={waiter => waiter.get('name')}
                     selectMethod={waitersEditorActions.selectWaiter}
                     deselectMethod={waitersEditorActions.deselectWaiter}
                 />

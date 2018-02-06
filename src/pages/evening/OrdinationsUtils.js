@@ -1,57 +1,88 @@
 import {findByUuid} from "../../utils/Utils";
+import DiningTablesUtils from "./tables/DiningTablesUtils";
+import {beautifyTime, formatDate} from "../../components/widgets/inputs/DateInput";
+const {fromJS, Map, OrderedMap, List} = require('immutable');
 
 export default class OrdinationsUtils {
 
-    static makePhaseMap(orders) {
-        let result = new Map();
-        orders.forEach(order => {
-            let found = false;
-            let phaseOrders = result.get(order.phase);
-            if (!phaseOrders) {
-                phaseOrders = [];
-                result.set(order.phase, phaseOrders);
+    static phaseComparator(o1, o2, phases){
+        let p1 = findByUuid(phases, o1.get('phase')).priority;
+        let p2 = findByUuid(phases, o2.get('phase')).priority;
+        return p1 - p2;
+    }
+
+    static makePhaseMap(orders, phases) {
+        let result = new OrderedMap();
+        orders.sort((o1, o2) => OrdinationsUtils.phaseComparator(o1, o2, phases))
+            .forEach(order => {
+            let phase = order.get('phase');
+            if (!result.get(phase)) {
+                result = result.set(order.get('phase'), List());
             }
-            phaseOrders.push(order);
+            result = result.updateIn([order.get('phase')], phaseOrders => phaseOrders.push(order));
         });
         return result;
     }
 
     static implode(orders) {
-        let result = [];
+        let result = List();
         orders.forEach(order => {
-            OrdinationsUtils.mergeOrder(result, order);
+            result = OrdinationsUtils.mergeOrder(result, order);
         });
         return result;
     }
 
-    static sortByDish(orders, dishes) {
+    static sortByDish(orders, dishes, additions) {
         return orders.sort((o1, o2) => {
-            let d1 = findByUuid(dishes, o1.order.dish);
-            let d2 = findByUuid(dishes, o2.order.dish);
+            let d1 = findByUuid(dishes, o1.get('order').get('dish'));
+            let d2 = findByUuid(dishes, o2.get('order').get('dish'));
             if (d1 && d2) {
-                return d1.name.localeCompare(d2.name);
+                let cmp = d1.get('name').localeCompare(d2.get('name'));
+                if (cmp === 0) {
+                    if (o1.get('order').get('additions').size > o2.get('order').get('additions').size) {
+                        return -1;
+                    } else if (o2.get('order').get('additions').size > o1.get('order').get('additions').size) {
+                        return 1;
+                    }
+                    for (let i = 0; i < o1.get('order').get('additions').size; i++) {
+                        let a1 = findByUuid(additions, o1.get('order').get('additions').get(i));
+                        let a2 = findByUuid(additions, o2.get('order').get('additions').get(i));
+                        if (a1 && a2) {
+                            if (a1.get('name').localeCompare(a2.get('name').name) < 0) {
+                                return -1;
+                            }
+                            if (a1.get('name').name.localeCompare(a2.get('name').name) > 0) {
+                                return 1;
+                            }
+                        }
+                    }
+                    return 0;
+                }
+                return cmp;
             }
-            return o1.order.dish.localeCompare(o2.order.dish);
+            return o1.get('order').get('dish').localeCompare(o2.get('order').get('dish'));
         });
     }
 
 
     static mergeOrder(orders, order) {
         let found = false;
-        orders.forEach(o => {
-            if (OrdinationsUtils.sameOrder(o.order, order)) {
-                o.quantity++;
-                o.price += order.price;
+        orders.forEach((o, i) => {
+            if (OrdinationsUtils.sameOrder(o.get('order'), order)) {
+                o = o.set('quantity', o.get('quantity') + 1);
+                o = o.set('price', o.get('price') + order.get('price'))
+                orders = orders.set(i, o);
                 found = true;
             }
         });
         if (!found) {
-            orders.push({
+            orders = orders.push(Map({
                 order: order,
                 quantity: 1,
-                price: order.price
-            })
+                price: order.get('price')
+            }))
         }
+        return orders;
     }
 
     static sameGroup(g1, g2) {
@@ -67,35 +98,32 @@ export default class OrdinationsUtils {
         if (!o1 || !o2) {
             return false;
         }
-        if (o1.dish !== o2.dish) {
+        if (o1.get('dish') !== o2.get('dish')) {
             return false;
         }
-        if (o1.notes || o2.notes) {
+        if (o1.get('notes') || o2.get('notes')) {
             return false;
         }
-        if (o1.price !== o2.price) {
+        if (o1.get('price') !== o2.get('price')) {
             return false;
         }
-        if (o1.phase !== o2.phase) {
+        if (o1.get('phase') !== o2.get('phase')) {
             return false;
         }
         let ok = true;
-        ok &= o1.additions.every(addition => o2.additions.includes(addition));
-        ok &= o2.additions.every(addition => o1.additions.includes(addition));
+        ok &= o1.get('additions').every(addition => o2.get('additions').includes(addition));
+        ok &= o2.get('additions').every(addition => o1.get('additions').includes(addition));
         return ok;
     }
 
-    static makeOrder(dish, phase, price, ordination) {
-        return {
+    static buildOrder(dish, phase, price, ordination) {
+        return fromJS({
             dish: dish,
             phase: phase,
             price: price,
-            additions: []
-        }
-    }
-
-    static duplicateOrder(order) {
-        return OrdinationsUtils.makeOrder(order.dish, order.phase, order.price, order.ordination);
+            additions: [],
+            notes:''
+        });
     }
 
     static total(orders) {
@@ -107,33 +135,49 @@ export default class OrdinationsUtils {
     }
 
     static renderImplodedOrder(order, dishes, additions) {
-        let dish = findByUuid(dishes, order.order.dish);
-        let result = order.quantity + " " + (dish ? dish.name : "?");
+        let dish = findByUuid(dishes, order.get('order').get('dish'));
+        let result = order.get('quantity') + " " + (dish ? dish.get('name') : "?");
 
-        order.order.additions.forEach(uuid => {
+        order.get('order').get('additions').forEach(uuid => {
             let addition = findByUuid(additions, uuid);
             if (addition) {
-                result += " " + addition.name
+                result += " " + addition.get('name');
             }
         });
+
+        if(order.get('order').get('notes')){
+            result += " " + order.get('order').get('notes');
+        }
 
         return result;
     }
 
     static renderOrder(order, dishes, additions) {
-        let result = dishes.find(d => d.uuid === order.dish).name;
+        let result = dishes.find(d => d.get('uuid') === order.get('dish')).get('name');
 
-        order.additions.forEach(uuid => {
+        order.get('additions').forEach(uuid => {
             let addition = findByUuid(additions, uuid);
             if (addition) {
-                result += " " + addition.name
+                result += " " + addition.get('name')
             }
         });
+
+        if(order.get('notes')){
+            result += " " + order.get('notes');
+        }
 
         return result;
     }
 
     static formatPrice(price) {
         return price.toFixed(2) + "€";
+    }
+
+    static renderOrdination(ordination){
+        return "Comanda delle " + beautifyTime(ordination.get('creationTime'));
+    }
+
+    static ordinationDateSorter(o1, o2){
+        return o1.get('creationTime').localeCompare(o2.get('creationTime'));
     }
 }

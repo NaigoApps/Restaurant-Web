@@ -54,33 +54,33 @@ export default class Keyboard extends Component {
     render() {
         let letters = this.state.uppercase ? UPPERCASE : LOWERCASE;
 
-        let numbers = NUMBERS.map(n => <KeyboardButton key={n} char={n} onClick={this.onButtonClick.bind(this, n)}/>);
-        let letters1 = letters[0].map(n => <KeyboardButton key={n} char={n} onClick={this.onButtonClick.bind(this, n)}/>);
-        let letters2 = letters[1].map(n => <KeyboardButton key={n} char={n} onClick={this.onButtonClick.bind(this, n)}/>);
-        let letters3 = letters[2].map(n => <KeyboardButton key={n} char={n} onClick={this.onButtonClick.bind(this, n)}/>);
+        let numbers = NUMBERS.map(n => <KeyboardButton reduced={this.props.reduced} key={n} char={n} onClick={this.onButtonClick.bind(this, n)}/>);
+        let letters1 = letters[0].map(n => <KeyboardButton reduced={this.props.reduced} key={n} char={n} onClick={this.onButtonClick.bind(this, n)}/>);
+        let letters2 = letters[1].map(n => <KeyboardButton reduced={this.props.reduced} key={n} char={n} onClick={this.onButtonClick.bind(this, n)}/>);
+        let letters3 = letters[2].map(n => <KeyboardButton reduced={this.props.reduced} key={n} char={n} onClick={this.onButtonClick.bind(this, n)}/>);
 
 
         return (<div className="container-fluid">
             <div className="row">
                 {numbers}
-                <KeyboardButton char="canc" size={SIZES.MEDIUM} onClick={this.onDelClick.bind(this)}/>
+                <KeyboardButton reduced={this.props.reduced} char="canc" size={SIZES.MEDIUM} onClick={this.onDelClick.bind(this)}/>
             </div>
             <div className="row">
-                <KeyboardButtonSpace size={SIZES.SMALL}/>
+                <KeyboardButtonSpace reduced={this.props.reduced} size={SIZES.SMALL}/>
                 {letters1}
             </div>
             <div className="row">
-                <KeyboardButton icon="lock" size={SIZES.MEDIUM} onClick={this.onCapsLockClick.bind(this)}/>
+                <KeyboardButton reduced={this.props.reduced} icon="lock" size={SIZES.MEDIUM} onClick={this.onCapsLockClick.bind(this)}/>
                 {letters2}
             </div>
             <div className="row">
-                <KeyboardButtonSpace size={SIZES.SMALL}/>{letters3}
+                <KeyboardButtonSpace reduced={this.props.reduced} size={SIZES.SMALL}/>{letters3}
             </div>
             <div className="row">
-                <KeyboardButtonSpace size={SIZES.HUGE}/>
-                <KeyboardButton icon="triangle-left" size={SIZES.XSMALL} onClick={this.onLeftClick.bind(this)}/>
-                <KeyboardButton char="&nbsp;" size={SIZES.SPACE} onClick={this.onButtonClick.bind(this)}/>
-                <KeyboardButton icon="triangle-right" size={SIZES.XSMALL} onClick={this.onRightClick.bind(this)}/>
+                <KeyboardButtonSpace reduced={this.props.reduced} size={SIZES.HUGE}/>
+                <KeyboardButton reduced={this.props.reduced} icon="triangle-left" size={SIZES.XSMALL} onClick={this.onLeftClick.bind(this)}/>
+                <KeyboardButton reduced={this.props.reduced} char="&nbsp;" size={SIZES.SPACE} onClick={this.onButtonClick.bind(this)}/>
+                <KeyboardButton reduced={this.props.reduced} icon="triangle-right" size={SIZES.XSMALL} onClick={this.onRightClick.bind(this)}/>
             </div>
         </div>);
     }

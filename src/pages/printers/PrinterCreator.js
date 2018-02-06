@@ -14,28 +14,29 @@ export default class PrinterCreator extends React.Component {
 
     render() {
         let props = this.props.data;
-        let name = props.printer.name || "Nuova stampante";
+        let name = props.get('printer').get('name') || "Nuova stampante";
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.printer}
+                    valid={!!props.get('printer').get('name')}
+                    entity={props.get('printer')}
                     confirmMethod={printersCreatorActions.createPrinter}
                     render={() => name}>
                     <SelectEditor
                         label="Nome"
-                        options={props.services}
-                        value={props.printer.name}
+                        options={props.get('services')}
+                        value={props.get('printer').get('name')}
                         commitAction={printersCreatorActions.updatePrinterName}
                     />
                     <BooleanEditor
                         label="Principale"
-                        value={props.printer.main}
+                        value={props.get('printer').get('main')}
                         commitAction={printersCreatorActions.updatePrinterMain}
                     />
                     <IntegerEditor
                         label="Lunghezza riga"
-                        value={props.printer.lineCharacters}
+                        value={props.get('printer').get('lineCharacters')}
                         commitAction={printersCreatorActions.updatePrinterLineCharacters}
                     />
                 </EntityEditor>

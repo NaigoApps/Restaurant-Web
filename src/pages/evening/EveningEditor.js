@@ -1,18 +1,16 @@
 import React from 'react';
-import diningTablesEditorActions from "./DiningTablesEditorActions";
+import diningTablesEditorActions from "./tables/DiningTablesEditorActions";
 import Button from "../../widgets/Button";
-import {findByUuid} from "../../utils/Utils";
-import DiningTableEditor from "./DiningTableEditor";
+import DiningTableEditor from "./tables/DiningTableEditor";
 import PaginatedEntitiesList from "../../components/widgets/PaginatedEntitiesList";
-import NavPills from "../../widgets/NavPills";
-import NavPillsElement from "../../widgets/NavElement";
-import eveningSelectionFormActions from "../../actions/pages/EveningSelectionFormActions";
-import diningTablesCreatorActions from "./DiningTablesCreatorActions";
-import DiningTableCreator from "./DiningTableCreator";
+import diningTablesCreatorActions from "./tables/DiningTablesCreatorActions";
+import DiningTableCreator from "./tables/DiningTableCreator";
 import Row from "../../widgets/Row";
 import Column from "../../widgets/Column";
 import eveningEditorActions from "./EveningEditorActions";
 import FloatEditor from "../../components/widgets/inputs/FloatEditor";
+import DiningTablesUtils from "./tables/DiningTablesUtils";
+import {NEW_DINING_TABLE_UUID} from "../../utils/EntitiesUtils";
 
 export default class EveningEditor extends React.Component {
     constructor(props) {
@@ -23,102 +21,56 @@ export default class EveningEditor extends React.Component {
 
         let props = this.props.data;
 
-        const createdDiningTable = props.createdDiningTable;
+        let editorContent = <span/>;
 
-        if (props.selectedDiningTable) {
-            let diningTableProps = EveningEditor.makeDiningTableEditorProps(props);
-
-            return <DiningTableEditor data={diningTableProps}/>;
-        } else if (!createdDiningTable) {
+        if (props.get('editingTable')) {
+            if (props.get('editingTable').get('uuid') === NEW_DINING_TABLE_UUID) {
+                editorContent = <DiningTableCreator data={props}/>;
+            } else {
+                editorContent = <DiningTableEditor data={props}/>;
+            }
+        } else {
             let diningTableRenderer = {
                 name: this.renderDiningTable.bind(this)
             };
-            return ([
-                <Row key="Selection">
-                    <Column>
-                        <NavPills>
-                            <NavPillsElement
-                                text="Selezione serata"
-                                active={false}
-                                commitAction={eveningSelectionFormActions.deselectEvening}
-                            />
-                            <NavPillsElement text="Elenco tavoli" active={true}/>
-                        </NavPills>
-                    </Column>
+            editorContent = [<Row key="coverCharge" topSpaced>
+                <Column>
+                    <FloatEditor
+                        label="Coperto"
+                        value={props.get('evening').get('coverCharge')}
+                        commitAction={eveningEditorActions.updateCoverCharge
+                            .bind(eveningEditorActions, props.get('evening').get('uuid'))}/>
+                </Column>
+            </Row>,
+                <Row key="tablesList" grow>
+                    <PaginatedEntitiesList
+                        rows={9}
+                        cols={3}
+                        entities={props.get('evening').get('diningTables')}
+                        renderer={diningTableRenderer}
+                        selectMethod={diningTablesEditorActions.beginDiningTableEditing}
+                        deselectMethod={diningTablesEditorActions.abortDiningTableEditing}/>,
                 </Row>,
-                <Row key="coverCharge" topSpaced>
-                    <Column>
-                        <FloatEditor
-                            label="Coperto"
-                            descriptor={EveningEditor.getCoverChargeDescriptor()}
-                            value={props.evening.coverCharge}
-                            commitAction={eveningEditorActions.updateCoverCharge.bind(eveningEditorActions, props.evening.uuid)}/>
-                    </Column>
-                </Row>,
-                <Row key="tables" topSpaced>
-                    <Column>
-                        <PaginatedEntitiesList
-                            entities={props.evening.diningTables}
-                            renderer={diningTableRenderer}
-                            selectMethod={diningTablesEditorActions.selectDiningTable}
-                            deselectMethod={diningTablesEditorActions.deselectDiningTable}
-                        />
-                    </Column>
-                </Row>,
-                <Row key="new" topSpaced>
+                <Row key="newTable" topSpaced>
                     <Column centered={true}>
                         <Button
                             text="Nuovo tavolo"
-                            size="lg"
-                            type="success"
+                            type="info"
                             commitAction={diningTablesCreatorActions.beginDiningTableCreation}
                         />
                     </Column>
-                </Row>]);
-        } else {
-            return <DiningTableCreator
-                data={EveningEditor.makeDiningTableCreatorProps(props)}
-            />;
+                </Row>];
         }
 
-    }
+        return (<Row topSpaced grow>
+            <Column>
+                {editorContent}
+            </Column>
+        </Row>);
 
-    static makeDiningTableEditorProps(props) {
-        return {
-            diningTable: findByUuid(props.evening.diningTables, props.selectedDiningTable),
-            waiters: props.waiters,
-            tables: props.tables,
-            categories: props.categories,
-            dishes: props.dishes,
-            phases: props.phases,
-            additions: props.additions,
-
-            selectedOrdination: props.selectedOrdination,
-            editingOrdination: props.editingOrdination,
-            createdOrdination: props.createdOrdination
-        };
-    }
-
-    static makeDiningTableCreatorProps(props) {
-        return {
-            tables: props.tables,
-            waiters: props.waiters,
-            diningTable: props.createdDiningTable
-        };
-    }
-
-    static getCoverChargeDescriptor() {
-        return {
-            name: "coverCharge",
-            label: "Coperto",
-            unit: "€",
-            isForNav: true
-        }
     }
 
     renderDiningTable(dt) {
-        const table = this.props.data.tables.find(t => t.uuid === dt.table);
-        const waiter = this.props.data.waiters.find(w => w.uuid === dt.waiter);
-        return DiningTableEditor.renderDiningTable(table, waiter, dt);
+        return DiningTablesUtils.renderDiningTable(dt, this.props.data.get('tables'), this.props.data.get('waiters'));
     }
 }

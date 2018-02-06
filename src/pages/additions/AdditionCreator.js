@@ -14,27 +14,29 @@ export default class AdditionCreator extends React.Component {
 
     render() {
         let props = this.props.data;
-        let name = props.addition.name || "Nuova variante";
+        let addition = props.get('addition');
+        let name = addition.get('name') || "Nuova variante";
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.addition}
+                    entity={addition}
+                    valid={addition.get('name')}
                     confirmMethod={additionsCreatorActions.createAddition}
                     render={() => name}>
                     <TextEditor
                         label="Nome"
-                        value={props.addition.name}
+                        value={addition.get('name')}
                         commitAction={additionsCreatorActions.updateAdditionName}
                     />
                     <BooleanEditor
-                        label="Principale"
-                        value={props.addition.generic}
+                        label="Generica"
+                        value={addition.get('generic')}
                         commitAction={additionsCreatorActions.updateAdditionGeneric}
                     />
                     <FloatEditor
                         label="Prezzo aggiuntivo"
-                        value={props.addition.price}
+                        value={addition.get('price')}
                         commitAction={additionsCreatorActions.updateAdditionPrice}
                     />
                 </EntityEditor>

@@ -11,6 +11,8 @@ import NavElementLink from "../../widgets/NavElementLink";
 import NavElement from "../../widgets/NavElement";
 import NavPills from "../../widgets/NavPills";
 
+const {fromJS} = require('immutable');
+
 export default class LocationsPage extends Component {
 
     constructor(props) {
@@ -35,8 +37,8 @@ export default class LocationsPage extends Component {
     }
 
     render() {
-        let navContent = LocationsPage.makeNavContent(this.state);
-        let pageContent = LocationsPage.makePageContent(this.state);
+        let navContent = LocationsPage.makeNavContent(this.state.data);
+        let pageContent = LocationsPage.makePageContent(this.state.data);
         return (
             <Page title="Postazioni">
                 {navContent}
@@ -46,9 +48,9 @@ export default class LocationsPage extends Component {
     }
 
     static makePageContent(state) {
-        if (state.selectedLocation) {
+        if (state.get('selectedLocation')) {
             return <LocationEditor data={LocationsPage.makeLocationEditorDescriptor(state)}/>
-        } else if (state.createdLocation) {
+        } else if (state.get('createdLocation')) {
             return <LocationCreator data={LocationsPage.makeLocationCreatorDescriptor(state)}/>
         } else {
             return <LocationsNavigator data={state}/>
@@ -56,17 +58,17 @@ export default class LocationsPage extends Component {
     }
 
     static makeLocationEditorDescriptor(data) {
-        return {
-            location: findByUuid(data.locations, data.selectedLocation),
-            printers: data.printers
-        }
+        return fromJS({
+            location: findByUuid(data.get('locations'), data.get('selectedLocation')),
+            printers: data.get('printers')
+        })
     }
 
     static makeLocationCreatorDescriptor(data) {
-        return {
-            location: data.createdLocation,
-            printers: data.printers
-        }
+        return fromJS({
+            location: data.get('createdLocation'),
+            printers: data.get('printers')
+        })
     }
 
     static makeNavContent(state) {
@@ -79,19 +81,19 @@ export default class LocationsPage extends Component {
         elements.push(<NavElement
             key="locations"
             text="Postazioni"
-            active={!state.selectedLocation && !state.createdLocation}
+            active={!state.get('selectedLocation') && !state.get('createdLocation')}
             commitAction={locationsEditorActions.deselectLocation}
         />);
-        if (state.selectedLocation) {
+        if (state.get('selectedLocation')) {
             elements.push(<NavElement
                 key="selected"
-                text={findByUuid(state.locations, state.selectedLocation).name}
+                text={findByUuid(state.get('locations'), state.get('selectedLocation')).get('name')}
                 active={true}
             />);
-        } else if (state.createdLocation) {
+        } else if (state.get('createdLocation')) {
             elements.push(<NavElement
                 key="selected"
-                text={state.createdLocation.name || "Nuova postazione"}
+                text={state.get('createdLocation').get('name') || "Nuova postazione"}
                 active={true}
             />);
         }

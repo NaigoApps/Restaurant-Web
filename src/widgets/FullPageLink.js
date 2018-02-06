@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import Icon from "./Icon";
-import Column from "./Column";
+import applicationStore from "../stores/ApplicationStore";
+import applicationActions from "../actions/ApplicationActions";
 
 /**
  * Expects:
@@ -14,12 +15,6 @@ export default class FullPageLink extends Component {
         super(props);
     }
 
-    clickAction() {
-        if (this.props.commitAction) {
-            this.props.commitAction();
-        }
-    }
-
     render() {
         let path = this.props.path;
         let icon;
@@ -28,23 +23,17 @@ export default class FullPageLink extends Component {
         }
         let text = this.props.text;
         return (
-            <Column>
-                <div onClick={this.clickAction.bind(this)}>
-                    <Link
-                        className="full-size"
-                        to={"/restaurant/" + path}
-                        replace={true}>
-                        <div className="full-size">
-                            <div className="text-center top-sep">
-                                {icon}
-                            </div>
-                            <h3 className="text-center">
-                                {text}
-                            </h3>
-                        </div>
-                    </Link>
+            <Link to={"/restaurant/" + path}
+                  replace={true}>
+                <div className="full-size" onClick={applicationActions.requestFullScreen}>
+                    <div className="text-center top-sep">
+                        {icon}
+                    </div>
+                    <h3 className="text-center">
+                        {text}
+                    </h3>
                 </div>
-            </Column>
+            </Link>
         );
     }
 

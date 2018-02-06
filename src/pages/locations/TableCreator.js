@@ -12,17 +12,19 @@ export default class TableCreator extends React.Component {
 
     render() {
         let props = this.props.data;
-        let name = props.table.name || "Nuovo tavolo";
+        let table = props.get('table');
+        let name = table.get('name') || "Nuovo tavolo";
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.table}
+                    entity={table}
+                    valid={table.get('name')}
                     confirmMethod={tablesCreatorActions.createTable}
                     render={() => name}>
                     <TextEditor
                         label="Nome"
-                        value={props.table.name}
+                        value={table.get('name')}
                         commitAction={tablesCreatorActions.updateTableName}
                     />
                 </EntityEditor>

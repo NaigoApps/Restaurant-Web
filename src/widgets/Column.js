@@ -26,10 +26,14 @@ export default class Column extends Component {
             classes.push("col-xl-" + this.props.xl);
         }
         if (classes.length === 2) {
-            classes.push("col");
+            if (this.props.auto) {
+                classes.push("col col-sm-auto");
+            } else {
+                classes.push("col");
+            }
         }
         if (this.props.align) {
-            classes.push("align-self-" + this.props.align);
+            classes.push("align-items-" + this.props.align);
         }
         if (this.props.centered) {
             classes.push("text-center");

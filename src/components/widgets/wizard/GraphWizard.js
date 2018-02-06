@@ -16,11 +16,20 @@ export default class GraphWizard extends Component {
 
         this.state = {
             uuid: "gw_" + uuid(),
-            data: []
+            data: [],
+            refreshPulse: 0
         };
 
         this.updateWizard = this.updateWizard.bind(this);
 
+    }
+
+    cssUpdate() {
+        this.setState(prevState => {
+            return {
+                refreshPulse: prevState.refreshPulse + 1
+            }
+        });
     }
 
     componentDidMount() {
@@ -81,11 +90,22 @@ export default class GraphWizard extends Component {
     }
 
     render() {
-        if (this.props.isForNav) {
-            return this.buildNavContent();
-        } else {
-            return this.buildDefaultContent();
+        if (this.props.hideForm) {
+            return <div className="form-horizontal">
+                {this.buildModal()}
+            </div>;
         }
+        return <div className="form-group row">
+            <label className="col-form-label col col-sm-3">{this.props.label}</label>
+            <div className="col-sm-9">
+                <Button
+                    commitAction={this.openWizard.bind(this)}
+                    text={this.renderData()}
+                    icon="pencil"
+                />
+            </div>
+            {this.buildModal()}
+        </div>;
     }
 
     renderData() {
@@ -110,44 +130,14 @@ export default class GraphWizard extends Component {
             commitAction={this.confirmAction.bind(this)}/>;
     }
 
-    buildNavContent() {
-        return <div className="form-group">
-            <Button
-                commitAction={this.openWizard.bind(this)}
-                text={this.props.label + " " + this.renderData()}
-                icon="pencil"
-            />
-            {this.buildModal()}
-        </div>;
-    }
-
-    buildDefaultContent() {
-        if (this.props.hideForm) {
-            return <div className="form-horizontal">
-                {this.buildModal()}
-            </div>;
-        }
-        return <div className="form-group row">
-            <label className="col-form-label col-sm-2">{this.props.label}</label>
-            <div className="col-sm-10">
-                <Button
-                    commitAction={this.openWizard.bind(this)}
-                    text={this.renderData()}
-                    icon="pencil"
-                />
-            </div>
-            {this.buildModal()}
-        </div>;
-    }
-
-
     buildModal() {
 
         const pageName = this.state.page;
 
         let pages = React.Children.map(this.props.children, (child) => React.cloneElement(child, {
             wizardData: this.state.data,
-            wizardId: this.state.uuid
+            wizardId: this.state.uuid,
+            refreshPulse: this.state.refreshPulse
         }));
 
         const currentPage = React.Children.toArray(pages).find(page => page.props.identifier === pageName);
@@ -178,7 +168,9 @@ export default class GraphWizard extends Component {
             </div>;
         }
 
-        return <Modal visible={this.props.visible || this.state.open} lg={this.props.size === "lg"}>
+        return <Modal visible={this.props.visible || this.state.open} lg={this.props.size === "lg"}
+                      onModalShown={() => this.cssUpdate()}
+                      onModalHidden={() => this.cssUpdate()}>
             {navContainer}
             <div className="modal-body d-flex">
                 <Column>

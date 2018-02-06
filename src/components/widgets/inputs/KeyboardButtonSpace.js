@@ -15,25 +15,28 @@ export default class KeyboardButtonSpace extends Component {
     }
 
     computeStyle() {
-        let style = "keyboard-character ";
+        let style = ["keyboard-character"];
         switch (this.props.size) {
             case SIZES.XSMALL:
-                style += "xs";
+                style.push("xs");
                 break;
             case SIZES.SMALL:
-                style += "sm";
+                style.push("sm");
                 break;
             case SIZES.MEDIUM:
-                style += "md";
+                style.push("md");
                 break;
             case SIZES.HUGE:
-                style += "lg";
+                style.push("lg");
                 break;
             default:
-                style += "xs";
+                style.push("xs");
                 break;
         }
-        return style;
+        if(this.props.reduced){
+            style.push("reduced");
+        }
+        return style.join(" ");
     }
 
     render() {

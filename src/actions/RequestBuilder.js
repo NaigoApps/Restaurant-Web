@@ -1,5 +1,7 @@
 import dispatcher from "../dispatcher/SimpleDispatcher";
 
+const {fromJS} = require('immutable');
+
 class RequestBuilder {
 
     constructor() {
@@ -7,8 +9,8 @@ class RequestBuilder {
     }
 
     buildParams(params) {
-        var url = "?";
-        var sep = "";
+        let url = "?";
+        let sep = "";
         Object.keys(params).forEach(function (prop) {
             url += sep + prop + "=" + params[prop];
             sep = "&";
@@ -29,10 +31,18 @@ class RequestBuilder {
                 mode: 'cors'
             }).then((response) => {
                 if (response.ok) {
-                    response.json().then((result) => {
-                        dispatcher.fireEnd(action, result);
-                        resolve(result);
-                    });
+                    let contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        response.json().then((result) => {
+                            dispatcher.fireEnd(action, fromJS(result));
+                            resolve(fromJS(result));
+                        });
+                    } else {
+                        response.text().then((result) => {
+                            dispatcher.fireEnd(action, result);
+                            resolve(result);
+                        });
+                    }
                 } else {
                     response.text().then((message) => {
                         dispatcher.fireError(action, message);
@@ -62,10 +72,19 @@ class RequestBuilder {
                 }
             ).then((response) => {
                 if (response.ok) {
-                    response.json().then((result) => {
-                        dispatcher.fireEnd(action, result);
-                        resolve(result.uuid);
-                    });
+
+                    let contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        response.json().then((result) => {
+                            dispatcher.fireEnd(action, fromJS(result));
+                            resolve(fromJS(result));
+                        });
+                    } else {
+                        response.text().then((result) => {
+                            dispatcher.fireEnd(action, result);
+                            resolve(result);
+                        });
+                    }
                 } else {
                     response.text().then((message) => {
                         dispatcher.fireError(action, message);
@@ -85,12 +104,19 @@ class RequestBuilder {
             method: "PUT",
             mode: 'cors',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': typeof(target) === "string" ? 'text/plain' : 'application/json'
             },
             body: typeof(target) === "string" ? target : JSON.stringify(target)
         }).then((response) => {
             if (response.ok) {
-                response.json().then((result) => dispatcher.fireEnd(action, result));
+                let contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    response.json().then((result) => dispatcher.fireEnd(action, fromJS(result)));
+                } else {
+                    response.text().then((result) => {
+                        dispatcher.fireEnd(action, result);
+                    });
+                }
             } else {
                 response.text().then((message) => {
                     dispatcher.fireError(action, message);
@@ -109,7 +135,14 @@ class RequestBuilder {
             body: object
         }).then((response) => {
             if (response.ok) {
-                dispatcher.fireEnd(action, object);
+                let contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    response.json().then((result) => dispatcher.fireEnd(action, fromJS(result)));
+                } else {
+                    response.text().then((result) => {
+                        dispatcher.fireEnd(action, result);
+                    });
+                }
             } else {
                 response.text().then((message) => {
                     dispatcher.fireError(action, message);

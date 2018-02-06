@@ -11,6 +11,8 @@ import NavPills from "../../widgets/NavPills";
 import NavElement from "../../widgets/NavElement";
 import NavElementLink from "../../widgets/NavElementLink";
 
+const {Map} = require('immutable');
+
 export default class WaitersPage extends Component {
 
     constructor(props) {
@@ -35,8 +37,8 @@ export default class WaitersPage extends Component {
     }
 
     render() {
-        let navContent = WaitersPage.makeNavContent(this.state);
-        let pageContent = WaitersPage.makePageContent(this.state);
+        let navContent = WaitersPage.makeNavContent(this.state.data);
+        let pageContent = WaitersPage.makePageContent(this.state.data);
         return (
             <Page title="Camerieri">
                 {navContent}
@@ -46,9 +48,9 @@ export default class WaitersPage extends Component {
     }
 
     static makePageContent(state) {
-        if (state.selectedWaiter) {
+        if (state.get('selectedWaiter')) {
             return <WaiterEditor data={WaitersPage.makeWaiterEditorDescriptor(state)}/>
-        } else if (state.createdWaiter) {
+        } else if (state.get('createdWaiter')) {
             return <WaiterCreator data={WaitersPage.makeWaiterCreatorDescriptor(state)}/>
         } else {
             return <WaitersNavigator data={state}/>
@@ -56,16 +58,16 @@ export default class WaitersPage extends Component {
     }
 
     static makeWaiterEditorDescriptor(data) {
-        return {
-            waiter: findByUuid(data.waiters, data.selectedWaiter),
-            statuses: data.waiterStatuses
-        }
+        return Map({
+            waiter: findByUuid(data.get('waiters'), data.get('selectedWaiter')),
+            statuses: data.get('waiterStatuses')
+        })
     }
 
     static makeWaiterCreatorDescriptor(data) {
-        return {
-            waiter: data.createdWaiter
-        }
+        return Map({
+            waiter: data.get('createdWaiter')
+        })
     }
 
     static makeNavContent(state) {
@@ -78,19 +80,19 @@ export default class WaitersPage extends Component {
         elements.push(<NavElement
             key="waiters"
             text="Camerieri"
-            active={!state.selectedWaiter && !state.createdWaiter}
+            active={!state.get('selectedWaiter') && !state.get('createdWaiter')}
             commitAction={waitersEditorActions.deselectWaiter}
         />);
-        if (state.selectedWaiter) {
+        if (state.get('selectedWaiter')) {
             elements.push(<NavElement
                 key="selected"
-                text={findByUuid(state.waiters, state.selectedWaiter).name}
+                text={findByUuid(state.get('waiters'), state.get('selectedWaiter')).get('name')}
                 active={true}
             />);
-        } else if (state.createdWaiter) {
+        } else if (state.get('createdWaiter')) {
             elements.push(<NavElement
                 key="selected"
-                text={state.createdWaiter.name || "Nuovo cameriere"}
+                text={state.get('createdWaiter').get('name') || "Nuovo cameriere"}
                 active={true}
             />);
         }

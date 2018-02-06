@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {uuid} from "../../utils/Utils";
 import ScrollBar from "../../widgets/ScrollBar";
+import Column from "../../widgets/Column";
 
 export default class Scrollable extends Component {
     constructor(props) {
@@ -27,18 +28,17 @@ export default class Scrollable extends Component {
 
         let height = global.$("#" + this.state.uuid).height();
         let parentHeight = global.$("#" + this.state.uuid).parent().height();
+        if (parentHeight < height) {
+            console.log("Parent: " + parentHeight + ", Son: " + height + ", DO need");
+        } else {
+            console.log("Parent: " + parentHeight + ", Son: " + height + ", NO need");
+        }
         this.setState({
             scrollbarNeeded: parentHeight < height
         });
-
-        global.$("body").on("css-update", this.updateScrollBar.bind(this));
     }
 
-    componentWillUnmount(){
-        global.$("body").off("css-update");
-    }
-
-    updateScrollBar(){
+    updateScrollBar() {
         let height = global.$("#" + this.state.uuid).height();
         let parentHeight = global.$("#" + this.state.uuid).parent().height();
         this.setState({
@@ -47,30 +47,61 @@ export default class Scrollable extends Component {
     }
 
     componentWillReceiveProps() {
-        let height = global.$("#" + this.state.uuid).height();
-        let parentHeight = global.$("#" + this.state.uuid).parent().height();
-        this.setState({
-            scrollbarNeeded: parentHeight < height
-        });
+        this.updateScrollBar();
     }
 
     componentDidUpdate(prevProps, prevState) {
         let height = global.$("#" + this.state.uuid).height();
         let parentHeight = global.$("#" + this.state.uuid).parent().height();
+        if (parentHeight < height) {
+            console.log("Parent: " + parentHeight + ", Son: " + height + ", DO need");
+        } else {
+            console.log("Parent: " + parentHeight + ", Son: " + height + ", NO need");
+        }
         if (prevState.scrollbarNeeded && height <= parentHeight ||
             !prevState.scrollbarNeeded && height > parentHeight) {
+            console.log("Change scroll status");
             this.setState({
-                scrollbarNeeded: parentHeight < height
+                scrollbarNeeded: parentHeight < height,
+                percent: 0
             });
+        }
+        if (prevProps.scrollPulse !== this.props.scrollPulse) {
+            this.setState({
+                percent: 1
+            });
+        }
+        this.updatePosition();
+    }
+
+    updatePosition() {
+        let children = global.$("#" + this.state.uuid);
+        let parent = children.parent();
+        if(this.state.scrollbarNeeded) {
+            children.css('top', (this.state.percent * (parent.height() - children.height())) + "px");
+        }else{
+            children.css('top', "0");
         }
     }
 
     render() {
         return <div className="draggable-container d-flex align-items-stretch h-100">
-            <div id={this.state.uuid} className="draggable-content">
-                {this.props.children}
-            </div>
-            <ScrollBar visible={this.state.scrollbarNeeded} percent={this.state.percent}/>
+            <Column>
+                <div id={this.state.uuid} className="draggable-content">
+                    {this.props.children}
+                </div>
+            </Column>
+            <ScrollBar
+                visible={this.state.scrollbarNeeded}
+                percent={this.state.percent}
+                onScroll={(percent) => this.onScroll(percent)}
+            />
         </div>;
+    }
+
+    onScroll(percent) {
+        this.setState({
+            percent: percent
+        })
     }
 }

@@ -18,8 +18,10 @@ export default class TablesNavigator extends Component {
         return [<Row key="list" topSpaced>
             <Column>
                 <PaginatedEntitiesList
-                    entities={props.tables}
-                    renderer={table => table.name}
+                    rows={9}
+                    cols={4}
+                    entities={props.get('tables')}
+                    renderer={table => table.get('name')}
                     selectMethod={tablesEditorActions.selectTable}
                     deselectMethod={tablesEditorActions.deselectTable}
                 />

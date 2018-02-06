@@ -20,14 +20,14 @@ export default class PrintersNavigator extends Component {
             <Row key="list" topSpaced>
                 <Column>
                     <PaginatedEntitiesList
-                        entities={props.printers}
-                        renderer={printer => printer.name}
+                        entities={props.get('printers')}
+                        renderer={printer => printer.get('name')}
                         selectMethod={printersEditorActions.selectPrinter}
                         deselectMethod={printersEditorActions.deselectPrinter}
                     />
                 </Column>
             </Row>,
-            <Row topSpaced>
+            <Row key="new" topSpaced>
                 <Column>
                     <Button key="new"
                             text="Nuova stampante"

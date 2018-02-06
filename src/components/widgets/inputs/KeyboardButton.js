@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {uuid} from "../../../utils/Utils";
 
-export const SIZES = {XSMALL: "XSMALL", SMALL: "SMALL", MEDIUM: "MEDIUM", HUGE: "HUGE", SPACE: "SPACE"};
+export const SIZES = {XXSMALL: "XXSMALL",XSMALL: "XSMALL", SMALL: "SMALL", MEDIUM: "MEDIUM", HUGE: "HUGE", SPACE: "SPACE"};
 
 export default class KeyboardButton extends Component {
     constructor(props) {
@@ -16,37 +16,43 @@ export default class KeyboardButton extends Component {
     }
 
     computeStyle() {
-        let style = "btn btn-lg btn-secondary keyboard-character ";
+        let style = ["btn", "btn-lg", "btn-secondary", "keyboard-character"];
         switch (this.props.size) {
+            case SIZES.XXSMALL:
+                style.push("xxs");
+                break;
             case SIZES.XSMALL:
-                style += "xs";
+                style.push("xs");
                 break;
             case SIZES.SMALL:
-                style += "sm";
+                style.push("sm");
                 break;
             case SIZES.MEDIUM:
-                style += "md";
+                style.push("md");
                 break;
             case SIZES.HUGE:
-                style += "lg";
+                style.push("lg");
                 break;
             case SIZES.SPACE:
-                style += "space";
+                style.push("space");
                 break;
             default:
-                style += "xs";
+                style.push("xs");
                 break;
         }
-        return style;
+        if(this.props.reduced){
+            style.push("reduced");
+        }
+        return style.join(" ");
     }
 
     render() {
         const disabled = this.props.disabled;
         let style = this.computeStyle();
         let content;
-        if(this.props.char){
+        if (this.props.char) {
             content = this.props.char;
-        }else if(this.props.icon){
+        } else if (this.props.icon) {
             content = <span className={"glyphicon glyphicon-" + this.props.icon}/>
         }
         let c = this.props.char;

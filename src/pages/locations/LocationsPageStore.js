@@ -14,36 +14,38 @@ import {
 import locationsStore from "../../stores/LocationsStore";
 import printersStore from "../../stores/PrintersStore";
 
+const {fromJS, Map} = require('immutable');
+
 const EVT_LOCATIONS_PAGE_STORE_CHANGED = "EVT_LOCATIONS_PAGE_STORE_CHANGED";
 
-class LocationsPageStore extends AbstractStore{
+class LocationsPageStore extends AbstractStore {
 
-    constructor(){
+    constructor() {
         super(EVT_LOCATIONS_PAGE_STORE_CHANGED);
         this.selectedLocation = null;
         this.createdLocation = null;
     }
 
-    setName(value){
-        this.createdLocation.name = value;
+    setName(value) {
+        this.createdLocation = this.createdLocation.set('name', value);
     }
 
-    setPrinter(value){
-        this.createdLocation.printer = value;
+    setPrinter(value) {
+        this.createdLocation = this.createdLocation.set('printer', value);
     }
 
-    handleCompletedAction(action){
+    handleCompletedAction(action) {
         let changed = true;
         dispatcher.waitFor([locationsStore.getToken(), printersStore.getToken()]);
         switch (action.type) {
             case ACT_RETRIEVE_LOCATIONS:
                 break;
             case ACT_CREATE_LOCATION:
-                this.selectedLocation = action.body.uuid;
+                this.selectedLocation = action.body.get('uuid');
                 this.createdLocation = null;
                 break;
             case ACT_UPDATE_LOCATION:
-                this.selectedLocation = action.body.uuid;
+                this.selectedLocation = action.body.get('uuid');
                 break;
             case ACT_DELETE_LOCATION:
                 this.selectedLocation = null;
@@ -53,7 +55,7 @@ class LocationsPageStore extends AbstractStore{
                 this.createdLocation = this.buildLocation();
                 break;
             case ACT_SELECT_LOCATION:
-                this.selectedLocation = action.body;
+                this.selectedLocation = action.body.get('uuid');
                 this.createdLocation = null;
                 break;
             case ACT_DESELECT_LOCATION:
@@ -73,20 +75,23 @@ class LocationsPageStore extends AbstractStore{
         return changed;
     }
 
-    buildLocation(){
-        return {
+    buildLocation() {
+        return fromJS({
             name: "",
             printer: ""
-        };
+        });
     }
 
-    getState(){
-        return {
+    getState() {
+        let result = Map({
             locations: locationsStore.getLocations().getPayload(),
             printers: printersStore.getPrinters().getPayload(),
 
             selectedLocation: this.selectedLocation,
             createdLocation: this.createdLocation
+        });
+        return {
+            data : result
         }
     }
 

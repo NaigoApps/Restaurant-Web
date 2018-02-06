@@ -13,25 +13,26 @@ export default class LocationEditor extends React.Component {
 
     render() {
         let props = this.props.data;
-        let uuid = props.location.uuid;
-
+        let uuid = props.get('location').get('uuid');
+        let location = props.get('location');
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.location}
-                    abortMethod={locationsEditorActions.deleteLocation}
-                    render={location => location.name}>
+                    valid={!!location.get('name') && !!location.get('printer')}
+                    entity={location}
+                    deleteMethod={locationsEditorActions.deleteLocation}
+                    render={location => location.get('name')}>
                     <TextEditor
                         label="Nome"
-                        value={props.location.name}
+                        value={location.get('name')}
                         commitAction={result => locationsEditorActions.updateLocationName(uuid, result)}
                     />
                     <EntitySelectEditor
                         label="Stampante"
-                        options={props.printers}
-                        renderer={printer => printer.name}
-                        value={props.location.printer}
+                        options={props.get('printers')}
+                        renderer={printer => printer.get('name')}
+                        value={location.get('printer')}
                         commitAction={result => locationsEditorActions.updateLocationPrinter(uuid, result)}
                     />
                 </EntityEditor>

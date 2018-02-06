@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {distribute} from "../utils/Utils";
+import {collectionsEquals, distribute} from "../utils/Utils";
 import Button from "./Button";
 import ButtonGroup from "./ButtonGroup";
 import Row from "./Row";
@@ -10,6 +10,14 @@ export default class PaginatedButtonGroup extends Component {
         super(props);
         this.state = {
             page: 0
+        };
+    }
+
+    componentWillReceiveProps(props) {
+        if(!collectionsEquals(props.data, this.props.data)){
+            this.setState({
+                page: 0
+            });
         }
     }
 
@@ -22,6 +30,7 @@ export default class PaginatedButtonGroup extends Component {
             while (buttons[buttons.length - 1].length < pageSize) {
                 buttons[buttons.length - 1].push(
                     <Button
+                        size="lg"
                         key={buttons[buttons.length - 1].length}
                         disabled={true}
                         text="&nbsp;"/>);
@@ -31,6 +40,7 @@ export default class PaginatedButtonGroup extends Component {
             for (let i = 0; i < pageSize; i++) {
                 buttons[0].push(
                     <Button
+                        size="lg"
                         key={buttons[0].length}
                         disabled={true}
                         text="&nbsp;"/>);
@@ -64,9 +74,11 @@ export default class PaginatedButtonGroup extends Component {
     buildDefaultButtons(pages, page) {
         return <div className="btn-group">
             <Button disabled={page <= 0}
+                    size="lg"
                     commitAction={this.selectPage.bind(this, page - 1)}
                     icon="arrow-left"/>
             <Button disabled={page >= pages - 1}
+                    size="lg"
                     commitAction={this.selectPage.bind(this, page + 1)}
                     icon="arrow-right"/>
         </div>
@@ -80,6 +92,7 @@ export default class PaginatedButtonGroup extends Component {
         return <div className="btn-group">
             {numbers.map(number => {
                 return <Button key={number}
+                               size="lg"
                                commitAction={this.selectPage.bind(this, number)}
                                active={page === number}
                                text={(number + 1).toString()}

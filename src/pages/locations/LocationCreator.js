@@ -13,24 +13,26 @@ export default class LocationCreator extends React.Component {
 
     render() {
         let props = this.props.data;
-        let name = props.location.name || "Nuova postazione";
+        let name = props.get('location').get('name') || "Nuova postazione";
+        let location = props.get('location');
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.location}
+                    valid={!!location.get('name') && !!location.get('printer')}
+                    entity={props.get('location')}
                     confirmMethod={locationsCreatorActions.createLocation}
                     render={() => name}>
                     <TextEditor
                         label="Nome"
-                        value={props.location.name}
+                        value={props.get('location').get('name')}
                         commitAction={locationsCreatorActions.updateLocationName}
                     />
                     <EntitySelectEditor
                         label="Stampante"
-                        options={props.printers}
-                        renderer={printer => printer.name}
-                        value={props.location.printer}
+                        options={props.get('printers')}
+                        renderer={printer => printer.get('name')}
+                        value={props.get('location').get('printer')}
                         commitAction={locationsCreatorActions.updateLocationPrinter}
                     />
                 </EntityEditor>

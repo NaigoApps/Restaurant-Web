@@ -18,8 +18,10 @@ export default class CategoriesNavigator extends Component {
         return [<Row key="list" topSpaced>
             <Column>
                 <PaginatedEntitiesList
-                    entities={props.categories}
-                    renderer={cat => cat.name}
+                    rows={9}
+                    cols={3}
+                    entities={props.get('categories')}
+                    renderer={cat => cat.get('name')}
                     selectMethod={categoriesEditorActions.selectCategory}
                     deselectMethod={categoriesEditorActions.deselectCategory}
                 />

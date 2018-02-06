@@ -14,6 +14,8 @@ import {
 } from "../../actions/ActionTypes";
 import additionsStore from "../../stores/generic/AdditionsStore";
 
+const {Map} = require('immutable');
+
 const EVT_ADDITIONS_PAGE_STORE_CHANGED = "EVT_ADDITIONS_PAGE_STORE_CHANGED";
 
 class AdditionsPageStore extends AbstractStore{
@@ -25,15 +27,15 @@ class AdditionsPageStore extends AbstractStore{
     }
 
     setName(value){
-        this.inCreationAddition.name = value;
+        this.inCreationAddition = this.inCreationAddition.set('name', value);
     }
 
     setPrice(value){
-        this.inCreationAddition.price = value;
+        this.inCreationAddition = this.inCreationAddition.set('price', value);
     }
 
     setGeneric(value){
-        this.inCreationAddition.generic = value;
+        this.inCreationAddition = this.inCreationAddition.set('generic', value);
     }
 
     handleCompletedAction(action){
@@ -43,11 +45,11 @@ class AdditionsPageStore extends AbstractStore{
             case ACT_RETRIEVE_ADDITIONS:
                 break;
             case ACT_CREATE_ADDITION:
-                this.selectedAddition = action.body.uuid;
+                this.selectedAddition = action.body.get('uuid');
                 this.inCreationAddition = null;
                 break;
             case ACT_UPDATE_ADDITION:
-                this.selectedAddition = action.body.uuid;
+                this.selectedAddition = action.body.get('uuid');
                 break;
             case ACT_DELETE_ADDITION:
                 this.selectedAddition = null;
@@ -57,7 +59,7 @@ class AdditionsPageStore extends AbstractStore{
                 this.inCreationAddition = this.buildAddition();
                 break;
             case ACT_SELECT_ADDITION:
-                this.selectedAddition = action.body;
+                this.selectedAddition = action.body.get('uuid');
                 this.inCreationAddition = null;
                 break;
             case ACT_DESELECT_ADDITION:
@@ -81,20 +83,23 @@ class AdditionsPageStore extends AbstractStore{
     }
 
     buildAddition(){
-        return {
+        return Map({
             name: "",
             price: 0,
             generic: false
-        };
+        });
     }
 
     getState(){
-        return {
+        let value = Map({
             additions: additionsStore.getAdditions().getPayload(),
 
             selectedAddition: this.selectedAddition,
             createdAddition: this.inCreationAddition
-        }
+        });
+        return {
+            data: value
+        };
     }
 
 }

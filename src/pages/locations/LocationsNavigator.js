@@ -19,8 +19,8 @@ export default class LocationsNavigator extends Component {
         return [<Row key="list" topSpaced>
             <Column>
                 <PaginatedEntitiesList
-                    entities={props.locations}
-                    renderer={location => location.name}
+                    entities={props.get('locations')}
+                    renderer={location => location.get('name')}
                     selectMethod={locationsEditorActions.selectLocation}
                     deselectMethod={locationsEditorActions.deselectLocation}
                 />

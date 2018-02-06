@@ -18,10 +18,6 @@ class RestaurantNav extends Component {
         super();
     }
 
-    toggleFullScreen() {
-        applicationActions.toggleFullScreen();
-    }
-
     render() {
 
         return (
@@ -33,6 +29,7 @@ class RestaurantNav extends Component {
                     <NavButtonLink
                         icon="home"
                         path="/restaurant"
+                        commitAction={applicationActions.dismissFullScreen}
                     />
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item"><a className="nav-link">{this.props.title}</a></li>
@@ -42,7 +39,7 @@ class RestaurantNav extends Component {
                         <li className="nav-item">
                             <NavButton
                                 icon="window-restore"
-                                commitAction={this.toggleFullScreen.bind(this)}/>
+                                commitAction={() => applicationActions.toggleFullScreen()}/>
                         </li>
                     </ul>
                 </div>

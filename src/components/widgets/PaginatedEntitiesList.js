@@ -16,11 +16,12 @@ export default class PaginatedEntitiesList extends Component {
         }
     }
 
-    selectEntity(uuid) {
-        if (!uuid || this.props.selected === uuid) {
+    selectEntity(entity) {
+        if (!entity || this.props.selected === entity.get('uuid')) {
             this.props.deselectMethod();
+        }else {
+            this.props.selectMethod(entity);
         }
-        this.props.selectMethod(uuid);
     }
 
     isSelected(uuid) {
@@ -49,10 +50,14 @@ export default class PaginatedEntitiesList extends Component {
                 let rowsComps = rowsGroups.map((row, index) => {
                     let buttons = row.map(entity => {
                         return (
-                            <Column key={entity.uuid} type={renderer.color ? renderer.color(entity) : "secondary"} bordered>
-                                <GridButton
+                            <Column key={entity.get('uuid')} type={renderer.color ? renderer.color(entity) : "secondary"}>
+                                <Button
+                                    active={this.props.selected && this.props.selected === entity.get('uuid')}
                                     text={renderer.name(entity)}
-                                    commitAction={this.selectEntity.bind(this, entity.uuid)}/>
+                                    size="lg"
+                                    commitAction={this.selectEntity.bind(this, entity)}
+                                    fullHeight
+                                />
                             </Column>
                         );
                     });
@@ -61,12 +66,12 @@ export default class PaginatedEntitiesList extends Component {
                         buttons.push(<ColumnSpace key={buttons.length}/>);
                     }
 
-                    return <Row key={index}>{buttons}</Row>
+                    return <Row key={index} grow>{buttons}</Row>
                 });
 
                 while (rowsComps.length < rows) {
                     rowsComps.push(
-                        <Row key={rowsComps.length}>
+                        <Row key={rowsComps.length} grow>
                             <ColumnSpace/>
                         </Row>);
                 }
@@ -77,9 +82,9 @@ export default class PaginatedEntitiesList extends Component {
         });
 
 
-        return <Row>
+        return <Row grow>
             <Column>
-                <Row>
+                <Row grow>
                     <Column>
                         {entitiesList}
                     </Column>

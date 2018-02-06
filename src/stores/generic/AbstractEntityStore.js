@@ -1,32 +1,29 @@
 import LazyData, {STATUSES} from "../LazyData";
-import dispatcher from "../../dispatcher/SimpleDispatcher";
 import AbstractStore from "../AbstractStore";
+
+const {Map, List} = require('immutable');
 
 export default class AbstractEntityStore extends AbstractStore{
     constructor(event){
         super(event);
         this.status = STATUSES.NOT_LOADED;
-        this.data = new Map();
+        this.data = Map();
     }
 
 
     clearData(){
-        this.data.clear();
+        this.data = Map();
         this.status = STATUSES.NOT_LOADED;
     }
 
     setData(data) {
-        this.data.clear();
-        data.forEach(d => {
-            this.data.set(d.uuid, d);
-        });
+        this.data = Map(data.map(d => [d.get('uuid'), d]));
         this.status = STATUSES.LOADED;
     }
 
     getData(){
         if (this.isLoaded()) {
-            let result = Array.from(this.data.values());
-            return LazyData.loaded(result);
+            return LazyData.loaded(this.data.toList());
         } else if (this.isLoading()) {
             return LazyData.loading();
         } else {
@@ -36,12 +33,9 @@ export default class AbstractEntityStore extends AbstractStore{
 
     getSingleData(){
         if (this.isLoaded()) {
-            let result = Array.from(this.data.values());
-            if(result.length === 1) {
-                return LazyData.loaded(result[0]);
-            }else{
-                return LazyData.loaded(null);
-            }
+            if(this.data.size === 1){
+                return LazyData.loaded(this.data.toList().get(0));
+            }return LazyData.loaded(null);
         } else if (this.isLoading()) {
             return LazyData.loading(null);
         } else {
@@ -50,28 +44,24 @@ export default class AbstractEntityStore extends AbstractStore{
     }
 
     createData(data) {
-        if(!this.data.has(data.uuid)) {
-            this.data.set(data.uuid, data);
+        if(!this.data.has(data.get('uuid'))) {
+            this.data = this.data.set(data.get('uuid'), data);
         }else{
-            console.warn("Trying to create existent data " + data.uuid);
+            console.warn("Trying to create existent data " + data.get('uuid'));
         }
     }
 
-    retrieveData(uuid){
-        return this.data.get(uuid);
-    }
-
     updateData(data) {
-        if(this.data.has(data.uuid)){
-            this.data.set(data.uuid, data);
+        if(this.data.has(data.get('uuid'))){
+            this.data = this.data.set(data.get('uuid'), data);
         }else{
-            console.warn("Trying to update non existent data " + data.uuid);
+            console.warn("Trying to update non existent data " + data.get('uuid'));
         }
     }
 
     deleteData(uuid){
         if(this.data.has(uuid)){
-            this.data.delete(uuid);
+            this.data = this.data.delete(uuid);
         }else{
             console.warn("Trying to delete non existent data " + uuid);
         }

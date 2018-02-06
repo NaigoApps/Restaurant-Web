@@ -17,13 +17,22 @@ export default class EntityEditor extends Component {
 
     render() {
         const entity = this.props.entity;
+        const deleteMethod = this.props.deleteMethod;
         const abortMethod = this.props.abortMethod;
         const confirmMethod = this.props.confirmMethod;
         const title = this.props.render(entity);
 
         if (entity) {
-            let abortButton = this.makeAbortButton.bind(this)(abortMethod, entity);
-            let confirmButton = this.makeConfirmButton.bind(this)(confirmMethod, entity);
+            let mainButtons = [];
+
+            if (abortMethod) {
+                mainButtons.push(this.makeAbortButton(abortMethod, entity));
+            }
+            if (confirmMethod) {
+                mainButtons.push(this.makeConfirmButton(confirmMethod, entity));
+            }
+
+            let deleteButton = this.makeDeleteButton(deleteMethod, entity);
 
             return (
                 <div className="card">
@@ -38,13 +47,11 @@ export default class EntityEditor extends Component {
                                 </Column>
                             </Row>
                             <Row topSpaced>
-                                <Column>
-                                    {confirmButton}
-                                </Column>
+                                {mainButtons}
                             </Row>
                             <Row topSpaced>
                                 <Column right>
-                                    {abortButton}
+                                    {deleteButton}
                                 </Column>
                             </Row>
                         </div>
@@ -56,7 +63,7 @@ export default class EntityEditor extends Component {
 
     }
 
-    makeAbortButton(method, entity) {
+    makeDeleteButton(method, entity) {
         let button = <span/>;
 
         let showDeleteModal = () => {
@@ -65,7 +72,7 @@ export default class EntityEditor extends Component {
 
         let doDelete = () => {
             this.setState({showDeleteModal: false});
-            method(entity.uuid);
+            method(entity.get('uuid'));
         };
 
         let doNotDelete = () => {
@@ -100,10 +107,24 @@ export default class EntityEditor extends Component {
 
 
     makeConfirmButton(method, entity) {
+        let x = [];
         let button = <span/>;
         if (method) {
-            button = <Button icon="check" text="Ok" type="success"
-                             commitAction={() => method(entity)}/>
+            button = <Column key="confirm">
+                <Button icon="check" text="Ok"
+                        disabled={!this.props.valid} type="success" size="lg" commitAction={() => method(entity)}/>
+            </Column>
+        }
+        return button;
+    }
+
+    makeAbortButton(method, entity) {
+        let button = <span/>;
+        if (method) {
+            button = <Column key="abort">
+                <Button icon="cross" text="Annulla" type="danger" size="lg"
+                        commitAction={() => method(entity)}/>
+            </Column>
         }
         return button;
     }

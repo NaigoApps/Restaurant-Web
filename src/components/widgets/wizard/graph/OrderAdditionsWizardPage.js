@@ -6,8 +6,9 @@ import OrdinationsUtils from "../../../../pages/evening/OrdinationsUtils";
 import Button from "../../../../widgets/Button";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
-import OrdinationSelectableReview from "../../../OrdinationSelectableReview";
-import FloatInput from "../../inputs/FloatInput";
+import OrdersCrudList from "../../../OrdersCrudList";
+import ordinationsEditorActions from "../../../../pages/evening/OrdinationsEditorActions";
+import {findIndexByUuid} from "../../../../utils/Utils";
 
 export default class OrderAdditionsWizardPage extends Component {
     constructor(props) {
@@ -18,63 +19,54 @@ export default class OrderAdditionsWizardPage extends Component {
         graphWizardActions.setWizardData(this.props.wizardId, sampleOrder, "editing")
     }
 
+    updateSelectedOrderPrice(price) {
+        let sampleOrder = this.props.wizardData["editing"];
+        let orders = this.props.data.get('editingOrders');
+        let index = orders.findIndex(order => OrdinationsUtils.sameOrder(order, sampleOrder));
+
+        ordinationsEditorActions.updateOrderPrice(index, price);
+
+        let updatedOrder = orders.get(index).set('notes', price);
+
+        graphWizardActions.setWizardData(this.props.wizardId, updatedOrder, "editing");
+    }
+
     lessOrders() {
         let sampleOrder = this.props.wizardData["editing"];
-        let orders = this.props.wizardData["orders"];
+        let orders = this.props.data.get('editingOrders');
 
         let index = orders.findIndex(order => OrdinationsUtils.sameOrder(order, sampleOrder));
-        orders.splice(index, 1);
-
-        graphWizardActions.setWizardData(this.props.wizardId, orders, "orders");
+        ordinationsEditorActions.removeOrder(index);
 
         let another = orders.find(order => OrdinationsUtils.sameOrder(order, sampleOrder));
 
         if (another) {
             graphWizardActions.setWizardData(this.props.wizardId, another, "editing")
-        }else{
+        } else {
             graphWizardActions.setWizardData(this.props.wizardId, null, "editing");
         }
     }
 
     moreOrders() {
         let sampleOrder = this.props.wizardData["editing"];
-        let newOrder = OrdinationsUtils.duplicateOrder(sampleOrder);
-        let orders = this.props.wizardData["orders"];
-
-        orders.unshift(newOrder);
-
-        graphWizardActions.setWizardData(this.props.wizardId, orders, "orders");
-    }
-
-    updateSelectedOrderPrice(price) {
-        let sampleOrder = this.props.wizardData["editing"];
-        let orders = this.props.wizardData["orders"];
-        let index = orders.findIndex(order => OrdinationsUtils.sameOrder(order, sampleOrder));
-
-        orders[index].price = price;
-        orders.unshift(orders.splice(index, 1)[0]);
-
-        graphWizardActions.setWizardData(this.props.wizardId, orders, "orders");
+        ordinationsEditorActions.addOrder(sampleOrder);
     }
 
     toggleAddition(addition) {
         let wData = this.props.wizardData;
         if (wData["editing"]) {
             let sampleOrder = wData["editing"];
-            let orders = wData["orders"];
+            let orders = this.props.data.get('editingOrders');
             let orderIndex = orders.findIndex(order => OrdinationsUtils.sameOrder(order, sampleOrder));
 
-            let additionIndex = orders[orderIndex].additions.findIndex(a => a === addition.uuid);
+            let additionIndex = findIndexByUuid(orders.get(orderIndex).get('additions'), addition.get('uuid'));
             if (additionIndex !== -1) {
-                orders[orderIndex].additions.splice(additionIndex, 1);
+                ordinationsEditorActions.removeAddition(orderIndex, additionIndex, addition.get('price'));
             } else {
-                orders[orderIndex].additions.push(addition.uuid);
+                ordinationsEditorActions.addAddition(orderIndex, addition.get('uuid'), addition.get('price'));
             }
 
-            orders.unshift(orders.splice(orderIndex, 1)[0]);
-
-            graphWizardActions.setWizardData(this.props.wizardId, orders[0], "editing");
-            graphWizardActions.setWizardData(this.props.wizardId, orders, "orders");
+            graphWizardActions.setWizardData(this.props.wizardId, orders.get(orderIndex), "editing");
         }
     }
 
@@ -82,13 +74,14 @@ export default class OrderAdditionsWizardPage extends Component {
         let props = this.props;
         let sampleOrder = props.wizardData["editing"];
 
-        let buttons = props.additions.map(a => {
+        let buttons = props.data.get('additions').map(a => {
             return (
                 <Button
-                    key={a.uuid}
-                    active={sampleOrder && sampleOrder.additions.includes(a.uuid)}
+                    key={a.get('uuid')}
+                    size="lg"
+                    active={sampleOrder && sampleOrder.get('additions').includes(a.get('uuid'))}
                     commitAction={this.toggleAddition.bind(this, a)}
-                    text={a.name}
+                    text={a.get('name')}
                 />
             );
         });
@@ -98,74 +91,23 @@ export default class OrderAdditionsWizardPage extends Component {
                 abortAction={props.abortAction}
                 confirmAction={props.confirmAction}>
                 <Row grow>
-                    <Column sm="4">
-                        <OrdinationSelectableReview
-                            data={OrderAdditionsWizardPage.makeOrdinationReviewDescriptor(props)}
+                    <Column sm="5">
+                        <OrdersCrudList
+                            data={this.props.data}
                             selectedOrder={sampleOrder}
                             commitAction={this.selectGroup.bind(this)}
                         />
                     </Column>
-                    <Column sm="4">
+                    <Column sm="7">
                         <PaginatedButtonGroup
                             showNumbers={true}
                             pageSize={8}>
                             {buttons}
                         </PaginatedButtonGroup>
                     </Column>
-                    <Column sm="4">
-                        <Row>
-                            <Column>
-                                <h4>Modifica quantità</h4>
-                            </Column>
-                        </Row>
-                        <Row>
-                            <Column>
-                                <Button
-                                    type="danger"
-                                    icon="minus"
-                                    commitAction={this.lessOrders.bind(this)}
-                                    disabled={!sampleOrder}/>
-                            </Column>
-                            <Column>
-                                <Button
-                                    type="success"
-                                    icon="plus"
-                                    commitAction={this.moreOrders.bind(this)}
-                                    disabled={!sampleOrder}/>
-                            </Column>
-                        </Row>
-                        <Row topSpaced>
-                            <Column>
-                                <h4>Modifica prezzo</h4>
-                            </Column>
-
-                        </Row>
-                        <Row>
-                            <Column>
-                                <Row>
-                                    <Column>
-                                        <FloatInput
-                                            default={sampleOrder ? sampleOrder.price : 0}
-                                            commitAction={this.updateSelectedOrderPrice.bind(this)}
-                                            disabled={!sampleOrder}
-                                        />
-                                    </Column>
-                                </Row>
-                            </Column>
-                        </Row>
-                    </Column>
                 </Row>
             </GraphWizardPage>
         )
-    }
-
-    static makeOrdinationReviewDescriptor(props) {
-        return {
-            dishes: props.dishes,
-            phases: props.phases,
-            additions: props.additions,
-            orders: props.wizardData["orders"]
-        }
     }
 
 }

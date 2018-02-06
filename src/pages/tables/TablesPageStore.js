@@ -1,5 +1,4 @@
 import AbstractStore from "../../stores/AbstractStore";
-import waitersStore from "../../stores/generic/WaitersStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
     ACT_BEGIN_CREATE_RESTAURANT_TABLE,
@@ -13,32 +12,34 @@ import {
 } from "../../actions/ActionTypes";
 import tablesStore from "../../stores/generic/TablesStore";
 
+const {fromJS, Map} = require('immutable');
+
 const EVT_TABLES_PAGE_STORE_CHANGED = "EVT_TABLES_PAGE_STORE_CHANGED";
 
-class TablesPageStore extends AbstractStore{
+class TablesPageStore extends AbstractStore {
 
-    constructor(){
+    constructor() {
         super(EVT_TABLES_PAGE_STORE_CHANGED);
         this.selectedTable = null;
         this.inCreationTable = null;
     }
 
-    setName(value){
-        this.inCreationTable.name = value;
+    setName(value) {
+        this.inCreationTable = this.inCreationTable.set('name', value);
     }
 
-    handleCompletedAction(action){
+    handleCompletedAction(action) {
         let changed = true;
         dispatcher.waitFor([tablesStore.getToken()]);
         switch (action.type) {
             case ACT_RETRIEVE_RESTAURANT_TABLES:
                 break;
             case ACT_CREATE_RESTAURANT_TABLE:
-                this.selectedTable = action.body.uuid;
+                this.selectedTable = action.body.get('uuid');
                 this.inCreationTable = null;
                 break;
             case ACT_UPDATE_RESTAURANT_TABLE:
-                this.selectedTable = action.body.uuid;
+                this.selectedTable = action.body.get('uuid');
                 break;
             case ACT_DELETE_RESTAURANT_TABLE:
                 this.selectedTable = null;
@@ -48,7 +49,7 @@ class TablesPageStore extends AbstractStore{
                 this.inCreationTable = this.buildTable();
                 break;
             case ACT_SELECT_RESTAURANT_TABLE:
-                this.selectedTable = action.body;
+                this.selectedTable = action.body.get('uuid');
                 this.inCreationTable = null;
                 break;
             case ACT_DESELECT_RESTAURANT_TABLE:
@@ -65,18 +66,21 @@ class TablesPageStore extends AbstractStore{
         return changed;
     }
 
-    buildTable(){
-        return {
+    buildTable() {
+        return Map({
             name: ""
-        };
+        });
     }
 
-    getState(){
-        return {
-            tables: tablesStore.getAllTables().getPayload(),
+    getState() {
+        let result = Map({
+            tables: tablesStore.getAllTables().getPayload().sort((t1, t2) => t1.get('name').localeCompare(t2.get('name'))),
 
             selectedTable: this.selectedTable,
-            inCreationTable: this.inCreationTable
+            createdTable: this.inCreationTable
+        });
+        return {
+            data: result
         }
     }
 

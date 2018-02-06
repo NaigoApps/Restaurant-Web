@@ -12,28 +12,30 @@ export default class WaiterCreator extends React.Component {
 
     render() {
         let props = this.props.data;
-        let name = props.waiter.name + " " + props.waiter.surname || "Nuovo cameriere";
-        let uuid = props.waiter.uuid;
+        let waiter = props.get('waiter');
+        let name = waiter.get('name') + " " + waiter.get('surname') || "Nuovo cameriere";
+        let uuid = waiter.get('uuid');
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.waiter}
+                    entity={waiter}
+                    valid={!!waiter.get('name')}
                     confirmMethod={waitersCreatorActions.createWaiter}
                     render={() => name}>
                     <TextEditor
                         label="Nome"
-                        value={props.waiter.name}
+                        value={waiter.get('name')}
                         commitAction={waitersCreatorActions.updateWaiterName}
                     />
                     <TextEditor
                         label="Cognome"
-                        value={props.waiter.surname}
+                        value={waiter.get('surname')}
                         commitAction={waitersCreatorActions.updateWaiterSurname}
                     />
                     <TextEditor
                         label="Codice fiscale"
-                        value={props.waiter.cf}
+                        value={waiter.get('cf')}
                         commitAction={waitersCreatorActions.updateWaiterCf}
                     />
                 </EntityEditor>

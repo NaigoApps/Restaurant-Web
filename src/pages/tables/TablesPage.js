@@ -11,6 +11,8 @@ import NavElementLink from "../../widgets/NavElementLink";
 import NavElement from "../../widgets/NavElement";
 import NavPills from "../../widgets/NavPills";
 
+const {Map} = require('immutable');
+
 export default class TablesPage extends Component {
 
     constructor(props) {
@@ -35,8 +37,8 @@ export default class TablesPage extends Component {
     }
 
     render() {
-        let navContent = TablesPage.makeNavContent(this.state);
-        let pageContent = TablesPage.makePageContent(this.state);
+        let navContent = TablesPage.makeNavContent(this.state.data);
+        let pageContent = TablesPage.makePageContent(this.state.data);
         return (
             <Page title="Tavoli">
                 {navContent}
@@ -46,9 +48,9 @@ export default class TablesPage extends Component {
     }
 
     static makePageContent(state) {
-        if (state.selectedTable) {
+        if (state.get('selectedTable')) {
             return <TableEditor data={TablesPage.makeTableEditorDescriptor(state)}/>
-        } else if (state.createdTable) {
+        } else if (state.get('createdTable')) {
             return <TableCreator data={TablesPage.makeTableCreatorDescriptor(state)}/>
         } else {
             return <TablesNavigator data={state}/>
@@ -56,15 +58,15 @@ export default class TablesPage extends Component {
     }
 
     static makeTableEditorDescriptor(data) {
-        return {
-            table: findByUuid(data.tables, data.selectedTable)
-        }
+        return Map({
+            table: findByUuid(data.get('tables'), data.get('selectedTable'))
+        })
     }
 
     static makeTableCreatorDescriptor(data) {
-        return {
-            tablw: data.createdTable
-        }
+        return Map({
+            table: data.get('createdTable')
+        })
     }
 
     static makeNavContent(state) {
@@ -77,19 +79,19 @@ export default class TablesPage extends Component {
         elements.push(<NavElement
             key="tables"
             text="Tavoli"
-            active={!state.selectedTable && !state.createdTable}
+            active={!state.get('selectedTable') && !state.get('createdTable')}
             commitAction={tablesEditorActions.deselectTable}
         />);
-        if (state.selectedTable) {
+        if (state.get('selectedTable')) {
             elements.push(<NavElement
                 key="selected"
-                text={findByUuid(state.tables, state.selectedTable).name}
+                text={findByUuid(state.get('tables'), state.get('selectedTable')).get('name')}
                 active={true}
             />);
-        } else if (state.createdTable) {
+        } else if (state.get('createdTable')) {
             elements.push(<NavElement
                 key="selected"
-                text={state.createdTable.name || "Nuovo tavolo"}
+                text={state.get('createdTable').get('name') || "Nuovo tavolo"}
                 active={true}
             />);
         }

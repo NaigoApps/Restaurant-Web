@@ -13,24 +13,25 @@ export default class CategoryCreator extends React.Component {
 
     render() {
         let props = this.props.data;
-        let name = props.category.name || "Nuova categoria";
+        let name = props.get('category').get('name') || "Nuova categoria";
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.category}
+                    valid={props.get('category').get('name') && props.get('category').get('location')}
+                    entity={props.get('category')}
                     confirmMethod={categoriesCreatorActions.createCategory}
                     render={() => name}>
                     <TextEditor
                         label="Nome"
-                        value={props.category.name}
+                        value={props.get('category').get('name')}
                         commitAction={categoriesCreatorActions.updateCategoryName}
                     />
                     <EntitySelectEditor
                         label="Postazione"
-                        options={props.locations}
-                        renderer={loc => loc.name}
-                        value={props.category.location}
+                        options={props.get('locations')}
+                        renderer={loc => loc.get('name')}
+                        value={props.get('category').get('location')}
                         commitAction={categoriesCreatorActions.updateCategoryLocation}
                     />
                 </EntityEditor>

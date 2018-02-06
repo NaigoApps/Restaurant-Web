@@ -14,6 +14,8 @@ import {
 import printersStore from "../../stores/PrintersStore";
 import AbstractEntityStore from "../../stores/generic/AbstractEntityStore";
 
+const {fromJS, Map} = require('immutable');
+
 const EVT_PRINTERS_PAGE_STORE_CHANGED = "EVT_PRINTERS_PAGE_STORE_CHANGED";
 
 class PrintersPageStore extends AbstractStore{
@@ -25,15 +27,15 @@ class PrintersPageStore extends AbstractStore{
     }
 
     setName(value){
-        this.createdPrinter.name = value;
+        this.createdPrinter = this.createdPrinter.set('name', value);
     }
 
     setMain(value){
-        this.createdPrinter.main = value;
+        this.createdPrinter = this.createdPrinter.set('main', value);
     }
 
     setLineCharacters(value){
-        this.createdPrinter.lineCharacters = value;
+        this.createdPrinter = this.createdPrinter.set('lineCharacters', value);
     }
 
     handleCompletedAction(action){
@@ -46,11 +48,11 @@ class PrintersPageStore extends AbstractStore{
             case ACT_RETRIEVE_PRINTERS:
                 break;
             case ACT_CREATE_PRINTER:
-                this.selectedPrinter = action.body.uuid;
+                this.selectedPrinter = action.body.get('uuid');
                 this.createdPrinter = null;
                 break;
             case ACT_UPDATE_PRINTER:
-                this.selectedPrinter = action.body.uuid;
+                this.selectedPrinter = action.body.get('uuid');
                 break;
             case ACT_DELETE_PRINTER:
                 this.selectedPrinter = null;
@@ -60,7 +62,7 @@ class PrintersPageStore extends AbstractStore{
                 this.createdPrinter = this.buildPrinter();
                 break;
             case ACT_SELECT_PRINTER:
-                this.selectedPrinter = action.body;
+                this.selectedPrinter = action.body.get('uuid');
                 this.createdPrinter = null;
                 break;
             case ACT_DESELECT_PRINTER:
@@ -84,20 +86,23 @@ class PrintersPageStore extends AbstractStore{
     }
 
     buildPrinter(){
-        return {
+        return Map({
             name: "",
             main: false,
             lineCharacters: 0
-        };
+        });
     }
 
     getState(){
-        return {
+        let result = Map({
             printers: printersStore.getPrinters().getPayload(),
             services: printersStore.getServices(),
 
             selectedPrinter: this.selectedPrinter,
             createdPrinter: this.createdPrinter
+        });
+        return {
+            data: result
         }
     }
 

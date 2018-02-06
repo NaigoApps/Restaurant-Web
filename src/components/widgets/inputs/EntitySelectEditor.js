@@ -9,7 +9,7 @@ export default class EntitySelectEditor extends Component {
     }
 
     onWizardConfirm(wData) {
-        this.props.commitAction(wData["select_page"].uuid);
+        this.props.commitAction(wData["select_page"].get('uuid'));
     }
 
     render() {

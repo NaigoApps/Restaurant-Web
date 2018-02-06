@@ -15,27 +15,28 @@ export default class DishCreator extends React.Component {
 
     render() {
         let props = this.props.data;
-        let name = props.dish.name || "Nuovo piatto";
+        let name = props.get('dish').get('name') || "Nuovo piatto";
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.dish}
+                    entity={props.get('dish')}
+                    valid={props.get('dish').get('name')}
                     confirmMethod={dishesCreatorActions.createDish}
                     render={() => name}>
                     <TextEditor
                         label="Nome"
-                        value={props.dish.name}
+                        value={props.get('dish').get('name')}
                         commitAction={dishesCreatorActions.updateDishName}
                     />
                     <TextEditor
                         label="Descrizione"
-                        value={props.dish.description}
+                        value={props.get('dish').get('description')}
                         commitAction={dishesCreatorActions.updateDishDescription}
                     />
                     <FloatEditor
                         label="Prezzo"
-                        value={props.dish.price}
+                        value={props.get('dish').get('price')}
                         commitAction={dishesCreatorActions.updateDishPrice}
                     />
                 </EntityEditor>

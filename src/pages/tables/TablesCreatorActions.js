@@ -9,7 +9,7 @@ import asyncActionBuilder from "../../actions/RequestBuilder";
 
 class TablesCreatorActions {
 
-    updateTableName(uuid, name) {
+    updateTableName(name) {
         dispatcher.fireEnd(ACT_UPDATE_RESTAURANT_TABLE_CREATOR_NAME, name);
     }
 

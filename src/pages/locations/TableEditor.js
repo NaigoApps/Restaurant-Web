@@ -12,18 +12,19 @@ export default class TableEditor extends React.Component {
 
     render() {
         let props = this.props.data;
-        let uuid = props.table.uuid;
+        let uuid = props.get('table').get('uuid');
 
 
         return <Row topSpaced>
             <Column>
                 <EntityEditor
-                    entity={props.table}
-                    abortMethod={tablesEditorActions.deleteTable}
-                    render={table => table.name}>
+                    entity={props.get('table')}
+                    valid={props.get('table').get('name')}
+                    deleteMethod={tablesEditorActions.deleteTable}
+                    render={table => table.get('name')}>
                     <TextEditor
                         label="Nome"
-                        value={props.table.name}
+                        value={props.get('table').get('name')}
                         commitAction={result => tablesEditorActions.updateTableName(uuid, result)}
                     />
                 </EntityEditor>
