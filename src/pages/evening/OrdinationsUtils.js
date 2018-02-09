@@ -174,7 +174,7 @@ export default class OrdinationsUtils {
     }
 
     static renderOrdination(ordination){
-        return "Comanda delle " + beautifyTime(ordination.get('creationTime'));
+        return beautifyTime(ordination.get('creationTime'));
     }
 
     static ordinationDateSorter(o1, o2){

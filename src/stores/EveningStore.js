@@ -1,10 +1,11 @@
 import {
+    ACT_ABORT_ENTITY_EDITING,
     ACT_ASK_SELECTED_EVENING,
     ACT_CREATE_BILL,
     ACT_CREATE_DINING_TABLE,
     ACT_CREATE_ORDINATION,
-    ACT_DELETE_BILL, ACT_DELETE_DINING_TABLE,
-    ACT_DESELECT_EVENING,
+    ACT_DELETE_BILL,
+    ACT_DELETE_DINING_TABLE,
     ACT_EDIT_ORDINATION,
     ACT_PRINT_ORDINATION,
     ACT_SELECT_EVENING,
@@ -15,6 +16,7 @@ import {
 import {STATUSES} from "./LazyData";
 import AbstractEntityStore from "./generic/AbstractEntityStore";
 import {findIndexByUuid} from "../utils/Utils";
+import {EVENING_TYPE} from "./EntityEditorStore";
 
 const {fromJS} = require('immutable');
 
@@ -51,9 +53,11 @@ class EveningStore extends AbstractEntityStore {
                 this.setData([action.body]);
                 this.setStatus(STATUSES.LOADED);
                 break;
-            case ACT_DESELECT_EVENING:
-                this.setData([]);
-                this.setStatus(STATUSES.LOADED);
+            case ACT_ABORT_ENTITY_EDITING:
+                if (action.body === EVENING_TYPE) {
+                    this.setData([]);
+                    this.setStatus(STATUSES.LOADED);
+                }
                 break;
             case ACT_UPDATE_EVENING:
                 this.updateData(action.body);
@@ -61,7 +65,7 @@ class EveningStore extends AbstractEntityStore {
             case ACT_CREATE_DINING_TABLE: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
-                    let newEvening = evening.getPayload().updateIn(['diningTables'], tables => tables.push(fromJS(action.body)));
+                    let newEvening = action.body.get(0);
                     this.updateData(newEvening);
                 }
                 break;
@@ -78,11 +82,9 @@ class EveningStore extends AbstractEntityStore {
             case ACT_CREATE_ORDINATION: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
-                    let diningTableIndex = findIndexByUuid(evening.getPayload().get('diningTables'), action.body.get('table'));
+                    let diningTableIndex = findIndexByUuid(evening.getPayload().get('diningTables'), action.body.get(0).get('uuid'));
                     if (diningTableIndex !== -1) {
-                        let diningTable = evening.getPayload().get('diningTables').get(diningTableIndex);
-                        let ordinations = diningTable.get('ordinations').push(action.body);
-                        diningTable = diningTable.set('ordinations', ordinations);
+                        let diningTable = action.body.get(0);
                         let newEvening = evening.getPayload().updateIn(['diningTables'], tables =>
                             tables.splice(diningTableIndex, 1, diningTable));
                         this.updateData(newEvening);

@@ -1,12 +1,14 @@
 import {
+    ACT_ABORT_ENTITY_EDITING,
     ACT_BEGIN_ENTITY_EDITING,
-    ACT_DESELECT_EVENING,
     ACT_SELECT_EVENING,
     ACT_UPDATE_EVENING_DATE
 } from "../ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../RequestBuilder";
 import {EVENING_TYPE} from "../../stores/EntityEditorStore";
+
+const {fromJS} = require('immutable');
 
 class EveningSelectionFormActions {
 
@@ -23,7 +25,7 @@ class EveningSelectionFormActions {
     }
 
     deselectEvening() {
-        dispatcher.fireEnd(ACT_DESELECT_EVENING);
+        dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, EVENING_TYPE);
     }
 
     printTest() {

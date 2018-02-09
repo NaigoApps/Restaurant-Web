@@ -6,8 +6,8 @@ import {
     ACT_DELETE_ORDINATION,
     ACT_EDIT_ORDINATION,
     ACT_PRINT_ORDINATION,
-    ACT_SELECT_ORDINATION, ACT_UPDATE_ENTITY,
-    ACT_UPDATE_ENTITY_PROPERTY,
+    ACT_SELECT_ORDINATION, ACT_SEND_ABORT_ORDINATION,
+    ACT_UPDATE_ENTITY,
     ACT_UPDATE_ORDINATION
 } from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
@@ -59,6 +59,14 @@ class OrdinationsEditorActions {
 
     editOrdination(uuid, orders) {
         asyncActionBuilder.put(ACT_UPDATE_ORDINATION, 'ordinations/' + uuid + "/orders", orders)
+            .then(newOrdination => dispatcher.fireEnd(ACT_UPDATE_ENTITY, fromJS({
+                type: ORDINATION_TYPE,
+                updater: oldOrdination => newOrdination
+            })))
+    }
+
+    sendAbortOrdination(uuid){
+        asyncActionBuilder.put(ACT_SEND_ABORT_ORDINATION, 'ordinations/' + uuid + "/abort");
     }
 
     addOrders(dish, phase, quantity) {

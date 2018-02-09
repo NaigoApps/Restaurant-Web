@@ -4,7 +4,6 @@ import {
     ACT_ABORT_DINING_TABLE_CLOSING,
     ACT_ABORT_DINING_TABLE_DATA_EDITING,
     ACT_ABORT_ENTITY_EDITING,
-    ACT_ADD_TO_ENTITY_PROPERTY,
     ACT_ASK_SELECTED_EVENING,
     ACT_BEGIN_DINING_TABLE_CLOSING,
     ACT_BEGIN_DINING_TABLE_DATA_EDITING,
@@ -13,9 +12,9 @@ import {
     ACT_CREATE_BILL,
     ACT_CREATE_DINING_TABLE,
     ACT_CREATE_ORDINATION,
-    ACT_DELETE_BILL, ACT_DELETE_DINING_TABLE,
+    ACT_DELETE_BILL,
+    ACT_DELETE_DINING_TABLE,
     ACT_DESELECT_BILL,
-    ACT_DESELECT_EVENING,
     ACT_OPEN_ORDERS,
     ACT_PRINT_ORDINATION,
     ACT_RETRIEVE_ADDITIONS,
@@ -45,7 +44,9 @@ import AbstractEntityStore from "../../stores/generic/AbstractEntityStore";
 import DiningTablesUtils from "./tables/DiningTablesUtils";
 import {findByUuid} from "../../utils/Utils";
 import entityEditorStore, {
-    DINING_TABLE_TYPE, EVENING_TYPE, ORDERS_TYPE,
+    DINING_TABLE_TYPE,
+    EVENING_TYPE,
+    ORDERS_TYPE,
     ORDINATION_TYPE
 } from "../../stores/EntityEditorStore";
 
@@ -96,12 +97,11 @@ class EveningPageStore extends AbstractStore {
             case ACT_SET_ENTITY_PROPERTY:
             case ACT_UPDATE_ENTITY_PROPERTY:
             case ACT_UPDATE_ENTITY:
-            case ACT_ADD_TO_ENTITY_PROPERTY:
 
             case ACT_UPDATE_ORDINATION:
                 break;
             case ACT_ABORT_ENTITY_EDITING:
-                if(action.body === ORDINATION_TYPE || action.body === EVENING_TYPE){
+                if([EVENING_TYPE, DINING_TABLE_TYPE, ORDINATION_TYPE].includes(action.body)){
                     this.editingTableData = false;
                 }
                 break;
@@ -184,7 +184,7 @@ class EveningPageStore extends AbstractStore {
         let result = Map({
             date: eveningSelectionFormStore.getDate(),
 
-            evening: eveningStore.getEvening().getPayload(),
+            evening: entityEditorStore.find(EVENING_TYPE),
 
             currentInvoice: this.currentInvoice,
             selectedBill: this.selectedBill,

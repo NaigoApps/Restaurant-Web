@@ -1,12 +1,15 @@
 import asyncActionBuilder from "../RequestBuilder";
 import {
-    ACT_ASK_SELECTED_EVENING,
-    ACT_RETRIEVE_ACTIVE_WAITERS,
+    ACT_ASK_SELECTED_EVENING, ACT_BEGIN_ENTITY_EDITING,
     ACT_RETRIEVE_CURRENT_MENU,
     ACT_RETRIEVE_RESTAURANT_TABLES,
     ACT_RETRIEVE_WAITERS,
     ACT_UPDATE_EVENING
 } from "../ActionTypes";
+import dispatcher from "../../dispatcher/SimpleDispatcher";
+import {EVENING_TYPE} from "../../stores/EntityEditorStore";
+
+const {fromJS} = require('immutable');
 
 class EveningActions {
 
@@ -36,7 +39,11 @@ class EveningActions {
     }
 
     retrieveSelectedEvening() {
-        asyncActionBuilder.get(ACT_ASK_SELECTED_EVENING, 'evenings/selected');
+        asyncActionBuilder.get(ACT_ASK_SELECTED_EVENING, 'evenings/selected')
+            .then((evening) => dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
+                type: EVENING_TYPE,
+                entity: evening
+            })));
     }
 
     printTest() {

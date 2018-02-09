@@ -1,8 +1,12 @@
 import requestBuilder from "../../actions/RequestBuilder";
-import {ACT_ABORT_ENTITY_EDITING, ACT_BEGIN_ENTITY_EDITING, ACT_CREATE_ORDINATION} from "../../actions/ActionTypes";
+import {
+    ACT_ABORT_ENTITY_EDITING, ACT_BEGIN_ENTITY_EDITING, ACT_CREATE_ORDINATION,
+    ACT_UPDATE_ENTITY
+} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
-import {ORDERS_TYPE, ORDINATION_TYPE} from "../../stores/EntityEditorStore";
+import {DINING_TABLE_TYPE, ORDERS_TYPE, ORDINATION_TYPE} from "../../stores/EntityEditorStore";
+import {findByUuid} from "../../utils/Utils";
 
 const {fromJS} = require('immutable');
 
@@ -26,7 +30,17 @@ class OrdinationsCreatorActions {
     }
 
     createOrdination(table, orders) {
-        requestBuilder.post(ACT_CREATE_ORDINATION, 'dining-tables/' + table + '/ordinations', orders);
+        requestBuilder.post(ACT_CREATE_ORDINATION, 'dining-tables/' + table + '/ordinations', orders)
+            .then(result => {
+                dispatcher.fireEnd(ACT_UPDATE_ENTITY, fromJS({
+                    type: DINING_TABLE_TYPE,
+                    updater: oldTable => result.get(0)
+                }));
+                dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
+                    type: ORDINATION_TYPE,
+                    entity: findByUuid(result.get(0).get('ordinations'), result.get(1))
+                }));
+            });
     }
 
 }

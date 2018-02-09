@@ -26,39 +26,39 @@ export default class DiningTableReview extends React.Component {
         }
     }
 
-    showDeleteDiningTableModal(){
+    showDeleteDiningTableModal() {
         this.setState({
             deletingDiningTable: true
         });
     }
 
-    doDeleteDiningTable(){
+    doDeleteDiningTable() {
         this.setState({
             deletingDiningTable: false
         });
         diningTablesEditorActions.deleteDiningTable(this.props.data.get('editingTable').get('uuid'));
     }
 
-    hideDeleteDiningTableModal(){
+    hideDeleteDiningTableModal() {
         this.setState({
             deletingDiningTable: false
         });
     }
 
-    showDeleteOrdinationModal(){
+    showDeleteOrdinationModal() {
         this.setState({
             deletingOrdination: true
         });
     }
 
-    doDeleteOrdination(){
+    doDeleteOrdination() {
         this.setState({
             deletingOrdination: false
         });
         ordinationsEditorActions.deleteOrdination(this.props.data.get('editingOrdination').get('uuid'));
     }
 
-    hideDeleteOrdinationModal(){
+    hideDeleteOrdinationModal() {
         this.setState({
             deletingOrdination: false
         });
@@ -76,7 +76,7 @@ export default class DiningTableReview extends React.Component {
         let orders = [];
         let diningTable = props.get('editingTable');
         if (diningTable.get('ordinations').size === 0) {
-            return <Scrollable>Il tavolo è vuoto</Scrollable>
+            return <Scrollable><h5 className="text-center">Il tavolo è vuoto</h5></Scrollable>
         }
         diningTable.get('ordinations').forEach(ordination => {
             ordination.get('orders').forEach(order => {
@@ -133,6 +133,11 @@ export default class DiningTableReview extends React.Component {
 
         return <Row grow>
             <Column>
+                <Row>
+                    <Column>
+                        <h5 className="text-center">Azioni sulla comanda</h5>
+                    </Column>
+                </Row>
                 <Row grow>
                     <Column>
                         <Button
@@ -160,7 +165,7 @@ export default class DiningTableReview extends React.Component {
                             icon="times-circle"
                             type="danger"
                             size="lg"
-                            commitAction={ordinationsEditorActions.beginOrdersEditing}
+                            commitAction={() => ordinationsEditorActions.sendAbortOrdination(ordination.get('uuid'))}
                             fullHeight/>
                     </Column>
                 </Row>
@@ -193,6 +198,11 @@ export default class DiningTableReview extends React.Component {
 
         return <Row grow>
             <Column>
+                <Row>
+                    <Column>
+                        <h5 className="text-center">Azioni sul tavolo</h5>
+                    </Column>
+                </Row>
                 <Row grow>
                     <Column>
                         <Button
@@ -265,18 +275,32 @@ export default class DiningTableReview extends React.Component {
             <Column>
                 <Row grow>
                     <Column>
-                        <h3 className="text-center">Comande</h3>
-                        <PaginatedEntitiesList
-                            selected={selectedOrdination ? selectedOrdination.get('uuid') : null}
-                            selectMethod={ordinationsEditorActions.beginOrdinationEditing}
-                            deselectMethod={ordinationsEditorActions.abortOrdinationEditing}
-                            rows={4}
-                            cols={1}
-                            entities={table.get('ordinations').sort(OrdinationsUtils.ordinationDateSorter)}
-                            renderer={ordination => OrdinationsUtils.renderOrdination(ordination)}
-                        />
-                        <Button text="Nuova comanda" type="info" size="lg"
-                                commitAction={ordinationsCreatorActions.beginOrdinationCreation}/>
+                        <Row>
+                            <Column>
+                                <h5 className="text-center">Comande</h5>
+                            </Column>
+                        </Row>
+
+                        <Row grow>
+                            <Column>
+                                <PaginatedEntitiesList
+                                    selected={selectedOrdination ? selectedOrdination.get('uuid') : null}
+                                    selectMethod={ordinationsEditorActions.beginOrdinationEditing}
+                                    deselectMethod={ordinationsEditorActions.abortOrdinationEditing}
+                                    rows={4}
+                                    cols={1}
+                                    entities={table.get('ordinations').sort(OrdinationsUtils.ordinationDateSorter)}
+                                    renderer={ordination => OrdinationsUtils.renderOrdination(ordination)}
+                                />
+                            </Column>
+                        </Row>
+
+                        <Row topSpaced>
+                            <Column>
+                                <Button text="Nuova comanda" type="info" size="lg"
+                                        commitAction={ordinationsCreatorActions.beginOrdinationCreation}/>
+                            </Column>
+                        </Row>
                     </Column>
                     <Column>
                         {actions}

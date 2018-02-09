@@ -100,57 +100,87 @@ class RequestBuilder {
 
     put(action, resource, target) {
         dispatcher.fireStart(action);
-        return fetch(this.BASE_URL + resource, {
-            method: "PUT",
-            mode: 'cors',
-            headers: {
-                'Content-Type': typeof(target) === "string" ? 'text/plain' : 'application/json'
-            },
-            body: typeof(target) === "string" ? target : JSON.stringify(target)
-        }).then((response) => {
-            if (response.ok) {
-                let contentType = response.headers.get("content-type");
-                if (contentType && contentType.includes("application/json")) {
-                    response.json().then((result) => dispatcher.fireEnd(action, fromJS(result)));
+
+        return new Promise((resolve, reject) => {
+            fetch(
+                this.BASE_URL + resource,
+                {
+                    method: "PUT",
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': typeof(target) === "string" ? 'text/plain' : 'application/json'
+                    },
+                    body: typeof(target) === "string" ? target : JSON.stringify(target)
+                }
+            ).then((response) => {
+                if (response.ok) {
+
+                    let contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        response.json().then((result) => {
+                            dispatcher.fireEnd(action, fromJS(result));
+                            resolve(fromJS(result));
+                        });
+                    } else {
+                        response.text().then((result) => {
+                            dispatcher.fireEnd(action, result);
+                            resolve(result);
+                        });
+                    }
                 } else {
-                    response.text().then((result) => {
-                        dispatcher.fireEnd(action, result);
+                    response.text().then((message) => {
+                        dispatcher.fireError(action, message);
+                        reject();
                     });
                 }
-            } else {
-                response.text().then((message) => {
-                    dispatcher.fireError(action, message);
-                });
-            }
-        }).catch((error) => {
-            dispatcher.fireFailure(action, error);
-        });
+            }).catch((error) => {
+                dispatcher.fireFailure(action, error);
+                reject();
+            });
+        })
+
     }
 
-    remove(action, resource, object) {
+    remove(action, resource, target) {
         dispatcher.fireStart(action);
-        return fetch(this.BASE_URL + resource, {
-            method: "DELETE",
-            mode: 'cors',
-            body: object
-        }).then((response) => {
-            if (response.ok) {
-                let contentType = response.headers.get("content-type");
-                if (contentType && contentType.includes("application/json")) {
-                    response.json().then((result) => dispatcher.fireEnd(action, fromJS(result)));
+
+        return new Promise((resolve, reject) => {
+            fetch(
+                this.BASE_URL + resource,
+                {
+                    method: "DELETE",
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': typeof(target) === "string" ? 'text/plain' : 'application/json'
+                    },
+                    body: typeof(target) === "string" ? target : JSON.stringify(target)
+                }
+            ).then((response) => {
+                if (response.ok) {
+
+                    let contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        response.json().then((result) => {
+                            dispatcher.fireEnd(action, fromJS(result));
+                            resolve(fromJS(result));
+                        });
+                    } else {
+                        response.text().then((result) => {
+                            dispatcher.fireEnd(action, result);
+                            resolve(result);
+                        });
+                    }
                 } else {
-                    response.text().then((result) => {
-                        dispatcher.fireEnd(action, result);
+                    response.text().then((message) => {
+                        dispatcher.fireError(action, message);
+                        reject();
                     });
                 }
-            } else {
-                response.text().then((message) => {
-                    dispatcher.fireError(action, message);
-                });
-            }
-        }).catch((error) => {
-            dispatcher.fireFailure(action, error);
-        });
+            }).catch((error) => {
+                dispatcher.fireFailure(action, error);
+                reject();
+            });
+        })
     }
 }
 

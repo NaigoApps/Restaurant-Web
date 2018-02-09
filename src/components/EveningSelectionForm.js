@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import DateInput from "./widgets/inputs/DateInput";
-import Button from "../widgets/Button";
 import eveningSelectionFormActions from "../actions/pages/EveningSelectionFormActions";
 import Calendar from "../widgets/Calendar";
+import Row from "../widgets/Row";
+import Column from "../widgets/Column";
 
 const TABLES_VIEW = "TABLES_VIEW";
 const TABLE_CREATION = "TABLE_CREATION";
@@ -18,15 +18,11 @@ export default class EveningSelectionForm extends Component {
 
     render() {
         return (
-            <div className="row">
-                <div className="col-sm-12">
-                    <div className="row">
-                        <div className="col-sm-12">
-                            <Calendar commitAction={this.onSelectEvening.bind(this)}/>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Row topSpaced>
+                <Column>
+                    <Calendar commitAction={this.onSelectEvening.bind(this)}/>
+                </Column>
+            </Row>
         );
     }
 }
