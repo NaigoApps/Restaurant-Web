@@ -13,6 +13,7 @@ import CategoryEditor from "./CategoryEditor";
 import CategoryCreator from "./CategoryCreator";
 import DishCreator from "./DishCreator";
 import DishEditor from "./DishEditor";
+import {SETTINGS} from "../../App";
 
 const {Map} = require('immutable');
 
@@ -68,7 +69,8 @@ export default class MenuPage extends Component {
             category: findByUuid(data.get('categories'), data.get('selectedCategory')),
             dishes: data.get('dishes'),
             dishesStatuses: data.get('dishesStatuses'),
-            locations: data.get('locations')
+            locations: data.get('locations'),
+            additions: data.get('additions')
         })
     }
 
@@ -98,7 +100,7 @@ export default class MenuPage extends Component {
         elements.push(<NavElementLink
             key="settings"
             text="Impostazioni"
-            href="/restaurant/settings"
+            page={SETTINGS}
         />);
         elements.push(<NavElement
             key="categories"

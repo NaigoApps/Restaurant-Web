@@ -1,5 +1,5 @@
 import LazyData, {STATUSES} from "./LazyData";
-import AbstractStore from "./AbstractStore";
+import AbstractStore from "./RootFeatureStore";
 
 export default class AbstractDataStore extends AbstractStore{
     constructor(event){

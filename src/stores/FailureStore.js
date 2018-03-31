@@ -1,4 +1,4 @@
-import AbstractStore from "./AbstractStore";
+import AbstractStore from "./RootFeatureStore";
 import {ACT_REMOVE_FAILED_ACTION} from "../actions/ActionTypes";
 
 const EVT_FAILURE_STORE_CHANGED = "EVT_FAILURE_STORE_CHANGED";

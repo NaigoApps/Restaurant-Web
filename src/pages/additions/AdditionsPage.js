@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
 import Page from "../Page";
-import EntitiesEditor from "../../components/editors/EntitiesEditor";
 import additionsPageStore from "./AdditionsPageStore";
 import additionsPageActions from "./AdditionsPageActions";
-import additionsCreatorActions from "./AdditionsCreatorActions";
 import additionsEditorActions from "./AdditionsEditorActions";
 import AdditionEditor from "./AdditionEditor";
 import AdditionCreator from "./AdditionCreator";
@@ -12,6 +10,7 @@ import NavElementLink from "../../widgets/NavElementLink";
 import NavElement from "../../widgets/NavElement";
 import NavPills from "../../widgets/NavPills";
 import {findByUuid} from "../../utils/Utils";
+import {SETTINGS} from "../../App";
 
 const {Map} = require('immutable');
 
@@ -77,7 +76,7 @@ export default class AdditionsPage extends Component {
         elements.push(<NavElementLink
             key="settings"
             text="Impostazioni"
-            href="/restaurant/settings"
+            page={SETTINGS}
         />);
         elements.push(<NavElement
             key="additions"

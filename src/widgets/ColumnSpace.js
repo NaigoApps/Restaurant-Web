@@ -9,7 +9,7 @@ export default class ColumnSpace extends Component {
     render() {
         return (
             <Column>
-                <span className="button-padding">&nbsp;</span>
+                <span className="button-padding"/>
             </Column>
         );
     }

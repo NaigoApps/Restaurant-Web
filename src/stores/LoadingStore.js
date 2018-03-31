@@ -1,4 +1,4 @@
-import AbstractStore from "./AbstractStore";
+import AbstractStore from "./RootFeatureStore";
 
 const EVT_LOADING_STORE_CHANGED = "EVT_LOADING_STORE_CHANGED";
 

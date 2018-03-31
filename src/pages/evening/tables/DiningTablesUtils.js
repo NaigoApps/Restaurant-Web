@@ -1,4 +1,4 @@
-import {findByUuid} from "../../../utils/Utils";
+import {findByUuid, stringEquals, uuid} from "../../../utils/Utils";
 import {beautifyTime} from "../../../components/widgets/inputs/DateInput";
 const {fromJS, Map, List} = require('immutable');
 
@@ -12,7 +12,7 @@ export default class DiningTablesUtils {
         if (o1.get('dish') !== o2.get('dish')) {
             return false;
         }
-        if (o1.get('notes') || o2.get('notes')) {
+        if (!stringEquals(o1.get('notes'), o2.get('notes'))) {
             return false;
         }
         if (o1.get('price') !== o2.get('price')) {
@@ -36,17 +36,29 @@ export default class DiningTablesUtils {
 
     static findTableOrders(table) {
         let orders = [];
-        table.ordinations.forEach(ordination => orders.push(...ordination.orders));
+        table.get('ordinations').forEach(ordination => orders.push(...ordination.get('orders')));
         return orders;
     }
 
     static findTableOpenedOrders(table) {
-        let orders = [];
-        table.get('ordinations').forEach(ordination => orders.push(...ordination.get('orders')));
+        let orders = List();
+        table.get('ordinations').forEach(ordination => orders = orders.push(...ordination.get('orders')));
         table.get('bills').forEach(invoice => {
             orders = orders.filter(order => !invoice.get('orders').includes(order.get('uuid')));
         });
         return orders;
+    }
+
+    static findTableOpenedCoverCharges(table) {
+        let ccs = table.get('coverCharges');
+        table.get('bills').forEach(bill => {
+            ccs -= bill.get('coverCharges');
+        });
+        return ccs;
+    }
+
+    static findSimilarTo(orders, order){
+        return orders.filter(o => DiningTablesUtils.sameOrder(o, order));
     }
 
     static implode(orders) {
@@ -60,18 +72,20 @@ export default class DiningTablesUtils {
     static mergeOrder(orders, order) {
         let found = false;
         orders.forEach((o, i) => {
-            if (DiningTablesUtils.sameOrder(o.get('order'), order)) {
-                o = o.set('quantity', o.get('quantity') + 1);
-                o = o.set('price', o.get('price') + order.get('price'))
+            if (DiningTablesUtils.sameOrder(o, order)) {
+                o = o.updateIn('orders', orders => orders.push(o));
                 orders = orders.set(i, o);
                 found = true;
             }
         });
         if (!found) {
             orders = orders.push(Map({
-                order: order,
-                quantity: 1,
-                price: order.get('price')
+                groupId: uuid(),
+                dish: order.get('dish'),
+                price: order.get('price'),
+                additions: order.get('additions'),
+                notes: order.get('notes'),
+                orders: List([order])
             }))
         }
         return orders;
@@ -90,5 +104,18 @@ export default class DiningTablesUtils {
 
     static getSelectedDiningTable(data) {
         return findByUuid(data.get('evening').get('diningTables'), data.get('selectedTable'));
+    }
+
+    static renderBill(bill, customers) {
+        if (bill.get('customer')) {
+            let customer = findByUuid(this.props.data.get('customers'), bill.get('customer'));
+            return "Fattura n°" + bill.get('progressive') + " di " + DiningTablesUtils.renderCustomer(customer)
+        } else {
+            return "Ricevuta n°" + bill.get('progressive')
+        }
+    }
+
+    static renderCustomer(customer) {
+        return customer.get('name') + " " + customer.get('surname');
     }
 }

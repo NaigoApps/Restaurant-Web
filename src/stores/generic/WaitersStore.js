@@ -1,16 +1,4 @@
-import {
-    ACT_BEGIN_CREATE_WAITER,
-    ACT_CREATE_WAITER,
-    ACT_DELETE_WAITER,
-    ACT_DESELECT_WAITER,
-    ACT_RETRIEVE_WAITERS,
-    ACT_SELECT_WAITER,
-    ACT_UPDATE_WAITER,
-    ACT_UPDATE_WAITER_CF,
-    ACT_UPDATE_WAITER_NAME,
-    ACT_UPDATE_WAITER_SURNAME
-} from "../../actions/ActionTypes";
-import {strcmp} from "../../utils/Utils";
+import {ACT_CREATE_WAITER, ACT_DELETE_WAITER, ACT_RETRIEVE_WAITERS, ACT_UPDATE_WAITER} from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
 
@@ -26,6 +14,9 @@ class WaitersStore extends AbstractEntityStore {
         return this.getData();
     }
 
+    comparator(w1, w2){
+        return w1.get('name').toLowerCase().localeCompare(w2.get('name').toLowerCase());
+    }
 
     // getAvailableWaiters() {
     //     return this.getLazyData()

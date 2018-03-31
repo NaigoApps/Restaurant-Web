@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import PaginatedEntitiesList from "../../components/widgets/PaginatedEntitiesList";
 import Row from "../../widgets/Row";
 import Button from "../../widgets/Button";
 import Column from "../../widgets/Column";
 import categoriesEditorActions from "./CategoriesEditorActions";
 import categoriesCreatorActions from "./CategoriesCreatorActions";
+import PaginatedList from "../../components/widgets/PaginatedList";
 
 export default class CategoriesNavigator extends Component {
 
@@ -17,7 +17,8 @@ export default class CategoriesNavigator extends Component {
 
         return [<Row key="list" topSpaced>
             <Column>
-                <PaginatedEntitiesList
+                <PaginatedList
+                    id={cat => cat.get('uuid')}
                     rows={9}
                     cols={3}
                     entities={props.get('categories')}

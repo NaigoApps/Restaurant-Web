@@ -1,7 +1,12 @@
 import {
-    ACT_BEGIN_CREATE_PRINTER, ACT_CREATE_PRINTER, ACT_DESELECT_PRINTER, ACT_UPDATE_PRINTER_LINE_CHARACTERS,
-    ACT_UPDATE_PRINTER_MAIN,
-    ACT_UPDATE_PRINTER_NAME
+    ACT_BEGIN_CREATE_PRINTER,
+    ACT_CREATE_PRINTER,
+    ACT_DESELECT_PRINTER,
+    ACT_PRINTER_CREATOR_LC_ABORT,
+    ACT_PRINTER_CREATOR_NAME_ABORT,
+    ACT_UPDATE_PRINTER_CREATOR_LC,
+    ACT_UPDATE_PRINTER_CREATOR_MAIN,
+    ACT_UPDATE_PRINTER_CREATOR_NAME
 } from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
@@ -12,24 +17,36 @@ class PrintersCreatorActions {
         dispatcher.fireEnd(ACT_BEGIN_CREATE_PRINTER);
     }
 
-    updatePrinterName(name) {
-        dispatcher.fireEnd(ACT_UPDATE_PRINTER_NAME, name);
-    }
+    //Editor actions
 
-    updatePrinterMain(main){
-        dispatcher.fireEnd(ACT_UPDATE_PRINTER_MAIN, main);
-    }
-
-    updatePrinterLineCharacters(chars){
-        dispatcher.fireEnd(ACT_UPDATE_PRINTER_LINE_CHARACTERS, chars);
-    }
-
-    createPrinter(printer) {
+    onConfirm(printer) {
         asyncActionBuilder.post(ACT_CREATE_PRINTER, 'printers', printer);
     }
 
-    deselectPrinter(){
+    onAbort(){
         dispatcher.fireEnd(ACT_DESELECT_PRINTER);
+    }
+
+    //Name
+
+    onAbortNameEditing(){
+        dispatcher.fireEnd(ACT_PRINTER_CREATOR_NAME_ABORT);
+    }
+
+    onConfirmNameEditing(uuid, value){
+        dispatcher.fireEnd(ACT_UPDATE_PRINTER_CREATOR_NAME, value);
+    }
+
+    onConfirmMainEditing(uuid, value) {
+        dispatcher.fireEnd(ACT_UPDATE_PRINTER_CREATOR_MAIN, value);
+    }
+
+    onConfirmLineCharactersEditing(uuid, value){
+        dispatcher.fireEnd(ACT_UPDATE_PRINTER_CREATOR_LC, value);
+    }
+
+    onAbortLineCharactersEditing(){
+        dispatcher.fireEnd(ACT_PRINTER_CREATOR_LC_ABORT);
     }
 }
 

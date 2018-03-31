@@ -6,6 +6,7 @@ import TextEditor from "../../components/widgets/inputs/TextEditor";
 import categoriesEditorActions from "./CategoriesEditorActions";
 import EntitySelectEditor from "../../components/widgets/inputs/EntitySelectEditor";
 import DishesNavigator from "./DishesNavigator";
+import EntitiesSelectEditor from "../../components/widgets/inputs/EntitiesSelectEditor";
 
 export default class CategoryEditor extends React.Component {
     constructor(props) {
@@ -14,38 +15,59 @@ export default class CategoryEditor extends React.Component {
 
     render() {
         let props = this.props.data;
-        let uuid = props.get('category').get('uuid');
+        let category = props.get('category');
+        if(category) {
+            let uuid = category.get('uuid');
 
+            let editorAdditions = props.get('additions')
+                .filter(addition => !addition.get("generic") || category.get('additions').includes(addition.get('uuid')))
 
-        return <Row topSpaced>
-            <Column>
-                <EntityEditor
-                    entity={props.get('category')}
-                    valid={props.get('category').get('name') && props.get('category').get('location')}
-                    deleteMethod={categoriesEditorActions.deleteCategory}
-                    render={cat => cat.get('name')}>
-                    <Row>
-                        <Column>
-                            <TextEditor
-                                label="Nome"
-                                value={props.get('category').get('name')}
-                                commitAction={result => categoriesEditorActions.updateCategoryName(uuid, result)}
-                            />
-                        </Column>
-                        <Column>
-                            <EntitySelectEditor
-                                label="Postazione"
-                                options={props.get('locations')}
-                                renderer={loc => loc.get('name')}
-                                value={props.get('category').get('location')}
-                                commitAction={result => categoriesEditorActions.updateCategoryLocation(uuid, result)}
-                            />
-                        </Column>
-                    </Row>
-                    <DishesNavigator data={props}/>
-                </EntityEditor>
-            </Column>
-        </Row>;
+            return <Row topSpaced>
+                <Column>
+                    <EntityEditor
+                        entity={category}
+                        valid={category.get('name') && category.get('location')}
+                        deleteMethod={categoriesEditorActions.deleteCategory}
+                        render={cat => cat.get('name')}>
+                        <Row>
+                            <Column>
+                                <TextEditor
+                                    label="Nome"
+                                    value={category.get('name')}
+                                    commitAction={result => categoriesEditorActions.updateCategoryName(uuid, result)}
+                                />
+                            </Column>
+                            <Column>
+                                <EntitySelectEditor
+                                    label="Postazione"
+                                    options={props.get('locations')}
+                                    renderer={loc => loc.get('name')}
+                                    value={category.get('location')}
+                                    commitAction={result => categoriesEditorActions.updateCategoryLocation(uuid, result)}
+                                />
+                            </Column>
+                        </Row>
+                        <Row>
+                            <Column>
+                                <EntitiesSelectEditor
+                                    label="Varianti"
+                                    labelSize="2"
+                                    buttonSize="10"
+                                    rows={5}
+                                    cols={3}
+                                    options={editorAdditions}
+                                    renderer={a => a.get('name')}
+                                    value={category.get('additions')}
+                                    commitAction={result => categoriesEditorActions.updateCategoryAdditions(uuid, result)}
+                                />
+                            </Column>
+                        </Row>
+                        <DishesNavigator data={props}/>
+                    </EntityEditor>
+                </Column>
+            </Row>;
+        }
+        return <div/>;
     }
 
 }

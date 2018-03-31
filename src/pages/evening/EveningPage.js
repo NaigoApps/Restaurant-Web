@@ -1,22 +1,10 @@
 import React, {Component} from 'react';
 import EveningSelectionForm from "../../components/EveningSelectionForm";
-import EntityEditor, {COMPONENTS, TYPES} from "../../components/editors/EntityEditor";
-import eveningActions from "../../actions/pages/EveningActions";
-import {beautifyDate, beautifyTime} from "../../components/widgets/inputs/DateInput";
+import {COMPONENTS, TYPES} from "../../components/editors/EntityEditor";
+import {beautifyDate} from "../../components/widgets/inputs/DateInput";
 import Page from "../Page";
-import OrdinationCreator from "../../components/widgets/inputs/OrdinationCreator";
 import eveningPageStore from "./EveningPageStore";
 import eveningPageActions from "./EveningPageActions";
-import diningTablesCreatorActions from "./tables/DiningTablesCreatorActions";
-import diningTablesEditorActions from "./tables/DiningTablesEditorActions";
-import ordinationsCreatorActions from "./OrdinationsCreatorActions";
-import ordinationsEditorActions from "./OrdinationsEditorActions";
-import DiningTableEditor from "./tables/DiningTableEditor";
-import Button from "../../widgets/Button";
-import eveningSelectionFormActions from "../../actions/pages/EveningSelectionFormActions";
-import FloatEditor from "../../components/widgets/inputs/FloatEditor";
-import eveningEditorActions from "./EveningEditorActions";
-import PaginatedEntitiesList from "../../components/widgets/PaginatedEntitiesList";
 import EveningEditor from "./EveningEditor";
 import EveningNav from "./EveningNav";
 
@@ -68,7 +56,7 @@ export default class EveningPage extends Component {
         if (state.get('evening')) {
             return <EveningEditor data={state}/>;
         } else {
-            return <EveningSelectionForm/>;
+            return <EveningSelectionForm data={state.get('date')}/>;
         }
     }
 }

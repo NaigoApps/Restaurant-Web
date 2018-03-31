@@ -3,6 +3,7 @@ import {SIZES} from "./RestaurantNav";
 import FullPageLink from "../widgets/FullPageLink";
 import Row from "../widgets/Row";
 import Column from "../widgets/Column";
+import {EVENINGS, SETTINGS} from "../App";
 
 export default class RestaurantHomeNav extends Component {
 
@@ -22,10 +23,10 @@ export default class RestaurantHomeNav extends Component {
         return (
             <Row grow>
                 <Column>
-                    <FullPageLink path="settings" icon="gears" text="Impostazioni"/>
+                    <FullPageLink page={SETTINGS} icon="gears" text="Impostazioni"/>
                 </Column>
                 <Column>
-                    <FullPageLink path="evening" icon="calendar" text="Serate"/>
+                    <FullPageLink page={EVENINGS} icon="calendar" text="Serate"/>
                 </Column>
             </Row>
         );

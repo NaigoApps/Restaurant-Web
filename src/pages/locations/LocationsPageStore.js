@@ -1,4 +1,4 @@
-import AbstractStore from "../../stores/AbstractStore";
+import AbstractStore from "../../stores/RootFeatureStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
     ACT_BEGIN_CREATE_LOCATION,
@@ -12,7 +12,7 @@ import {
     ACT_UPDATE_LOCATION_PRINTER
 } from "../../actions/ActionTypes";
 import locationsStore from "../../stores/LocationsStore";
-import printersStore from "../../stores/PrintersStore";
+import printersStore from "../../stores/generic/PrintersStore";
 
 const {fromJS, Map} = require('immutable');
 
@@ -55,7 +55,7 @@ class LocationsPageStore extends AbstractStore {
                 this.createdLocation = this.buildLocation();
                 break;
             case ACT_SELECT_LOCATION:
-                this.selectedLocation = action.body.get('uuid');
+                this.selectedLocation = action.body;
                 this.createdLocation = null;
                 break;
             case ACT_DESELECT_LOCATION:

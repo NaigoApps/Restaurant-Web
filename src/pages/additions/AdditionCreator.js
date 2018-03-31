@@ -4,8 +4,8 @@ import Column from "../../widgets/Column";
 import Row from "../../widgets/Row";
 import additionsCreatorActions from "./AdditionsCreatorActions";
 import TextEditor from "../../components/widgets/inputs/TextEditor";
-import BooleanEditor from "../../components/widgets/inputs/BooleanEditor";
-import FloatEditor from "../../components/widgets/inputs/FloatEditor";
+import BooleanEditor from "../../components/widgets/inputs/boolean/BooleanInput";
+import FloatEditor from "../../components/widgets/inputs/float/FloatEditor";
 
 export default class AdditionCreator extends React.Component {
     constructor(props) {

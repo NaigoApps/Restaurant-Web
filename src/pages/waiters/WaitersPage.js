@@ -10,6 +10,7 @@ import waitersEditorActions from "./WaitersEditorActions";
 import NavPills from "../../widgets/NavPills";
 import NavElement from "../../widgets/NavElement";
 import NavElementLink from "../../widgets/NavElementLink";
+import {SETTINGS} from "../../App";
 
 const {Map} = require('immutable');
 
@@ -75,7 +76,7 @@ export default class WaitersPage extends Component {
         elements.push(<NavElementLink
             key="settings"
             text="Impostazioni"
-            href="/restaurant/settings"
+            page={SETTINGS}
         />);
         elements.push(<NavElement
             key="waiters"

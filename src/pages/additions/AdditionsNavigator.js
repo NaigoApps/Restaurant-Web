@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import PaginatedEntitiesList from "../../components/widgets/PaginatedEntitiesList";
 import Row from "../../widgets/Row";
 import Button from "../../widgets/Button";
 import Column from "../../widgets/Column";
 import additionsEditorActions from "./AdditionsEditorActions";
 import additionsCreatorActions from "./AdditionsCreatorActions";
+import PaginatedList from "../../components/widgets/PaginatedList";
 
 export default class AdditionsNavigator extends Component {
 
@@ -17,7 +17,8 @@ export default class AdditionsNavigator extends Component {
 
         return [<Row key="list" topSpaced>
             <Column>
-                <PaginatedEntitiesList
+                <PaginatedList
+                    id={addition => addition.get('uuid')}
                     rows={9}
                     cols={3}
                     entities={props.get('additions')}

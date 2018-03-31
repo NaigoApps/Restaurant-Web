@@ -2,10 +2,11 @@ import React from 'react';
 import IntegerEditor from "../../components/widgets/inputs/IntegerEditor";
 import printersEditorActions from "./PrintersEditorActions";
 import SelectEditor from "../../components/widgets/inputs/SelectEditor";
-import BooleanEditor from "../../components/widgets/inputs/BooleanEditor";
+import BooleanEditor from "../../components/widgets/inputs/boolean/BooleanEditor";
 import EntityEditor from "../../components/editors/EntityEditor";
 import Column from "../../widgets/Column";
 import Row from "../../widgets/Row";
+import {iGet} from "../../utils/Utils";
 
 export default class PrinterEditor extends React.Component {
     constructor(props) {
@@ -13,36 +14,82 @@ export default class PrinterEditor extends React.Component {
     }
 
     render() {
-        let props = this.props.data;
-        let printer = props.get('printer');
-        let uuid = printer.get('uuid');
+        let editorData = this.props.data;
+        let actionsProvider = this.props.actionsProvider;
+        let printer = this.props.data.get('printer');
+
+        let components = PrinterEditor.buildComponents(editorData, actionsProvider, printer);
 
         return <Row key="editor" topSpaced>
             <Column>
                 <EntityEditor
-                    valid={!!props.get('printer').get('name')}
+                    valid={!!iGet(editorData, "editor.name.value")}
                     entity={printer}
-                    deleteMethod={printersEditorActions.deletePrinter}
+                    confirmMethod={actionsProvider.onConfirm}
+                    abortMethod={actionsProvider.onAbort}
+                    deleteMethod={actionsProvider.onDelete}
                     render={p => p.get('name')}>
-                    <SelectEditor
-                        label="Nome"
-                        options={props.get('services')}
-                        value={printer ? printer.get('name') : "?"}
-                        commitAction={result => printersEditorActions.updatePrinterName(uuid, result)}
-                    />
-                    <BooleanEditor
-                        label="Principale"
-                        value={printer.get('main')}
-                        commitAction={result => printersEditorActions.updatePrinterMain(uuid, result)}
-                    />
-                    <IntegerEditor
-                        label="Lunghezza riga"
-                        value={printer.get('lineCharacters')}
-                        commitAction={result => printersEditorActions.updatePrinterLineCharacters(uuid, result)}
-                    />
+                    {components}
                 </EntityEditor>
             </Column>
         </Row>;
+    }
+
+    static buildComponents(editorData, actionsProvider, printer) {
+        let components = [];
+        if (actionsProvider.onConfirmNameEditing && actionsProvider.onAbortNameEditing) {
+            components.push(PrinterEditor.buildNameEditor(editorData, actionsProvider, printer));
+        }
+        if (actionsProvider.onConfirmMainEditing) {
+            components.push(PrinterEditor.buildMainEditor(editorData, actionsProvider, printer));
+        }
+        if (actionsProvider.onConfirmLineCharactersEditing && actionsProvider.onAbortLineCharactersEditing) {
+            components.push(PrinterEditor.buildLineCharactersEditor(editorData, actionsProvider, printer));
+        }
+        return components;
+    }
+
+    static buildNameEditor(editorData, actionsProvider, printer) {
+        return <SelectEditor
+            label="Nome"
+            key="name"
+            page={iGet(editorData, "editor.name.page")}
+            visible={iGet(editorData, "editor.name.visible")}
+            options={iGet(editorData, "services")}
+            value={iGet(editorData, "editor.name.value")}
+            isValid={!!iGet(editorData, "editor.name.value")}
+            onSelect={value => printersEditorActions.onSelectName(value)}
+            onDeselect={value => printersEditorActions.onSelectName(null)}
+            onSelectPage={index => printersEditorActions.onSelectNamePage(index)}
+            onShowModal={() => printersEditorActions.onStartNameEditing()}
+
+            onAbort={actionsProvider.onAbortNameEditing}
+            onConfirm={result => actionsProvider.onConfirmNameEditing(iGet(printer, "uuid"), result)}
+        />;
+    }
+
+    static buildMainEditor(editorData, actionsProvider, printer){
+        return <BooleanEditor
+            key="main"
+            label="Principale"
+            value={iGet(editorData, "editor.main.value")}
+            onConfirm={result => actionsProvider.onConfirmMainEditing(iGet(printer, "uuid"), result)}
+        />;
+    }
+
+    static buildLineCharactersEditor(editorData, actionsProvider, printer){
+        return <IntegerEditor
+            key="lcs"
+            uuid="printer_editor_lcs"
+            label="Lunghezza riga"
+            visible={iGet(editorData, "editor.lineCharacters.visible")}
+            text={iGet(editorData, "editor.lineCharacters.text")}
+            onShowModal={() => printersEditorActions.onStartLineCharactersEditing()}
+            onChar={char => printersEditorActions.onLineCharactersChar(char)}
+
+            onConfirm={result => actionsProvider.onConfirmLineCharactersEditing(iGet(printer, "uuid"), result)}
+            onAbort={actionsProvider.onAbortLineCharactersEditing}
+        />;
     }
 
 }

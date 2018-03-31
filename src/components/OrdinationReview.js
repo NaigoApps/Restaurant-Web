@@ -11,14 +11,14 @@ export default class OrdinationReview extends React.Component {
         super(props);
     }
 
-    renderOrder(order) {
+    renderOrder(group) {
         let dishes = this.props.data.get('dishes');
         let additions = this.props.data.get('additions');
-        let result = OrdinationsUtils.renderImplodedOrder(order, dishes, additions);
+        let result = OrdinationsUtils.renderImplodedOrder(group, dishes, additions);
 
-        return <Row key={order.get('order').get('dish') + uuid()}>
+        return <Row key={group.get('groupId')}>
             <Column>
-                <FormattedParagraph leftText={result} rightText={OrdinationsUtils.formatPrice(order.get('price'))}/>
+                <FormattedParagraph leftText={result} rightText={OrdinationsUtils.formatPrice(group.get('price'))}/>
             </Column>
         </Row>
     }

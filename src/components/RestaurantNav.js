@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
 import applicationActions from "../actions/ApplicationActions";
-import NavButtonLink from "../widgets/NavButtonLink";
-import NavButton from "../widgets/NavButton";
 import Icon from "../widgets/Icon";
 import Button from "../widgets/Button";
+import {HOME} from "../App";
 
 export const SIZES = {
     HIDDEN: "HIDDEN",
@@ -18,6 +16,11 @@ class RestaurantNav extends Component {
         super();
     }
 
+    goHome(){
+        applicationActions.dismissFullScreen();
+        applicationActions.goToPage(HOME)
+    }
+
     render() {
 
         return (
@@ -26,18 +29,14 @@ class RestaurantNav extends Component {
                     <Icon name="gear"/>
                 </button>
                 <div id="navbar" className="collapse navbar-collapse">
-                    <NavButtonLink
+                    <Button
+                        text="Home"
                         icon="home"
-                        path="/restaurant"
-                        commitAction={applicationActions.dismissFullScreen}
+                        commitAction={() => this.goHome()}
                     />
-                    <ul className="navbar-nav mr-auto">
-                        <li className="nav-item"><a className="nav-link">{this.props.title}</a></li>
-                        {this.props.content}
-                    </ul>
                     <ul className="navbar-nav ml-auto">
                         <li className="nav-item">
-                            <NavButton
+                            <Button
                                 icon="window-restore"
                                 commitAction={() => applicationActions.toggleFullScreen()}/>
                         </li>

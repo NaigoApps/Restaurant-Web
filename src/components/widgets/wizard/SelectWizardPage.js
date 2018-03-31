@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import graphWizardActions from "./GraphWizardActions";
-import GraphWizardPage from "./graph/GraphWizardPage";
-import Button from "../../../widgets/Button";
+import graphWizardActions from "./graph-wizard/GraphWizardActions";
+import GraphWizardPage from "./graph-wizard/GraphWizardPage";
+import PaginatedList from "../PaginatedList";
 
 export default class SelectWizardPage extends Component {
     constructor(props) {
@@ -13,19 +13,19 @@ export default class SelectWizardPage extends Component {
     }
 
     render() {
-        let buttons = this.props.options.map((o, index) =>
-            (
-                <Button key={index}
-                        active={o === this.props.wizardData[this.props.identifier]}
-                        commitAction={this.selectOption.bind(this, o)}
-                        text={this.props.optionRenderer(o)}
-                />
-            )
-        );
 
         return (
             <GraphWizardPage>
-                {buttons}
+                <PaginatedList
+                    rows={this.props.rows}
+                    cols={this.props.cols}
+                    selected={this.props.wizardData[this.props.identifier]}
+                    entities={this.props.options}
+                    renderer={this.props.renderer}
+                    colorRenderer={this.props.colorRenderer}
+                    selectMethod={entity => this.selectOption(entity)}
+                    deselectMethod={() => {}}
+                />
             </GraphWizardPage>
         )
     }

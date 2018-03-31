@@ -1,5 +1,4 @@
 import {ACT_CREATE_DISH, ACT_DELETE_DISH, ACT_RETRIEVE_DISHES, ACT_UPDATE_DISH} from "../../actions/ActionTypes";
-import {strcmp} from "../../utils/Utils";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
 
@@ -15,10 +14,13 @@ class DishesStore extends AbstractEntityStore {
         return this.getData();
     }
 
+    comparator(d1, d2){
+        return d1.get('name').toLowerCase().localeCompare(d2.get('name').toLowerCase());
+    }
+
     getDishesByCategory(uuid) {
         return this.getData().getPayload()
-            .filter(d => d.get('category') === uuid)
-            .sort((d1, d2) => d1.get('name').toUpperCase().localeCompare(d2.get('name').toUpperCase()));
+            .filter(d => d.get('category') === uuid);
     }
 
     handleStartedAction(action) {

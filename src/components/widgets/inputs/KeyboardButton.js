@@ -43,17 +43,20 @@ export default class KeyboardButton extends Component {
         if(this.props.reduced){
             style.push("reduced");
         }
+        if(this.props.fullHeight){
+            style.push("full-height");
+        }
         return style.join(" ");
     }
 
     render() {
         const disabled = this.props.disabled;
         let style = this.computeStyle();
-        let content;
-        if (this.props.char) {
-            content = this.props.char;
+        let content = "";
+        if (this.props.text || this.props.char) {
+            content = this.props.text || this.props.char;
         } else if (this.props.icon) {
-            content = <span className={"glyphicon glyphicon-" + this.props.icon}/>
+            content = <span className={"fa fa-" + this.props.icon}/>
         }
         let c = this.props.char;
         let button = <button

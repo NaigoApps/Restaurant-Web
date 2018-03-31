@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import {uuid} from "../../../utils/Utils";
 import $ from 'jquery';
 import KeyPad, {CANC} from "../KeyPad";
-import GraphWizardPage from "./graph/GraphWizardPage";
-import graphWizardActions from "./GraphWizardActions";
+import GraphWizardPage from "./graph-wizard/GraphWizardPage";
+import graphWizardActions from "./graph-wizard/GraphWizardActions";
 
 export default class FloatInputWizardPage extends Component {
     constructor(props) {

@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import Button from "./Button";
+import applicationActions from "../actions/ApplicationActions";
 
 export default class NavElementLink extends Component {
     constructor(props) {
@@ -16,13 +18,21 @@ export default class NavElementLink extends Component {
         return classes.join(" ");
     }
 
+    goToPage(page){
+        applicationActions.goToPage(page);
+    }
+
     render() {
         const text = this.props.text;
         const disabled = this.props.disabled;
 
         return (
                 <li className="nav-item">
-                    <a className={NavElementLink.getClassName(this.props)} href={disabled ? "#" : this.props.href}>{text}</a>
+                    <Button
+                        text={text}
+                        disabled={disabled}
+                        commitAction={() => this.goToPage(this.props.page)}
+                    />
                 </li>
         );
     }

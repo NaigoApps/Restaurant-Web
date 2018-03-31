@@ -1,4 +1,4 @@
-import AbstractStore from "../../stores/AbstractStore";
+import AbstractStore from "../../stores/RootFeatureStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
     ACT_BEGIN_CREATE_ADDITION,
@@ -59,7 +59,7 @@ class AdditionsPageStore extends AbstractStore{
                 this.inCreationAddition = this.buildAddition();
                 break;
             case ACT_SELECT_ADDITION:
-                this.selectedAddition = action.body.get('uuid');
+                this.selectedAddition = action.body;
                 this.inCreationAddition = null;
                 break;
             case ACT_DESELECT_ADDITION:

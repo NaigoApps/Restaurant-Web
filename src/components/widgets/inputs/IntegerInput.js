@@ -1,56 +1,58 @@
 import React, {Component} from 'react';
+import IntKeyPad from "../IntKeyPad";
+import Column from "../../../widgets/Column";
+import Row from "../../../widgets/Row";
 
-/**
- * Expects:
- * - name: label caption
- * - changeAction: action to throw on change
- */
+const {Map} = require('immutable');
 
 export default class IntegerInput extends Component {
     constructor(props) {
         super(props);
-        this.state = this.resetState(props)
     }
 
-    componentWillReceiveProps(props) {
-        this.setState(this.resetState(props));
-    }
-
-    resetState(props) {
-        return {
-            number: props.default || "",
-            hasChanged: false
+    onChar(char) {
+        if(this.props.onChar) {
+            this.props.onChar(char);
         }
     }
 
-    numberChange(event) {
-        this.setState({
-            number: Math.floor(event.target.value),
-            hasChanged: true
-        });
-    }
-
-    commitChange() {
-        if (this.state.hasChanged) {
-            console.log(this.state.number);
-            if (this.props.commitAction) {
-                this.props.commitAction(this.state.number);
-            }
-            this.setState({
-                hasChanged: false
-            });
+    updateCaret() {
+        if(this.props.onSetCaret) {
+            let input = global.$("#" + this.props.uuid)[0];
+            this.props.onSetCaret(input.selectionStart);
         }
     }
 
     render() {
-        const label = this.props.label;
-        const number = this.state.number;
-        const field = (
-            <input className="form-control" type="text" value={number}
-                   onChange={this.numberChange.bind(this)}
-                   onBlur={this.commitChange.bind(this)}/>
-        );
-        return field;
+        const text = this.props.text;
+        const placeholder = this.props.placeholder;
+        const disabled = this.props.disabled;
+
+        return (
+            <Row>
+                <Column>
+                    <Row>
+                        <Column>
+                            <input
+                                id={this.props.uuid}
+                                className="form-control"
+                                placeholder={placeholder}
+                                type="text"
+                                disabled={disabled}
+                                value={text || ""}
+                                onMouseUp={() => this.updateCaret()}
+                                onKeyDown={data => this.onChar(data.key, data)}/>
+                        </Column>
+                    </Row>
+                    <Row topSpaced>
+                        <Column>
+                            <IntKeyPad
+                                disabled={disabled}
+                                onCharAction={this.onChar.bind(this)}/>
+                        </Column>
+                    </Row>
+                </Column>
+            </Row>);
     }
 
 }

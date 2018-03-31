@@ -19,6 +19,10 @@ class CategoriesStore extends AbstractEntityStore {
         return this.getData();
     }
 
+    comparator(c1, c2){
+        return c1.get('name').toLowerCase().localeCompare(c2.get('name').toLowerCase());
+    }
+
     handleStartedAction(action) {
         let changed = true;
         switch (action.type) {

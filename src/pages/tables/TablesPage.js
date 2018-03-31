@@ -10,6 +10,7 @@ import TablesNavigator from "../locations/TablesNavigator";
 import NavElementLink from "../../widgets/NavElementLink";
 import NavElement from "../../widgets/NavElement";
 import NavPills from "../../widgets/NavPills";
+import {SETTINGS} from "../../App";
 
 const {Map} = require('immutable');
 
@@ -74,7 +75,7 @@ export default class TablesPage extends Component {
         elements.push(<NavElementLink
             key="settings"
             text="Impostazioni"
-            href="/restaurant/settings"
+            page={SETTINGS}
         />);
         elements.push(<NavElement
             key="tables"

@@ -6,7 +6,7 @@ import TextEditor from "../../components/widgets/inputs/TextEditor";
 import categoriesCreatorActions from "./CategoriesCreatorActions";
 import EntitySelectEditor from "../../components/widgets/inputs/EntitySelectEditor";
 import dishesCreatorActions from "./DishesCreatorActions";
-import FloatEditor from "../../components/widgets/inputs/FloatEditor";
+import FloatEditor from "../../components/widgets/inputs/float/FloatEditor";
 
 export default class DishCreator extends React.Component {
     constructor(props) {

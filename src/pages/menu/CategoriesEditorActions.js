@@ -21,6 +21,10 @@ class CategoriesEditorActions {
         requestBuilder.put(ACT_UPDATE_CATEGORY, 'categories/' + uuid + '/location', value);
     }
 
+    updateCategoryAdditions(uuid, values) {
+        requestBuilder.put(ACT_UPDATE_CATEGORY, 'categories/' + uuid + '/additions', values);
+    }
+
     selectCategory(category) {
         dispatcher.fireEnd(ACT_SELECT_CATEGORY, category);
     }

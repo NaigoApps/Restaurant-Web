@@ -5,7 +5,7 @@ import {
 } from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
-import {DINING_TABLE_TYPE, ORDERS_TYPE, ORDINATION_TYPE} from "../../stores/EntityEditorStore";
+import {CREATING_MODE, DINING_TABLE_TYPE, ORDERS_TYPE, ORDINATION_TYPE} from "../../stores/EntityEditorStore";
 import {findByUuid} from "../../utils/Utils";
 
 const {fromJS} = require('immutable');
@@ -16,29 +16,26 @@ class OrdinationsCreatorActions {
         let newOrdination = EntitiesUtils.newOrdination();
         dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
             type: ORDINATION_TYPE,
-            entity: newOrdination
+            entity: newOrdination,
+            mode: CREATING_MODE
         }));
         dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
             type: ORDERS_TYPE,
-            entity: newOrdination.get('orders')
+            entity: newOrdination.get('orders'),
+            mode: CREATING_MODE
         }));
     }
 
     abortOrdinationCreation() {
         dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, ORDINATION_TYPE);
-        dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, ORDERS_TYPE);
     }
 
     createOrdination(table, orders) {
         requestBuilder.post(ACT_CREATE_ORDINATION, 'dining-tables/' + table + '/ordinations', orders)
             .then(result => {
-                dispatcher.fireEnd(ACT_UPDATE_ENTITY, fromJS({
-                    type: DINING_TABLE_TYPE,
-                    updater: oldTable => result.get(0)
-                }));
                 dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
                     type: ORDINATION_TYPE,
-                    entity: findByUuid(result.get(0).get('ordinations'), result.get(1))
+                    entity: result.get(1)
                 }));
             });
     }

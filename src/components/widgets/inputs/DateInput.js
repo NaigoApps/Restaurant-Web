@@ -13,6 +13,12 @@ export function isToday(date){
         date.getFullYear() === now.getFullYear();
 }
 
+export function isThisMonth(date){
+    let now = new Date();
+    return date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear();
+}
+
 export function daysInMonth(month, year){
     return new Date(year, month + 1, 0).getDate();
 }

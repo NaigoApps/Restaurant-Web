@@ -18,7 +18,7 @@ class RequestBuilder {
         return url;
     }
 
-    get(action, resource, params) {
+    get(action, resource, params, topics) {
         if (params) {
             resource += this.buildParams(params);
         }
@@ -34,12 +34,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result));
+                            dispatcher.fireEnd(action, fromJS(result), topics);
                             resolve(fromJS(result));
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result);
+                            dispatcher.fireEnd(action, result, topics);
                             resolve(result);
                         });
                     }
@@ -56,7 +56,7 @@ class RequestBuilder {
         })
     }
 
-    post(action, resource, target) {
+    post(action, resource, target, topics) {
         dispatcher.fireStart(action);
 
         return new Promise((resolve, reject) => {
@@ -76,12 +76,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result));
+                            dispatcher.fireEnd(action, fromJS(result), topics);
                             resolve(fromJS(result));
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result);
+                            dispatcher.fireEnd(action, result, topics);
                             resolve(result);
                         });
                     }
@@ -98,8 +98,12 @@ class RequestBuilder {
         })
     }
 
-    put(action, resource, target) {
+    put(action, resource, target, params, topics) {
         dispatcher.fireStart(action);
+
+        if (params) {
+            resource += this.buildParams(params);
+        }
 
         return new Promise((resolve, reject) => {
             fetch(
@@ -118,12 +122,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result));
+                            dispatcher.fireEnd(action, fromJS(result), topics);
                             resolve(fromJS(result));
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result);
+                            dispatcher.fireEnd(action, result, topics);
                             resolve(result);
                         });
                     }
@@ -141,7 +145,7 @@ class RequestBuilder {
 
     }
 
-    remove(action, resource, target) {
+    remove(action, resource, target, topics) {
         dispatcher.fireStart(action);
 
         return new Promise((resolve, reject) => {
@@ -161,12 +165,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result));
+                            dispatcher.fireEnd(action, fromJS(result), topics);
                             resolve(fromJS(result));
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result);
+                            dispatcher.fireEnd(action, result, topics);
                             resolve(result);
                         });
                     }

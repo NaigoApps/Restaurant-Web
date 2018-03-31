@@ -14,7 +14,7 @@ export default class Row extends Component {
     getCss(){
         let classes = ["row"];
         if(this.props.align){
-            classes.push("align-self-" + this.props.align);
+            classes.push("align-items-" + this.props.align);
         }
         if(this.props.justify){
             classes.push("justify-content-" + this.props.justify)

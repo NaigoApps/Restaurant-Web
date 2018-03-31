@@ -28,6 +28,7 @@ export default class DiningTableCreator extends React.Component {
 
     getTableDataEditorContent() {
         let table = this.props.data.get('editingTable');
+        let waiters = this.props.data.get('waiters');
 
         return <EntityEditor
             entity={table}
@@ -48,13 +49,31 @@ export default class DiningTableCreator extends React.Component {
                 commitAction={this.waiterChange.bind(this)}
             />
             <EntitySelectEditor
+                rows={8}
+                cols={4}
                 label="Tavolo"
                 options={this.props.data.get('tables')}
                 renderer={table => table.get('name')}
+                colorRenderer={table => this.diningTableColorRenderer(table)}
                 value={table.get('table')}
                 commitAction={this.tableChange.bind(this)}
             />
         </EntityEditor>
+    }
+
+    diningTableColorRenderer(table) {
+        let diningTables = this.props.data.get('evening').get('diningTables');
+        let color = null;
+        diningTables.filter(dTable => dTable.get('table') === table.get('uuid'))
+            .forEach(dTable => {
+                if (dTable.get('status') === "APERTO") {
+                    color = "danger";
+                }
+                if (dTable.get('status') === "IN CHIUSURA" && !color) {
+                    color = "warning";
+                }
+            });
+        return color || "secondary";
     }
 
     render() {

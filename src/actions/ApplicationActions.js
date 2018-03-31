@@ -1,4 +1,4 @@
-import {ACT_DISMISS_FULL_SCREEN, ACT_REQUEST_FULL_SCREEN, ACT_TOGGLE_FULL_SCREEN} from "./ActionTypes";
+import {ACT_DISMISS_FULL_SCREEN, ACT_GO_TO_PAGE, ACT_REQUEST_FULL_SCREEN, ACT_TOGGLE_FULL_SCREEN} from "./ActionTypes";
 import dispatcher from "../dispatcher/SimpleDispatcher";
 
 class ApplicationActions {
@@ -13,6 +13,10 @@ class ApplicationActions {
 
     dismissFullScreen() {
         dispatcher.fireEnd(ACT_DISMISS_FULL_SCREEN);
+    }
+
+    goToPage(page) {
+        dispatcher.fireEnd(ACT_GO_TO_PAGE, page);
     }
 }
 

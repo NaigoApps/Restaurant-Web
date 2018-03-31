@@ -1,35 +1,64 @@
 import React, {Component} from 'react';
-import TextInputWizardPage from "../wizard/TextInputWizardPage";
-import GraphWizard from "../wizard/GraphWizard";
+import TextInput from "./text/TextInput";
+import Button from "../../../widgets/Button";
+import Column from "../../../widgets/Column";
+import Row from "../../../widgets/Row";
+import OkCancelModal from "../../../widgets/OkCancelModal";
 
 export default class TextEditor extends Component {
     constructor(props) {
         super(props);
     }
 
-    onWizardConfirm(wData){
-        this.props.commitAction(wData["text_page"]);
+    onWizardConfirm(wData) {
+        if(this.props.onConfirm) {
+            this.props.onConfirm(this.props.text);
+        }
+    }
+
+    onWizardAbort(){
+        if(this.props.onAbort) {
+            this.props.onAbort();
+        }
+    }
+
+    onShowModal(){
+        if(this.props.onShowModal){
+            this.props.onShowModal();
+        }
+    }
+
+    onInputChar(char){
+        if(this.props.onChar){
+            this.props.onChar(char);
+        }
+    }
+
+    onSetInputCaret(pos){
+        if(this.props.onSetCaret){
+            this.props.onSetCaret(pos);
+        }
     }
 
     render() {
-        const label = this.props.label;
-        const value = this.props.value;
-        const placeholder = this.props.placeholder;
-
-        return <GraphWizard
-            hideReview={true}
-            initialPage="text_page"
-            label={label}
-            size="lg"
-            renderer={wData => wData["text_page"]}
-            commitAction={this.onWizardConfirm.bind(this)}>
-            <TextInputWizardPage
-                identifier="text_page"
-                initializer={value}
-                name={label}
-                placeholder={placeholder}
-            />
-        </GraphWizard>;
+        return <Row>
+            <Column>
+                <Button
+                    text={this.props.text}
+                    commitAction={() => this.onShowModal()}
+                />
+            </Column>
+            <OkCancelModal
+                visible={this.props.visible}
+                confirmAction={() => this.onWizardConfirm()}
+                abortAction={() => this.onWizardAbort()}>
+                <TextInput
+                    uuid={this.props.uuid}
+                    text={this.props.text}
+                    onSetCaret={(pos) => this.onSetInputCaret(pos)}
+                    onChar={(char) => this.onInputChar(char)}
+                />
+            </OkCancelModal>
+        </Row>
     }
-
 }

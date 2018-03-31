@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {TYPES} from "../../components/editors/EntityEditor";
-import PaginatedEntitiesList from "../../components/widgets/PaginatedEntitiesList";
 import Row from "../../widgets/Row";
 import Button from "../../widgets/Button";
 import Column from "../../widgets/Column";
 import locationsEditorActions from "./LocationsEditorActions";
 import locationsCreatorActions from "./LocationsCreatorActions";
+import PaginatedList from "../../components/widgets/PaginatedList";
 
 export default class LocationsNavigator extends Component {
 
@@ -18,7 +18,8 @@ export default class LocationsNavigator extends Component {
 
         return [<Row key="list" topSpaced>
             <Column>
-                <PaginatedEntitiesList
+                <PaginatedList
+                    id={location => location.get('uuid')}
                     entities={props.get('locations')}
                     renderer={location => location.get('name')}
                     selectMethod={locationsEditorActions.selectLocation}

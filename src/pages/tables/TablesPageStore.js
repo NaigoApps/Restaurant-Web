@@ -1,4 +1,4 @@
-import AbstractStore from "../../stores/AbstractStore";
+import AbstractStore from "../../stores/RootFeatureStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
     ACT_BEGIN_CREATE_RESTAURANT_TABLE,
@@ -49,7 +49,7 @@ class TablesPageStore extends AbstractStore {
                 this.inCreationTable = this.buildTable();
                 break;
             case ACT_SELECT_RESTAURANT_TABLE:
-                this.selectedTable = action.body.get('uuid');
+                this.selectedTable = action.body;
                 this.inCreationTable = null;
                 break;
             case ACT_DESELECT_RESTAURANT_TABLE:
@@ -74,7 +74,7 @@ class TablesPageStore extends AbstractStore {
 
     getState() {
         let result = Map({
-            tables: tablesStore.getAllTables().getPayload().sort((t1, t2) => t1.get('name').localeCompare(t2.get('name'))),
+            tables: tablesStore.getAllTables().getPayload(),
 
             selectedTable: this.selectedTable,
             createdTable: this.inCreationTable

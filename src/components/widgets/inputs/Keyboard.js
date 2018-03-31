@@ -16,8 +16,14 @@ const LOWERCASE = [
 ];
 
 export const BACKSPACE = "BACKSPACE";
-export const LEFT = "LEFT";
-export const RIGHT = "RIGHT";
+export const LEFT = "ARROWLEFT";
+export const RIGHT = "ARROWRIGHT";
+export const SHIFT = "SHIFT";
+export const CTRL = "CONTROL";
+export const ALT = "ALT";
+export const META = "META";
+export const LOCK = "CAPSLOCK";
+export const DELETE = "DELETE";
 
 export default class Keyboard extends Component {
     constructor(props) {
@@ -78,9 +84,9 @@ export default class Keyboard extends Component {
             </div>
             <div className="row">
                 <KeyboardButtonSpace reduced={this.props.reduced} size={SIZES.HUGE}/>
-                <KeyboardButton reduced={this.props.reduced} icon="triangle-left" size={SIZES.XSMALL} onClick={this.onLeftClick.bind(this)}/>
-                <KeyboardButton reduced={this.props.reduced} char="&nbsp;" size={SIZES.SPACE} onClick={this.onButtonClick.bind(this)}/>
-                <KeyboardButton reduced={this.props.reduced} icon="triangle-right" size={SIZES.XSMALL} onClick={this.onRightClick.bind(this)}/>
+                <KeyboardButton reduced={this.props.reduced} icon="angle-left" size={SIZES.XSMALL} onClick={this.onLeftClick.bind(this)}/>
+                <KeyboardButton reduced={this.props.reduced} text="&nbsp;" char=" " size={SIZES.SPACE} onClick={this.onButtonClick.bind(this)}/>
+                <KeyboardButton reduced={this.props.reduced} icon="angle-right" size={SIZES.XSMALL} onClick={this.onRightClick.bind(this)}/>
             </div>
         </div>);
     }

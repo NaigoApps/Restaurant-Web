@@ -20,6 +20,10 @@ class AdditionsStore extends AbstractEntityStore {
         super(EVT_ADDITIONS_STORE_CHANGE);
     }
 
+    comparator(a1, a2){
+        return a1.get('name').toLowerCase().localeCompare(a2.get('name').toLowerCase());
+    }
+
     handleStartedAction(action) {
         let changed = true;
         switch (action.type) {

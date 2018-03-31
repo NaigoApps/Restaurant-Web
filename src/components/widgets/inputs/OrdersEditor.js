@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import GraphWizard from "../wizard/GraphWizard";
-import OrderDishWizardPage from "../wizard/graph/OrderDishWizardPage";
-import graphWizardActions from "../wizard/GraphWizardActions";
-import OrderAdditionsWizardPage from "../wizard/graph/OrderAdditionsWizardPage";
+import GraphWizard from "../wizard/graph-wizard/GraphWizard";
+import OrderDishWizardPage from "../wizard/graph-wizard/OrderDishWizardPage";
+import graphWizardActions from "../wizard/graph-wizard/GraphWizardActions";
+import OrderAdditionsWizardPage from "../wizard/graph-wizard/OrderAdditionsWizardPage";
 import OrdinationsUtils from "../../../pages/evening/OrdinationsUtils";
-import OrderFreeAdditionsWizardPage from "../wizard/graph/OrderFreeAdditionsWizardPage";
-import OrderPriceQuantityWizardPage from "../wizard/graph/OrderPriceQuantityWizardPage";
+import OrderFreeAdditionsWizardPage from "../wizard/graph-wizard/OrderFreeAdditionsWizardPage";
+import OrderPriceQuantityWizardPage from "../wizard/graph-wizard/OrderPriceQuantityWizardPage";
+import {findByUuid} from "../../../utils/Utils";
 
 const {List} = require('immutable');
 
@@ -58,18 +59,18 @@ export default class OrdersEditor extends Component {
                 label={add => add.get('name')}
                 data={this.props.data}/>
 
-            <OrderFreeAdditionsWizardPage
-                identifier="free_additions"
-                name="Variante libera"
-                initializer={null}
-                label={add => add.get('name')}
-                data={this.props.data}/>
-
             <OrderPriceQuantityWizardPage
                 identifier="price_quantity"
                 name="Prezzo / Quantità"
                 initializer={null}
-                // label={add => add.get('name')}
+                data={this.props.data}/>
+
+            <OrderFreeAdditionsWizardPage
+                identifier="free_additions"
+                canEnter={data => data && !!data['editing']}
+                name="Variante libera"
+                initializer={null}
+                label={add => add.get('name')}
                 data={this.props.data}/>
 
         </GraphWizard>
@@ -77,12 +78,15 @@ export default class OrdersEditor extends Component {
     }
 
     renderWizardData(wData) {
-        if (wData["editing"]) {
-            let sampleOrder = wData["editing"];
-            let name = OrdinationsUtils.renderOrder(sampleOrder, this.props.data.get('dishes'), this.props.data.get('phases'));
-            let price = OrdinationsUtils.formatPrice(sampleOrder.get('price'));
-
-            return "Ordine corrente: " + name + " (" + price + ")";
+        let orders = this.props.data.get('editingOrders');
+        if (orders) {
+            let sampleOrder = findByUuid(orders, wData["editing"]);
+            if (sampleOrder) {
+                let price = OrdinationsUtils.formatPrice(sampleOrder.get('price'));
+                return "Ordine corrente: " +
+                    OrdinationsUtils.renderExplodedOrder(sampleOrder, this.props.data.get('dishes'), this.props.data.get('additions')) +
+                    " (" + price + ")";
+            }
         }
         return "Ordine corrente: ";
     }

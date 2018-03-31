@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import SelectWizardPage from "../wizard/SelectWizardPage";
 import {findByUuid} from "../../../utils/Utils";
-import GraphWizard from "../wizard/GraphWizard";
+import GraphWizard from "../wizard/graph-wizard/GraphWizard";
 
 export default class EntitySelectEditor extends Component {
     constructor(props) {
@@ -10,6 +10,20 @@ export default class EntitySelectEditor extends Component {
 
     onWizardConfirm(wData) {
         this.props.commitAction(wData["select_page"].get('uuid'));
+    }
+
+    wizardRenderer(wData){
+        let uuid = wData['select_page'];
+        if(uuid) {
+            let entity = findByUuid(this.props.options, uuid);
+            if (uuid && !entity) {
+                console.error(uuid + " not found")
+            }
+            if (entity) {
+                return this.props.renderer(entity)
+            }
+        }
+        return "?"
     }
 
     render() {
@@ -24,19 +38,18 @@ export default class EntitySelectEditor extends Component {
                 hideReview={true}
                 initialPage="select_page"
                 label={label}
-                renderer={wData => {
-                    let option = findByUuid(options, wData["select_page"]);
-                    if (option) {
-                        return renderer(option);
-                    }
-                    return "?";
-                }}
+                size="lg"
+                renderer={wData => this.wizardRenderer(wData)}
                 commitAction={this.onWizardConfirm.bind(this)}>
                 <SelectWizardPage
+                    rows={this.props.rows}
+                    cols={this.props.cols}
                     identifier="select_page"
                     initializer={value}
+                    id={entity => entity.get('uuid')}
                     options={options}
-                    optionRenderer={opt => opt ? renderer(opt) : ""}
+                    renderer={renderer}
+                    colorRenderer={this.props.colorRenderer}
                 />
             </GraphWizard>
         );

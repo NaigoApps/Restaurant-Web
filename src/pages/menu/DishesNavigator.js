@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import PaginatedEntitiesList from "../../components/widgets/PaginatedEntitiesList";
 import Row from "../../widgets/Row";
 import Button from "../../widgets/Button";
 import Column from "../../widgets/Column";
 import dishesEditorActions from "./DishesEditorActions";
 import dishesCreatorActions from "./DishesCreatorActions";
+import PaginatedList from "../../components/widgets/PaginatedList";
 
 export default class DishesNavigator extends Component {
 
@@ -17,11 +17,13 @@ export default class DishesNavigator extends Component {
 
         return [<Row key="list" topSpaced>
             <Column>
-                <PaginatedEntitiesList
-                    rows={6}
+                <PaginatedList
+                    id={dish => dish.get('uuid')}
+                    rows={5}
                     cols={3}
                     entities={props.get('dishes')}
                     renderer={dish => dish.get('name')}
+                    colorRenderer={dish => this.color(dish)}
                     selectMethod={dishesEditorActions.selectDish}
                     deselectMethod={dishesEditorActions.deselectDish}
                 />
@@ -36,6 +38,16 @@ export default class DishesNavigator extends Component {
                     />
                 </Column>
             </Row>];
+    }
+
+    color(dish){
+        if(dish.get('status') === "SOSPESO"){
+            return "warning";
+        }
+        if(dish.get('status') === "RIMOSSO"){
+            return "danger";
+        }
+        return "secondary";
     }
 
 }

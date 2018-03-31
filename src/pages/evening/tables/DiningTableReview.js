@@ -9,20 +9,24 @@ import Row from "../../../widgets/Row";
 import DiningTableClosingView from "./DiningTableClosingView";
 import DiningTablesUtils from "./DiningTablesUtils";
 import FormattedParagraph from "../../../widgets/FormattedParagraph";
-import PaginatedEntitiesList from "../../../components/widgets/PaginatedEntitiesList";
 import ordinationsEditorActions from "../OrdinationsEditorActions";
 import ordinationsCreatorActions from "../OrdinationsCreatorActions";
 import {NEW_ORDINATION_UUID} from "../../../utils/EntitiesUtils";
 import OrdinationCreator from "../../../components/widgets/inputs/OrdinationCreator";
 import OrdinationEditor from "../../../components/OrdinationEditor";
 import ConfirmModal from "../../../widgets/ConfirmModal";
+import PaginatedList from "../../../components/widgets/PaginatedList";
+import eveningEditorActions from "../EveningEditorActions";
+import GraphWizard from "../../../components/widgets/wizard/graph-wizard/GraphWizard";
+import SelectWizardPage from "../../../components/widgets/wizard/SelectWizardPage";
 
 export default class DiningTableReview extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             deletingOrdination: false,
-            deletingDiningTable: false
+            deletingDiningTable: false,
+            mergingDiningTable: false
         }
     }
 
@@ -32,16 +36,35 @@ export default class DiningTableReview extends React.Component {
         });
     }
 
+    showMergeDiningTableModal() {
+        this.setState({
+            mergingDiningTable: true
+        });
+    }
+
     doDeleteDiningTable() {
         this.setState({
             deletingDiningTable: false
         });
-        diningTablesEditorActions.deleteDiningTable(this.props.data.get('editingTable').get('uuid'));
+        eveningEditorActions.deleteEveningDiningTable(this.props.data.get('editingTable').get('uuid'));
+    }
+
+    doMergeDiningTable(data) {
+        this.setState({
+            mergingDiningTable: false
+        });
+        eveningEditorActions.mergeDiningTable(this.props.data.get('editingTable').get('uuid'), data.get('uuid'))
     }
 
     hideDeleteDiningTableModal() {
         this.setState({
             deletingDiningTable: false
+        });
+    }
+
+    hideMergeDiningTableModal() {
+        this.setState({
+            mergingDiningTable: false
         });
     }
 
@@ -55,7 +78,8 @@ export default class DiningTableReview extends React.Component {
         this.setState({
             deletingOrdination: false
         });
-        ordinationsEditorActions.deleteOrdination(this.props.data.get('editingOrdination').get('uuid'));
+        diningTablesEditorActions.deleteDiningTableOrdination(this.props.data.get('editingTable').get('uuid'),
+            this.props.data.get('editingOrdination').get('uuid'));
     }
 
     hideDeleteOrdinationModal() {
@@ -65,7 +89,7 @@ export default class DiningTableReview extends React.Component {
     }
 
     printPartialBill() {
-        diningTablesEditorActions.printPartialBill(this.props.data.table.uuid);
+        diningTablesEditorActions.printPartialBill(this.props.data.get('editingTable').get('uuid'));
     }
 
     beginDiningTableClosing() {
@@ -74,6 +98,7 @@ export default class DiningTableReview extends React.Component {
 
     static getReviewContent(props) {
         let orders = [];
+        let evening = props.get('evening');
         let diningTable = props.get('editingTable');
         if (diningTable.get('ordinations').size === 0) {
             return <Scrollable><h5 className="text-center">Il tavolo è vuoto</h5></Scrollable>
@@ -83,19 +108,44 @@ export default class DiningTableReview extends React.Component {
                 orders.push(order);
             });
         });
+        let allOrders = orders;
         orders = DiningTablesUtils.implode(orders);
         orders = OrdinationsUtils.sortByDish(orders, props.get('dishes'), props.get('additions'));
         let ordersComponents = orders.map(o => {
             let left = OrdinationsUtils.renderImplodedOrder(o, props.get('dishes'), props.get('additions'));
-            return <Row key={o.get('order').get('dish') + uuid()}>
+            return <Row key={o.get('groupId')}>
                 <Column>
                     <FormattedParagraph leftText={left} rightText={OrdinationsUtils.formatPrice(o.get('price'))}/>
                 </Column>
             </Row>;
         });
-        return <Scrollable>
-            {ordersComponents}
-        </Scrollable>;
+        let coverCharges = diningTable.get('coverCharges');
+        let leftCoverCharges = coverCharges + " ";
+        if (coverCharges > 1) {
+            leftCoverCharges += " COPERTI";
+        } else {
+            leftCoverCharges += " COPERTO";
+        }
+        let coverChargesPrice = coverCharges * evening.get('coverCharge');
+        let rightCoverCharges = OrdinationsUtils.formatPrice(coverChargesPrice);
+        let total = OrdinationsUtils.total(allOrders) + coverChargesPrice;
+        return <Row grow>
+            <Column>
+                <Scrollable>
+                    <Row>
+                        <Column>
+                            <FormattedParagraph leftText={leftCoverCharges} rightText={rightCoverCharges}/>
+                        </Column>
+                    </Row>
+                    {ordersComponents}
+                </Scrollable>
+                <Row>
+                    <Column>
+                        <b>TOTALE: <span>{OrdinationsUtils.formatPrice(total)}</span></b>
+                    </Column>
+                </Row>
+            </Column>
+        </Row>;
     }
 
     createOrdination() {
@@ -196,6 +246,10 @@ export default class DiningTableReview extends React.Component {
         let data = this.props.data;
         let table = data.get('editingTable');
 
+        let otherOpenTables = data.get('evening').get('diningTables')
+            .filter(t => t.get('status') !== "CHIUSO")
+            .filter(t => t.get('uuid') !== table.get('uuid'));
+
         return <Row grow>
             <Column>
                 <Row>
@@ -204,6 +258,17 @@ export default class DiningTableReview extends React.Component {
                     </Column>
                 </Row>
                 <Row grow>
+                    <Column>
+                        <Button
+                            text="Nuova comanda"
+                            icon="plus"
+                            type="info"
+                            size="lg"
+                            commitAction={ordinationsCreatorActions.beginOrdinationCreation}
+                            fullHeight/>
+                    </Column>
+                </Row>
+                <Row grow topSpaced>
                     <Column>
                         <Button
                             text="Modifica dati del tavolo"
@@ -219,18 +284,27 @@ export default class DiningTableReview extends React.Component {
                             text="Stampa pre-conto"
                             icon="print"
                             size="lg"
-                            // commitAction={this.printPartialBill.bind(this)}
+                            commitAction={() => this.printPartialBill()}
                             fullHeight/>
                     </Column>
                 </Row>
                 <Row grow topSpaced>
                     <Column>
                         <Button
-                            text="Conto"
+                            text="Conti"
                             icon="euro"
                             size="lg"
-                            disabled={DiningTablesUtils.findTableOpenedOrders(table).size === 0}
-                            // commitAction={this.beginDiningTableClosing.bind(this)}
+                            commitAction={() => diningTablesEditorActions.beginDiningTableBillsEditing()}
+                            fullHeight/>
+                    </Column>
+                </Row>
+                <Row grow topSpaced>
+                    <Column>
+                        <Button
+                            text="Fondi tavolo"
+                            icon="handshake-o"
+                            size="lg"
+                            commitAction={() => this.showMergeDiningTableModal()}
                             fullHeight/>
                     </Column>
                 </Row>
@@ -253,6 +327,28 @@ export default class DiningTableReview extends React.Component {
                         confirmType="danger"
                         abortAction={() => this.hideDeleteDiningTableModal()}
                         confirmAction={() => this.doDeleteDiningTable()}/>
+                </Row>
+                <Row>
+                    <GraphWizard
+                        isValid={wData => !!wData["select_page"]}
+                        hideReview={true}
+                        initialPage="select_page"
+                        size="lg"
+                        auto={true}
+                        renderer={wData => wData["select_page"] ? wData["select_page"].get('uuid') : "?"}
+                        visible={this.state.mergingDiningTable}
+                        message="Scegliere il tavolo destinazione"
+                        commitAction={(data) => this.doMergeDiningTable(data['select_page'])}
+                        abortAction={() => this.hideMergeDiningTableModal()}>
+                        <SelectWizardPage
+                            rows={5}
+                            cols={3}
+                            identifier="select_page"
+                            id={table => table.get('uuid')}
+                            options={otherOpenTables}
+                            renderer={table => this.renderDiningTable(table)}
+                        />
+                    </GraphWizard>
                 </Row>
             </Column>
         </Row>
@@ -283,22 +379,16 @@ export default class DiningTableReview extends React.Component {
 
                         <Row grow>
                             <Column>
-                                <PaginatedEntitiesList
+                                <PaginatedList
+                                    id={ordination => ordination.get("uuid")}
                                     selected={selectedOrdination ? selectedOrdination.get('uuid') : null}
                                     selectMethod={ordinationsEditorActions.beginOrdinationEditing}
                                     deselectMethod={ordinationsEditorActions.abortOrdinationEditing}
-                                    rows={4}
+                                    rows={5}
                                     cols={1}
                                     entities={table.get('ordinations').sort(OrdinationsUtils.ordinationDateSorter)}
                                     renderer={ordination => OrdinationsUtils.renderOrdination(ordination)}
                                 />
-                            </Column>
-                        </Row>
-
-                        <Row topSpaced>
-                            <Column>
-                                <Button text="Nuova comanda" type="info" size="lg"
-                                        commitAction={ordinationsCreatorActions.beginOrdinationCreation}/>
                             </Column>
                         </Row>
                     </Column>
@@ -307,11 +397,12 @@ export default class DiningTableReview extends React.Component {
                     </Column>
                 </Row>
             </Column>
-            <DiningTableClosingView
-                visible={false}
-                // visible={!!this.props.data.get('currentInvoice')}
-                data={this.props.data}/>
         </Row>;
+    }
+
+
+    renderDiningTable(dt) {
+        return DiningTablesUtils.renderDiningTable(dt, this.props.data.get('tables'), this.props.data.get('waiters'));
     }
 
 }

@@ -1,6 +1,6 @@
-import AbstractStore from "./AbstractStore";
+import AbstractStore from "./RootFeatureStore";
 import {
-    ACT_DISMISS_FULL_SCREEN, ACT_GOTO_FULLSCREEN, ACT_REQUEST_FULL_SCREEN,
+    ACT_DISMISS_FULL_SCREEN, ACT_GO_TO_PAGE, ACT_GOTO_FULLSCREEN, ACT_REQUEST_FULL_SCREEN,
     ACT_TOGGLE_FULL_SCREEN
 } from "../actions/ActionTypes";
 
@@ -11,6 +11,7 @@ class ApplicationStore extends AbstractStore {
     constructor() {
         super(EVT_APPLICATION_STORE_CHANGED);
         this.isFullScreen = false;
+        this.currentPage = null;
     }
 
     handleCompletedAction(action) {
@@ -25,6 +26,9 @@ class ApplicationStore extends AbstractStore {
             case ACT_DISMISS_FULL_SCREEN:
                 this.isFullScreen = false;
                 break;
+            case ACT_GO_TO_PAGE:
+                this.currentPage = action.body;
+                break;
             default:
                 changed = false;
                 break;
@@ -34,7 +38,8 @@ class ApplicationStore extends AbstractStore {
 
     getState(){
         return {
-            fullScreen: this.isFullScreen
+            fullScreen: this.isFullScreen,
+            currentPage: this.currentPage
         };
     }
 

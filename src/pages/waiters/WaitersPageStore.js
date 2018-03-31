@@ -1,4 +1,4 @@
-import AbstractStore from "../../stores/AbstractStore";
+import AbstractStore from "../../stores/RootFeatureStore";
 import waitersStore from "../../stores/generic/WaitersStore";
 import waiterStatusesStore from "../../generic/WaiterStatusesStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
@@ -57,7 +57,7 @@ class WaitersPageStore extends AbstractStore{
                 this.inCreationWaiter = this.buildWaiter();
                 break;
             case ACT_SELECT_WAITER:
-                this.selectedWaiter = action.body.get('uuid');
+                this.selectedWaiter = action.body;
                 this.inCreationWaiter = null;
                 break;
             case ACT_DESELECT_WAITER:

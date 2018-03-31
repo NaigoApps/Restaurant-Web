@@ -1,10 +1,18 @@
-export function clone(object) {
-    return JSON.parse(JSON.stringify(object));
+import {CANC} from "./Characters";
+
+export function stringEquals(s1, s2){
+    if(s1 && !s2 || s2 && !s1){
+        return false;
+    }
+    if(!s1 && !s2){
+        return true;
+    }
+    return s1.localeCompare(s2) === 0;
 }
 
-export function strcmp(s1, s2) {
-    if (s1 < s2) return -1;
-    if (s1 > s2) return +1;
+export function numberCompare(n1, n2) {
+    if (n1 < n2) return -1;
+    if (n1 > n2) return +1;
     return 0;
 }
 
@@ -58,9 +66,27 @@ export function uuid() {
     return Math.random().toString(16).slice(2);
 }
 
-export function camel(word) {
-    return word.charAt(0).toUpperCase() + word.substr(1);
+export function foo() {
 }
 
-export function foo() {
+export function iGet(map, namespace){
+    return map.getIn(namespace.split('.'));
+}
+
+export function iSet(map, namespace, value){
+    return map.setIn(namespace.split('.'), value);
+}
+
+export function appendIntEditorChar(oldText, char) {
+    if(char === CANC){
+        return "";
+    }
+    if(oldText === "0"){
+        oldText = "";
+    }
+    let newText = oldText + char;
+    if(!isNaN(parseInt(newText))){
+        return newText;
+    }
+    return oldText;
 }

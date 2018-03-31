@@ -20,7 +20,11 @@ export default class EveningSelectionForm extends Component {
         return (
             <Row topSpaced>
                 <Column>
-                    <Calendar commitAction={this.onSelectEvening.bind(this)}/>
+                    <Calendar
+                        data={this.props.data}
+                        monthActionsProvider={eveningSelectionFormActions}
+                        yearActionsProvider={eveningSelectionFormActions}
+                        commitAction={this.onSelectEvening.bind(this)}/>
                 </Column>
             </Row>
         );

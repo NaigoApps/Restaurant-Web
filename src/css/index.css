@@ -1,3 +1,7 @@
+html{
+    font-size: 16px;
+}
+
 .top-sep {
     padding-top: 10px;
 }
@@ -17,7 +21,7 @@
     min-width: 60px;
 }
 
-.keyboard-character.xs.reduced{
+.keyboard-character.xs.reduced {
     width: 5%;
     min-width: 50px;
 }
@@ -113,8 +117,8 @@
         max-width: 98%;
         width: 98%;
         margin: 0 1%;
-        height: 90%;
-        top: 5%;
+        height: 98%;
+        top: 1%;
     }
 }
 
@@ -123,8 +127,8 @@
         max-width: 98%;
         width: 98%;
         margin: 0 1%;
-        height: 90%;
-        top: 5%;
+        height: 98%;
+        top: 1%;
     }
 }
 
@@ -165,7 +169,7 @@ a.button-link {
 
 .scrollbar {
     background-color: #FFFFFF;
-    width: 44px;
+    width: 46px;
     position: relative;
     border-radius: 4px;
     border: 1px solid #cccccc;
@@ -221,8 +225,49 @@ a.button-link {
     border: 1px solid #cccccc;
 }
 
+.nav-pills > .nav-item{
+    margin-right: 5px;
+}
+
+.switch-container{
+    padding: 0.2rem 2rem 0.2rem 0.2rem;
+    border-radius: 1.3rem;
+    transition: padding 0.25s;
+}
+
+.switch-container.checked{
+    padding: 0.2rem 0.2rem 0.2rem 2rem;
+}
+
+.switch-container .btn{
+    height: 2.6rem;
+    border-radius: 1.3rem;
+}
+
+.card{
+    background-color: #f7f7f7;
+}
+
+body{
+    background-color: #f7f7f7;
+}
+
+.btn{
+    height: 3rem;
+    line-height: 1.0rem;
+    font-size: 1.0rem;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 .button-padding {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    border: 1px solid white;
+    height: 3rem;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.btn-xl {
+    padding: .75rem 1.5rem;
+    font-size: 2.00rem;
+    border-radius: .3rem;
 }

@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Button from "./Button";
 
 export default class NavElement extends Component {
     constructor(props) {
@@ -11,24 +12,14 @@ export default class NavElement extends Component {
         }
     }
 
-    static getClassName(props){
-        let classes = ["nav-link"];
-        if(props.active){
-            classes.push("active");
-        }
-        if(props.disabled){
-            classes.push("not-allowed");
-        }
-        return classes.join(" ");
-    }
-
     render() {
         const text = this.props.text;
         const active = this.props.active;
+        const disabled = this.props.disabled;
 
         return (
                 <li className="nav-item" onClick={this.clickAction.bind(this)}>
-                    <a className={NavElement.getClassName(this.props)} href="#">{text}</a>
+                    <Button text={text} disabled={disabled} active={active}/>
                 </li>
         );
     }

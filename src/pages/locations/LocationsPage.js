@@ -10,6 +10,7 @@ import LocationsNavigator from "./LocationsNavigator";
 import NavElementLink from "../../widgets/NavElementLink";
 import NavElement from "../../widgets/NavElement";
 import NavPills from "../../widgets/NavPills";
+import {SETTINGS} from "../../App";
 
 const {fromJS} = require('immutable');
 
@@ -76,7 +77,7 @@ export default class LocationsPage extends Component {
         elements.push(<NavElementLink
             key="settings"
             text="Impostazioni"
-            href="/restaurant/settings"
+            page={SETTINGS}
         />);
         elements.push(<NavElement
             key="locations"

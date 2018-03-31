@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
 import printersEditorActions from "./PrintersEditorActions";
 import {TYPES} from "../../components/editors/EntityEditor";
-import PaginatedEntitiesList from "../../components/widgets/PaginatedEntitiesList";
 import Row from "../../widgets/Row";
 import Button from "../../widgets/Button";
 import printersCreatorActions from "./PrintersCreatorActions";
 import Column from "../../widgets/Column";
+import PaginatedList from "../../components/widgets/PaginatedList";
+import SelectInput from "../../components/widgets/inputs/SelectInput";
+import printersPageActions from "./PrintersPageActions";
 
 export default class PrintersNavigator extends Component {
 
@@ -17,13 +19,15 @@ export default class PrintersNavigator extends Component {
         const props = this.props.data;
 
         return [
-            <Row key="list" topSpaced>
+            <Row key="list" topSpaced grow>
                 <Column>
-                    <PaginatedEntitiesList
-                        entities={props.get('printers')}
+                    <SelectInput
+                        id={printer => printer.get('uuid')}
+                        options={props.get('printers')}
+                        page={props.get('page')}
                         renderer={printer => printer.get('name')}
-                        selectMethod={printersEditorActions.selectPrinter}
-                        deselectMethod={printersEditorActions.deselectPrinter}
+                        onSelectPage={index => printersPageActions.onSelectPrinterPage(index)}
+                        onSelect={printer => printersEditorActions.selectPrinter(printer)}
                     />
                 </Column>
             </Row>,

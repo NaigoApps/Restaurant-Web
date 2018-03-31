@@ -1,6 +1,7 @@
 import categoriesActions from "./CategoriesActions";
 import dishesActions from "./DishesActions";
 import locationsActions from "../../generic/LocationsActions";
+import additionsActions from "../../generic/AdditionsActions";
 
 class MenuPageActions {
 
@@ -9,6 +10,7 @@ class MenuPageActions {
         dishesActions.retrieveAllDishes();
         dishesActions.retrieveDishesStatuses();
         locationsActions.retrieveLocations();
+        additionsActions.retrieveAdditions();
     }
 
 }

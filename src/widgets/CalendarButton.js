@@ -17,7 +17,8 @@ export default class CalendarButton extends Component {
 
     render() {
         return (
-            <GridButton
+            <Button
+                disabled={this.props.disabled}
                 active={this.props.active}
                 text={this.props.date.getDate() + "/" + (this.props.date.getMonth() + 1)}
                 commitAction={this.props.commitAction.bind(this, formatDate(this.props.date))}

@@ -42,10 +42,11 @@ export default class Button extends Component {
     render() {
         let text = this.props.text;
         let icon = this.props.icon;
+        let separator = this.props.separator || " ";
 
         let content;
         if (text && icon) {
-            content = <span>{text} &nbsp; <Icon name={icon}/></span>;
+            content = <span>{text}{separator}<Icon name={icon}/></span>;
         } else if (text) {
             content = text;
         } else if (icon) {

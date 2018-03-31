@@ -5,8 +5,8 @@ import NavElement from "../../widgets/NavElement";
 import diningTablesEditorActions from "./tables/DiningTablesEditorActions";
 import DiningTablesUtils from "./tables/DiningTablesUtils";
 import ordinationsEditorActions from "./OrdinationsEditorActions";
-import {ORDINATION_TYPE} from "../../stores/EntityEditorStore";
 import OrdinationsUtils from "./OrdinationsUtils";
+import {findByUuid} from "../../utils/Utils";
 
 export default class EveningNav extends Component {
     constructor(props) {
@@ -43,29 +43,53 @@ export default class EveningNav extends Component {
             />);
 
             if (data.get('editingTable')) {
+                let table = data.get('editingTable');
+
                 pills.push(<NavElement
                     key="table_editor"
-                    text={DiningTablesUtils.renderDiningTable(data.get('editingTable'), data.get('tables'), data.get('waiters'))}
-                    active={!!data.get('editingTable') && !data.get('editingOrdination') && !data.get('editingTableData')}
+                    text={DiningTablesUtils.renderDiningTable(table, data.get('tables'), data.get('waiters'))}
+                    active={!!table &&
+                    !data.get('editingOrdination') &&
+                    !data.get('editingTableBills') &&
+                    !data.get('editingTableData')}
                     commitAction={ordinationsEditorActions.abortOrdinationEditing}
                 />);
+
+                if (data.get('editingTableData')) {
+                    pills.push(<NavElement
+                        key="table_data_editor"
+                        text="Modifica dati"
+                        active={data.get('editingTableData')}
+                    />);
+                }
+
+                if (data.get('editingTableBills')) {
+                    pills.push(<NavElement
+                        key="table_bills_editor"
+                        text="Modifica conti"
+                        commitAction={diningTablesEditorActions.deselectBill}
+                        active={data.get('editingTableBills') && !data.get('selectedBill')}
+                    />);
+                }
+
+                if (data.get('selectedBill')) {
+                    pills.push(<NavElement
+                        key="table_bill_editor"
+                        text={DiningTablesUtils.renderBill(data.get('selectedBill'), this.props.data.get('customers'))}
+                        commitAction={diningTablesEditorActions.deselectBill}
+                        active={data.get('editingTableBills')}
+                    />);
+                }
+
+                if (data.get('editingOrdination')) {
+                    pills.push(<NavElement
+                        key="ordination_editor"
+                        text={OrdinationsUtils.renderOrdination(data.get('editingOrdination'))}
+                        active={!!data.get('editingOrdination')}
+                    />);
+                }
             }
 
-            if (data.get('editingTableData')) {
-                pills.push(<NavElement
-                    key="table_data_editor"
-                    text="Modifica dati"
-                    active={data.get('editingTableData')}
-                />);
-            }
-
-            if (data.get('editingOrdination')) {
-                pills.push(<NavElement
-                    key="ordination_editor"
-                    text={OrdinationsUtils.renderOrdination(data.get('editingOrdination'))}
-                    active={!!data.get('editingOrdination')}
-                />);
-            }
         }
         return pills;
     }

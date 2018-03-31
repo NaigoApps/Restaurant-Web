@@ -18,11 +18,11 @@ export default class OrdersCrudList extends React.Component {
         let price = OrdinationsUtils.formatPrice(order.get('price'));
 
         return <FormattedButton key={order.get('order').get('dish') + uuid()}
-                                active={OrdinationsUtils.sameOrder(this.props.selectedOrder, order.get('order'))}
+                                active={this.props.selectedOrder === order.get('order').get('uuid')}
                                 leftText={result}
                                 rightText={price}
                                 size="lg"
-                                commitAction={() => this.props.commitAction(order.get('order'))}/>
+                                commitAction={() => this.props.commitAction(order.get('order').get('uuid'))}/>
     }
 
     renderOrders(orders) {
