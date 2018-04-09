@@ -21,7 +21,6 @@ export class EntitiesUtils {
 
     static newOrdination() {
         return fromJS({
-            uuid: NEW_ORDINATION_UUID,
             orders: []
         });
     }

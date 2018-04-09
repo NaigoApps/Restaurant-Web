@@ -2,64 +2,131 @@ import requestBuilder from "../../../actions/RequestBuilder";
 import {
     ACT_ABORT_DINING_TABLE_CLOSING,
     ACT_ABORT_DINING_TABLE_DATA_EDITING,
-    ACT_ABORT_ENTITY_EDITING, ACT_BEGIN_DINING_TABLE_BILLS_EDITING,
+    ACT_ABORT_ENTITY_EDITING,
+    ACT_BEGIN_DINING_TABLE_BILLS_EDITING,
     ACT_BEGIN_DINING_TABLE_CLOSING,
     ACT_BEGIN_DINING_TABLE_DATA_EDITING,
     ACT_BEGIN_EDIT_ORDERS,
-    ACT_BEGIN_ENTITY_EDITING, ACT_CLOSE_ALL_ORDERS, ACT_CLOSE_COVER_CHARGES,
+    ACT_BEGIN_ENTITY_EDITING,
+    ACT_CLOSE_ALL_ORDERS,
+    ACT_CLOSE_COVER_CHARGES,
     ACT_CLOSE_ORDERS,
-    ACT_CREATE_BILL,
     ACT_DELETE_BILL,
-    ACT_DELETE_ORDINATION,
-    ACT_DESELECT_BILL, ACT_DINING_TABLE_CLOSING_BACKWARD, ACT_DINING_TABLE_CLOSING_FORWARD, ACT_OPEN_ALL_ORDERS,
+    ACT_DESELECT_BILL,
+    ACT_DESELECT_DINING_TABLE,
+    ACT_DINING_TABLE_CLOSING_BACKWARD,
+    ACT_DINING_TABLE_CLOSING_FORWARD,
+    ACT_OPEN_ALL_ORDERS,
     ACT_OPEN_COVER_CHARGES,
     ACT_OPEN_ORDERS,
     ACT_PRINT_PARTIAL_BILL,
-    ACT_SELECT_BILL, ACT_SELECT_INVOICE_CUSTOMER, ACT_SET_BILL_TYPE, ACT_SET_FINAL_TOTAL, ACT_SET_PERCENT,
-    ACT_SET_QUICK, ACT_SET_SPLIT,
-    ACT_UPDATE_DINING_TABLE,
+    ACT_SELECT_BILL,
+    ACT_SELECT_DINING_TABLE,
+    ACT_SELECT_INVOICE_CUSTOMER,
+    ACT_SET_BILL_TYPE,
+    ACT_SET_FINAL_TOTAL,
+    ACT_SET_PERCENT,
+    ACT_SET_QUICK,
+    ACT_SET_SPLIT,
     ACT_UPDATE_ENTITY
 } from "../../../actions/ActionTypes";
 import dispatcher from "../../../dispatcher/SimpleDispatcher";
-import {DINING_TABLE_TYPE, ORDINATION_TYPE} from "../../../stores/EntityEditorStore";
-import {DINING_TABLE_COVER_CHARGES_EDITOR} from "../Topics";
-import {
-    ACT_DINING_TABLE_EDITOR_CCS_ABORT, ACT_DINING_TABLE_EDITOR_CCS_CHAR,
-    ACT_DINING_TABLE_EDITOR_CCS_START
-} from "./DiningTableActionTypes";
+import {Actions} from "../diningTablesEditing/DiningTablesEditingActions";
 
 const {fromJS} = require('immutable');
 
 class DiningTablesEditorActions {
 
     beginDiningTableEditing(table) {
-        dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
-            type: DINING_TABLE_TYPE,
-            entity: table
-        }));
+        dispatcher.fireEnd(Actions.SELECT_DINING_TABLE, table);
     }
 
-    onStartCoverChargesEditing(){
-        dispatcher.fireEnd(ACT_DINING_TABLE_EDITOR_CCS_START, null, [DINING_TABLE_COVER_CHARGES_EDITOR]);
+    abortDiningTableEditing() {
+        dispatcher.fireEnd(Actions.DESELECT_DINING_TABLE);
     }
 
-    onCoverChargesChar(char){
-        dispatcher.fireEnd(ACT_DINING_TABLE_EDITOR_CCS_CHAR, char, [DINING_TABLE_COVER_CHARGES_EDITOR]);
+    //Cover charges
+
+    onStartCoverChargesEditing() {
+        dispatcher.fireEnd(Actions.BEGIN_CCS_EDITING);
     }
 
-    onAbortCoverChargesEditing(){
-        dispatcher.fireEnd(ACT_DINING_TABLE_EDITOR_CCS_ABORT, null, [DINING_TABLE_COVER_CHARGES_EDITOR]);
+    onCoverChargesChange(text) {
+        dispatcher.fireEnd(Actions.CCS_CHANGE, text);
+    }
+
+    onCoverChargesChar(char) {
+        dispatcher.fireEnd(Actions.CCS_CHAR, char);
+    }
+
+    onAbortCoverChargesEditing() {
+        dispatcher.fireEnd(Actions.ABORT_CCS);
     }
 
     onCoverChargesConfirm(uuid, value) {
         requestBuilder.put(
-            ACT_UPDATE_DINING_TABLE,
+            Actions.CONFIRM_CCS,
             'dining-tables/' + uuid + '/cover-charges',
-            value.toString(),
-            null,
-            [DINING_TABLE_COVER_CHARGES_EDITOR]
+            value.toString()
         );
     }
+
+    //Waiter
+
+    onStartWaiterEditing() {
+        dispatcher.fireEnd(Actions.BEGIN_WAITER_EDITING);
+    }
+
+    onSelectWaiterPage(page) {
+        dispatcher.fireEnd(Actions.SELECT_WAITER_PAGE, page);
+    }
+
+    onSelectWaiter(waiter) {
+        dispatcher.fireEnd(Actions.SELECT_WAITER, waiter);
+    }
+
+    onConfirmWaiter(uuid, waiter) {
+        requestBuilder.put(
+            Actions.CONFIRM_WAITER,
+            'dining-tables/' + uuid + '/waiter',
+            waiter
+        );
+    }
+
+    onAbortWaiter() {
+        dispatcher.fireEnd(Actions.ABORT_WAITER);
+    }
+
+    //Table
+
+    onStartTableEditing() {
+        dispatcher.fireEnd(Actions.BEGIN_TABLE_EDITING);
+    }
+
+    onSelectTablePage(page) {
+        dispatcher.fireEnd(Actions.SELECT_TABLE_PAGE, page);
+    }
+
+    onSelectTable(table) {
+        dispatcher.fireEnd(Actions.SELECT_TABLE, table);
+    }
+
+    onAbortTable() {
+        dispatcher.fireEnd(Actions.ABORT_TABLE);
+    }
+
+    onConfirmTable(uuid, table) {
+        requestBuilder.put(
+            Actions.CONFIRM_TABLE,
+            'dining-tables/' + uuid + '/table',
+            table
+        )
+    }
+
+
+
+
+
 
     beginDiningTableDataEditing() {
         dispatcher.fireEnd(ACT_BEGIN_DINING_TABLE_DATA_EDITING);
@@ -73,29 +140,10 @@ class DiningTablesEditorActions {
         dispatcher.fireEnd(ACT_ABORT_DINING_TABLE_DATA_EDITING);
     }
 
-    abortDiningTableEditing() {
-        dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, DINING_TABLE_TYPE);
-    }
-
-    updateDiningTableWaiter(uuid, value) {
-        requestBuilder.put(
-            ACT_UPDATE_DINING_TABLE,
-            'dining-tables/' + uuid + '/waiter',
-            value
-        );
-    }
-
-    updateDiningTableTable(uuid, value) {
-        requestBuilder.put(
-            ACT_UPDATE_DINING_TABLE,
-            'dining-tables/' + uuid + '/table',
-            value
-        )
-    }
-
     deleteDiningTableOrdination(tUuid, oUuid) {
-        requestBuilder.remove(ACT_DELETE_ORDINATION, 'dining-tables/' + tUuid + "/ordinations", oUuid)
-            .then(() => dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, ORDINATION_TYPE));
+        //FIXME
+        // requestBuilder.remove(ACT_DELETE_ORDINATION, 'dining-tables/' + tUuid + "/ordinations", oUuid)
+        //     .then(() => dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, ORDINATION_TYPE));
     }
 
     printPartialBill(uuid) {
@@ -106,23 +154,23 @@ class DiningTablesEditorActions {
         dispatcher.fireEnd(ACT_BEGIN_DINING_TABLE_CLOSING);
     }
 
-    setBillType(type){
+    setBillType(type) {
         dispatcher.fireEnd(ACT_SET_BILL_TYPE, type)
     }
 
-    setSplit(value){
+    setSplit(value) {
         dispatcher.fireEnd(ACT_SET_SPLIT, value)
     }
 
-    setPercent(value){
+    setPercent(value) {
         dispatcher.fireEnd(ACT_SET_PERCENT, value)
     }
 
-    setQuick(value){
+    setQuick(value) {
         dispatcher.fireEnd(ACT_SET_QUICK, value)
     }
 
-    setFinalTotal(value){
+    setFinalTotal(value) {
         dispatcher.fireEnd(ACT_SET_FINAL_TOTAL, value);
     }
 
@@ -130,11 +178,11 @@ class DiningTablesEditorActions {
         dispatcher.fireEnd(ACT_CLOSE_ORDERS, {order: order, quantity: quantity});
     }
 
-    closeCoverCharges(quantity){
+    closeCoverCharges(quantity) {
         dispatcher.fireEnd(ACT_CLOSE_COVER_CHARGES, quantity);
     }
 
-    openCoverCharges(quantity){
+    openCoverCharges(quantity) {
         dispatcher.fireEnd(ACT_OPEN_COVER_CHARGES, quantity);
     }
 
@@ -155,16 +203,17 @@ class DiningTablesEditorActions {
             total: total,
             coverCharges: coverCharges
         };
-        if(customer){
+        if (customer) {
             params.customer = customer;
         }
-        requestBuilder.put(ACT_CREATE_BILL, 'dining-tables/' + table + "/bills", orders, params)
-            .then(result => {
-                dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
-                    type: DINING_TABLE_TYPE,
-                    entity: result
-                }));
-            });
+        //FIXME
+        // requestBuilder.put(ACT_CREATE_BILL, 'dining-tables/' + table + "/bills", orders, params)
+        //     .then(result => {
+        //         dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
+        //             type: DINING_TABLE_TYPE,
+        //             entity: result
+        //         }));
+        //     });
     }
 
     abortDiningTableClosing() {
@@ -179,7 +228,7 @@ class DiningTablesEditorActions {
         dispatcher.fireEnd(ACT_DINING_TABLE_CLOSING_FORWARD, pages);
     }
 
-    selectInvoiceCustomer(uuid){
+    selectInvoiceCustomer(uuid) {
         dispatcher.fireEnd(ACT_SELECT_INVOICE_CUSTOMER, uuid);
     }
 

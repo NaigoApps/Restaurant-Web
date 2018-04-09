@@ -1,5 +1,6 @@
 import {findByUuid, stringEquals, uuid} from "../../../utils/Utils";
 import {beautifyTime} from "../../../components/widgets/inputs/DateInput";
+
 const {fromJS, Map, List} = require('immutable');
 
 
@@ -57,7 +58,7 @@ export default class DiningTablesUtils {
         return ccs;
     }
 
-    static findSimilarTo(orders, order){
+    static findSimilarTo(orders, order) {
         return orders.filter(o => DiningTablesUtils.sameOrder(o, order));
     }
 
@@ -92,14 +93,19 @@ export default class DiningTablesUtils {
     }
 
     static renderDiningTable(diningTable, tables, waiters) {
+        let result = "";
         if (diningTable) {
             const table = findByUuid(tables, diningTable.get('table'));
             const waiter = findByUuid(waiters, diningTable.get('waiter'));
-            if (table && waiter) {
-                return table.get('name') + " (" + beautifyTime(diningTable.get('openingTime')) + ") - " + waiter.get('name');
+            result += table ? table.get('name') : "?";
+            if (diningTable.get('openingTime')) {
+                result += " (" + beautifyTime(diningTable.get('openingTime')) + ") ";
+            } else {
+                result += " (?) "
             }
+            result += waiter ? waiter.get('name') : "?";
         }
-        return "?";
+        return result;
     }
 
     static getSelectedDiningTable(data) {

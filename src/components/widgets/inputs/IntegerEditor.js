@@ -22,7 +22,7 @@ export default class IntegerEditor extends Component {
     }
 
     onWizardConfirm(wData) {
-        if(this.props.onConfirm) {
+        if(this.props.onConfirm && StoresUtils.isInteger(this.props.text)) {
             this.props.onConfirm(parseInt(this.props.text));
         }
     }
@@ -45,9 +45,9 @@ export default class IntegerEditor extends Component {
         }
     }
 
-    onSetInputCaret(pos){
-        if(this.props.onSetCaret){
-            this.props.onSetCaret(pos);
+    onInputChange(text){
+        if(this.props.onChange){
+            this.props.onChange(text);
         }
     }
 
@@ -78,8 +78,8 @@ export default class IntegerEditor extends Component {
                 <IntegerInput
                     uuid={this.props.uuid}
                     text={this.props.text}
-                    onSetCaret={(pos) => this.onSetInputCaret(pos)}
-                    onChar={(char) => this.onInputChar(char)}
+                    onChar={char => this.onInputChar(char)}
+                    onChange={text => this.onInputChange(text)}
                 />
             </OkCancelModal>
         </Row>

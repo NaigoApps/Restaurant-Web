@@ -1,18 +1,13 @@
 import AbstractStore from "../../stores/RootFeatureStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
-    ACT_ABORT_ENTITY_EDITING,
-    ACT_BEGIN_ENTITY_EDITING,
     ACT_CREATE_CUSTOMER,
     ACT_DELETE_CUSTOMER,
     ACT_DESELECT_CUSTOMER,
     ACT_RETRIEVE_CUSTOMERS,
     ACT_SELECT_CUSTOMER,
-    ACT_SET_ENTITY_PROPERTY,
     ACT_UPDATE_CUSTOMER
 } from "../../actions/ActionTypes";
-import entityEditorStore, {CUSTOMER_TYPE} from "../../stores/EntityEditorStore";
-import {findByUuid} from "../../utils/Utils";
 import customersStore from "../../stores/generic/CustomersStore";
 
 const {fromJS, Map} = require('immutable');
@@ -29,9 +24,6 @@ class CustomersPageStore extends AbstractStore {
         let changed = true;
         dispatcher.waitFor([customersStore.getToken()]);
         switch (action.type) {
-            case ACT_BEGIN_ENTITY_EDITING:
-            case ACT_SET_ENTITY_PROPERTY:
-            case ACT_ABORT_ENTITY_EDITING:
             case ACT_RETRIEVE_CUSTOMERS:
                 break;
             case ACT_CREATE_CUSTOMER:
@@ -66,13 +58,14 @@ class CustomersPageStore extends AbstractStore {
     }
 
     getState() {
+        //FIXME
         let customers = customersStore.getCustomers().getPayload();
         let customer = null;
-        if (entityEditorStore.isEditing(CUSTOMER_TYPE)) {
-            customer = findByUuid(customers, entityEditorStore.find(CUSTOMER_TYPE));
-        } else if (entityEditorStore.isCreating(CUSTOMER_TYPE)) {
-            customer = entityEditorStore.find(CUSTOMER_TYPE);
-        }
+        // if (entityEditorStore.isEditing(CUSTOMER_TYPE)) {
+        //     customer = findByUuid(customers, entityEditorStore.find(CUSTOMER_TYPE));
+        // } else if (entityEditorStore.isCreating(CUSTOMER_TYPE)) {
+        //     customer = entityEditorStore.find(CUSTOMER_TYPE);
+        // }
         let result = Map({
             editingCustomer: customer,
             customers: customers,

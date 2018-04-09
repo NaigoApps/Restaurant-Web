@@ -64,10 +64,6 @@ class DiningTableClosingWizardStore extends WizardStore {
             case ACT_UPDATE_DINING_TABLE:
             case ACT_UPDATE_ORDINATION:
 
-            case ACT_BEGIN_ENTITY_EDITING:
-            case ACT_UPDATE_ENTITY:
-            case ACT_SET_ENTITY_PROPERTY:
-                break;
             case ACT_BEGIN_DINING_TABLE_CLOSING:
                 super.init(2);
                 super.setWizardData(fromJS({
@@ -80,9 +76,10 @@ class DiningTableClosingWizardStore extends WizardStore {
                     coverCharges: 0,
                     customer: null
                 }));
-                this.closeAllOrders();
-                this.closeCoverCharges(eveningPageStore.getState().data.get('editingTable').get('coverCharges'));
-                this.updateFinalTotal();
+                //FIXME
+                // this.closeAllOrders();
+                // this.closeCoverCharges(eveningPageStore.getState().data.get('editingTable').get('coverCharges'));
+                // this.updateFinalTotal();
                 break;
             case ACT_DINING_TABLE_CLOSING_BACKWARD:
                 super.backward();

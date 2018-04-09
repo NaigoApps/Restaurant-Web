@@ -10,16 +10,15 @@ export default class FloatInput extends Component {
         super(props);
     }
 
-    onChar(char) {
-        if(this.props.onChar) {
-            this.props.onChar(char);
+    onChange(evt){
+        if(this.props.onChange){
+            this.props.onChange(evt.target.value);
         }
     }
 
-    updateCaret() {
-        if(this.props.onSetCaret) {
-            let input = global.$("#" + this.props.uuid)[0];
-            this.props.onSetCaret(input.selectionStart);
+    onChar(char) {
+        if(this.props.onChar) {
+            this.props.onChar(char);
         }
     }
 
@@ -40,8 +39,7 @@ export default class FloatInput extends Component {
                                 type="text"
                                 disabled={disabled}
                                 value={text || ""}
-                                onMouseUp={() => this.updateCaret()}
-                                onKeyDown={data => this.onChar(data.key, data)}/>
+                                onChange={evt => this.onChange(evt)}/>
                         </Column>
                     </Row>
                     <Row topSpaced>

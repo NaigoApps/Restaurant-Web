@@ -34,9 +34,9 @@ export default class FloatEditor extends Component {
         }
     }
 
-    onSetInputCaret(pos){
-        if(this.props.onSetCaret){
-            this.props.onSetCaret(pos);
+    onInputChange(text){
+        if(this.props.onChange){
+            this.props.onChange(text);
         }
     }
 
@@ -60,8 +60,8 @@ export default class FloatEditor extends Component {
                 <FloatInput
                     uuid={this.props.uuid}
                     text={this.props.text}
-                    onSetCaret={(pos) => this.onSetInputCaret(pos)}
-                    onChar={(char) => this.onInputChar(char)}
+                    onChange={text => this.onInputChange(text)}
+                    onChar={char => this.onInputChar(char)}
                 />
             </OkCancelModal>
         </Row>

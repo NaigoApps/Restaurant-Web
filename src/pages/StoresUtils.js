@@ -28,6 +28,12 @@ export default class StoresUtils{
         });
     }
 
+    static initIntInput(initialValue){
+        return Map({
+            text: initialValue ? initialValue.toString() : ""
+        });
+    }
+
     static initIntEditor(value){
         return Map({
             text: value.toString(),
@@ -77,6 +83,10 @@ export default class StoresUtils{
             return editor.set('text', newText);
         }
         return editor;
+    }
+
+    static isInteger(text){
+        return !isNaN(parseInt(text));
     }
 }
 

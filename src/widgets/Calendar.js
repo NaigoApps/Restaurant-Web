@@ -7,7 +7,7 @@ import CalendarButton from "./CalendarButton";
 import {distribute, iGet} from "../utils/Utils";
 import SelectEditor from "../components/widgets/inputs/SelectEditor";
 import IntegerEditor from "../components/widgets/inputs/IntegerEditor";
-import eveningSelectionFormActions from "../actions/pages/EveningSelectionFormActions";
+import eveningSelectionFormActions from "../pages/evening/eveningSelector/EveningSelectorActions";
 
 /**
  * Expects:
@@ -100,6 +100,7 @@ export default class Calendar extends Component {
                                 text={iGet(data, "yearEditor.text")}
                                 onShowModal={() => yearActionsProvider.onStartDayEditing()}
                                 onChar={char => yearActionsProvider.onDayChar(char)}
+                                onChange={text => yearActionsProvider.onDayChange(text)}
 
                                 onConfirm={result => yearActionsProvider.onConfirmDayEditing(result)}
                                 onAbort={yearActionsProvider.onAbortDayEditing}

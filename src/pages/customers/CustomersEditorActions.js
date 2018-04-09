@@ -6,21 +6,22 @@ import {
 } from "../../actions/ActionTypes"
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
-import {CUSTOMER_TYPE} from "../../stores/EntityEditorStore";
 
 const {fromJS} = require('immutable');
 
 class CustomersEditorActions {
 
     selectCustomer(customer) {
-        dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
-            type: CUSTOMER_TYPE,
-            entity: customer
-        }));
+        //FIXME
+        // dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
+        //     type: CUSTOMER_TYPE,
+        //     entity: customer
+        // }));
     }
 
     deselectCustomer(){
-        dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, CUSTOMER_TYPE);
+        //FIXME
+        // dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, CUSTOMER_TYPE);
     }
 
     updateCustomerName(uuid, value) {

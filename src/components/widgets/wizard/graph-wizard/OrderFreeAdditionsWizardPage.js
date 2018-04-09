@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import $ from 'jquery';
-import ordinationsEditorActions from "../../../../pages/evening/OrdinationsEditorActions";
+import ordinationsEditorActions from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
 import OrdinationsUtils from "../../../../pages/evening/OrdinationsUtils";
 import graphWizardActions from "./GraphWizardActions";
 import Keyboard, {BACKSPACE, LEFT, RIGHT} from "../../inputs/Keyboard";

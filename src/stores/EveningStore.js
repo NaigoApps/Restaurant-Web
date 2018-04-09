@@ -16,8 +16,8 @@ import {
 import {STATUSES} from "./LazyData";
 import AbstractEntityStore from "./generic/AbstractEntityStore";
 import {findIndexByUuid} from "../utils/Utils";
-import {EVENING_TYPE} from "./EntityEditorStore";
 import {ACT_EVENING_EDITOR_CC_CONFIRM} from "../pages/evening/EveningEditorActionTypes";
+import {Actions} from "../pages/evening/diningTablesEditing/DiningTablesEditingActions";
 
 const {fromJS} = require('immutable');
 
@@ -53,25 +53,28 @@ class EveningStore extends AbstractEntityStore {
             case ACT_ASK_SELECTED_EVENING:
                 this.setData([action.body]);
                 this.setStatus(STATUSES.LOADED);
+                this.sortTables();
                 break;
             case ACT_DESELECT_EVENING:
                 this.setData([]);
                 break;
-            case ACT_ABORT_ENTITY_EDITING:
-                if (action.body === EVENING_TYPE) {
-                    this.setData([]);
-                    this.setStatus(STATUSES.LOADED);
-                }
-                break;
+            // case ACT_ABORT_ENTITY_EDITING:
+            //     if (action.body === EVENING_TYPE) {
+            //         this.setData([]);
+            //         this.setStatus(STATUSES.LOADED);
+            //     }
+            //     break;
             case ACT_EVENING_EDITOR_CC_CONFIRM:
             case ACT_UPDATE_EVENING:
                 this.updateData(action.body);
                 break;
-            case ACT_CREATE_DINING_TABLE: {
+            case Actions.CREATE_DINING_TABLE: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
-                    let newEvening = action.body.get(0);
-                    this.updateData(newEvening);
+                    let tables = evening.getPayload().get('diningTables');
+                    tables = tables.push(action.body);
+                    this.updateData(evening.getPayload().set('diningTables', tables));
+                    this.sortTables();
                 }
                 break;
             }
@@ -137,6 +140,16 @@ class EveningStore extends AbstractEntityStore {
                 break;
         }
         return changed;
+    }
+
+    sortTables(){
+        let tables = this.getEvening().getPayload()
+            .get('diningTables')
+            .sort((t1, t2) => -t1.get('openingTime').localeCompare(t2.get('openingTime')));
+
+        this.setData([
+            this.getEvening().getPayload().set('diningTables', tables)
+        ]);
     }
 
     getChangeEvent() {

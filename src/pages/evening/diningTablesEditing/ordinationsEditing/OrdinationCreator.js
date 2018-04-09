@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import ordinationsCreatorActions from "../../../pages/evening/OrdinationsCreatorActions";
-import OrdersEditor from "./OrdersEditor";
-import {findByUuid} from "../../../utils/Utils";
+import OrdersEditor from "./ordersEditing/OrdersEditor";
+import {findByUuid} from "../../../../utils/Utils";
 
 export default class OrdinationCreator extends Component {
     constructor(props) {
@@ -9,12 +8,14 @@ export default class OrdinationCreator extends Component {
     }
 
     onWizardOk() {
+        //FIXME
         let table = this.props.data.get('editingTable');
-        ordinationsCreatorActions.createOrdination(table.get('uuid'), this.props.data.get('editingOrders'));
+        // ordinationsCreatorActions.createOrdination(table.get('uuid'), this.props.data.get('editingOrders'));
     }
 
     onWizardAbort() {
-        ordinationsCreatorActions.abortOrdinationCreation();
+        //FIXME
+        // ordinationsCreatorActions.abortOrdinationCreation();
     }
 
     render() {

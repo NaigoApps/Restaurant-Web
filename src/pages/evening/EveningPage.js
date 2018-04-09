@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import EveningSelectionForm from "../../components/EveningSelectionForm";
+import EveningSelectionForm from "./eveningSelector/EveningSelector";
 import {COMPONENTS, TYPES} from "../../components/editors/EntityEditor";
 import {beautifyDate} from "../../components/widgets/inputs/DateInput";
 import Page from "../Page";
@@ -56,7 +56,7 @@ export default class EveningPage extends Component {
         if (state.get('evening')) {
             return <EveningEditor data={state}/>;
         } else {
-            return <EveningSelectionForm data={state.get('date')}/>;
+            return <EveningSelectionForm data={state.get('eveningSelector')}/>;
         }
     }
 }

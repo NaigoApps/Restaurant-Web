@@ -10,6 +10,10 @@ import AdditionsPage from "./pages/additions/AdditionsPage";
 import CustomersPage from "./pages/customers/CustomersPage";
 import EveningPage from "./pages/evening/EveningPage";
 import applicationStore from "./stores/ApplicationStore";
+import eveningSelectorStore from "./pages/evening/eveningSelector/EveningSelectorStore";
+import diningTablesEditingStore from "./pages/evening/diningTablesEditing/DiningTableEditorStore";
+import ordinationEditingStore from "./pages/evening/diningTablesEditing/ordinationsEditing/OrdinationEditingStore";
+import ordersEditingStore from "./pages/evening/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
 
 const {Map} = require('immutable');
 
@@ -45,7 +49,16 @@ class App extends Component {
             currentPage: null
         };
 
+        this.requireModules();
+
         this.updateState = this.updateState.bind(this);
+    }
+
+    requireModules(){
+        console.log("Requiring " + eveningSelectorStore.getFeatureName());
+        console.log("Requiring " + diningTablesEditingStore.getFeatureName());
+        console.log("Requiring " + ordinationEditingStore.getFeatureName());
+        console.log("Requiring " + ordersEditingStore.getFeatureName());
     }
 
     componentDidMount() {

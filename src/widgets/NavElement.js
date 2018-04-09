@@ -16,10 +16,11 @@ export default class NavElement extends Component {
         const text = this.props.text;
         const active = this.props.active;
         const disabled = this.props.disabled;
+        const type = this.props.type;
 
         return (
                 <li className="nav-item" onClick={this.clickAction.bind(this)}>
-                    <Button text={text} disabled={disabled} active={active}/>
+                    <Button type={type || "secondary"} text={text} disabled={disabled} active={active}/>
                 </li>
         );
     }

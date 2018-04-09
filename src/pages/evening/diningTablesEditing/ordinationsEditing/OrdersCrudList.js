@@ -1,12 +1,12 @@
 import React from 'react';
-import {findByUuid, uuid} from "../utils/Utils";
-import OrdinationsUtils from "../pages/evening/OrdinationsUtils";
-import Scrollable from "./widgets/Scrollable";
-import Column from "../widgets/Column";
-import Row from "../widgets/Row";
-import FormattedButton from "../widgets/FormattedButton";
-import ButtonGroup from "../widgets/ButtonGroup";
-import Button from "../widgets/Button";
+import {findByUuid, uuid} from "../../../../utils/Utils";
+import OrdinationsUtils from "../../OrdinationsUtils";
+import Scrollable from "../../../../components/widgets/Scrollable";
+import Column from "../../../../widgets/Column";
+import Row from "../../../../widgets/Row";
+import FormattedButton from "../../../../widgets/FormattedButton";
+import ButtonGroup from "../../../../widgets/ButtonGroup";
+import Button from "../../../../widgets/Button";
 
 export default class OrdersCrudList extends React.Component {
     constructor(props) {

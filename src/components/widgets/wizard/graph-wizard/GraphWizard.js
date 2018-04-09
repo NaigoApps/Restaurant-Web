@@ -33,7 +33,8 @@ export default class GraphWizard extends Component {
     }
 
     componentDidMount() {
-        graphWizardStore.addChangeListener(this.updateWizard);
+        //FIXME
+        // graphWizardStore.addChangeListener(this.updateWizard);
         if (this.props.visible) {
             this.openWizard();
         }
@@ -51,7 +52,8 @@ export default class GraphWizard extends Component {
     }
 
     componentWillUnmount() {
-        graphWizardStore.removeChangeListener(this.updateWizard);
+        //FIXME
+        // graphWizardStore.removeChangeListener(this.updateWizard);
     }
 
     initialWizardData() {
@@ -137,7 +139,7 @@ export default class GraphWizard extends Component {
 
     buildModal() {
 
-        const pageName = this.state.page;
+        const pageName = this.props.page;
 
         let pages = React.Children.map(this.props.children, (child) => React.cloneElement(child, {
             wizardData: this.state.data,

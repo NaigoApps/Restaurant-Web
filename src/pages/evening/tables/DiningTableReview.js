@@ -1,19 +1,18 @@
 import React from 'react';
 import diningTablesEditorActions from "./DiningTablesEditorActions";
 import Button from "../../../widgets/Button";
-import {uuid} from "../../../utils/Utils";
+import {iGet, uuid} from "../../../utils/Utils";
 import OrdinationsUtils from "../OrdinationsUtils";
 import Scrollable from "../../../components/widgets/Scrollable";
 import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
-import DiningTableClosingView from "./DiningTableClosingView";
 import DiningTablesUtils from "./DiningTablesUtils";
 import FormattedParagraph from "../../../widgets/FormattedParagraph";
-import ordinationsEditorActions from "../OrdinationsEditorActions";
-import ordinationsCreatorActions from "../OrdinationsCreatorActions";
+import ordinationsEditorActions from "../diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
+import {OrdinationsCreatorActions} from "../diningTablesEditing/ordinationsEditing/OrdinationsCreatorActions";
 import {NEW_ORDINATION_UUID} from "../../../utils/EntitiesUtils";
-import OrdinationCreator from "../../../components/widgets/inputs/OrdinationCreator";
-import OrdinationEditor from "../../../components/OrdinationEditor";
+import OrdinationCreator from "../diningTablesEditing/ordinationsEditing/OrdinationCreator";
+import OrdinationEditor from "../diningTablesEditing/ordinationsEditing/OrdinationEditor";
 import ConfirmModal from "../../../widgets/ConfirmModal";
 import PaginatedList from "../../../components/widgets/PaginatedList";
 import eveningEditorActions from "../EveningEditorActions";
@@ -46,14 +45,14 @@ export default class DiningTableReview extends React.Component {
         this.setState({
             deletingDiningTable: false
         });
-        eveningEditorActions.deleteEveningDiningTable(this.props.data.get('editingTable').get('uuid'));
+        eveningEditorActions.deleteEveningDiningTable(iGet(this.props.data, "diningTablesEditing.diningTable.uuid"));
     }
 
     doMergeDiningTable(data) {
         this.setState({
             mergingDiningTable: false
         });
-        eveningEditorActions.mergeDiningTable(this.props.data.get('editingTable').get('uuid'), data.get('uuid'))
+        eveningEditorActions.mergeDiningTable(iGet(this.props.data, "diningTablesEditing.diningTable.uuid"), data.get('uuid'))
     }
 
     hideDeleteDiningTableModal() {
@@ -99,7 +98,9 @@ export default class DiningTableReview extends React.Component {
     static getReviewContent(props) {
         let orders = [];
         let evening = props.get('evening');
-        let diningTable = props.get('editingTable');
+
+        let diningTable = iGet(props, "diningTablesEditing.diningTable");
+
         if (diningTable.get('ordinations').size === 0) {
             return <Scrollable><h5 className="text-center">Il tavolo è vuoto</h5></Scrollable>
         }
@@ -149,7 +150,8 @@ export default class DiningTableReview extends React.Component {
     }
 
     createOrdination() {
-        ordinationsCreatorActions.beginOrdinationCreation();
+        //FIXME
+        // ordinationsCreatorActions.beginOrdinationCreation();
     }
 
     selectOrdination(uuid) {
@@ -177,74 +179,8 @@ export default class DiningTableReview extends React.Component {
         </Column>
     }
 
-    getOrdinationActions() {
-        let data = this.props.data;
-        let ordination = data.get('editingOrdination');
-
-        return <Row grow>
-            <Column>
-                <Row>
-                    <Column>
-                        <h5 className="text-center">Azioni sulla comanda</h5>
-                    </Column>
-                </Row>
-                <Row grow>
-                    <Column>
-                        <Button
-                            text="Modifica comanda"
-                            icon="pencil"
-                            size="lg"
-                            commitAction={() => ordinationsEditorActions.beginOrdersEditing(data.get('editingOrdination').get('orders'))}
-                            fullHeight/>
-                    </Column>
-                </Row>
-                <Row topSpaced grow>
-                    <Column>
-                        <Button text="Stampa comanda"
-                                icon="print"
-                                size="lg"
-                                type={ordination.get('dirty') ? "warning" : "secondary"}
-                                commitAction={() => ordinationsEditorActions.printOrdination(ordination.get('uuid'))}
-                                fullHeight/>
-                    </Column>
-                </Row>
-                <Row topSpaced grow>
-                    <Column>
-                        <Button
-                            text="Annullamento comanda"
-                            icon="times-circle"
-                            type="danger"
-                            size="lg"
-                            commitAction={() => ordinationsEditorActions.sendAbortOrdination(ordination.get('uuid'))}
-                            fullHeight/>
-                    </Column>
-                </Row>
-                <Row topSpaced grow>
-                    <Column>
-                        <Button text="Elimina comanda"
-                                icon="trash"
-                                type="danger"
-                                size="lg"
-                                commitAction={() => this.showDeleteOrdinationModal()}
-                                fullHeight/>
-                    </Column>
-                </Row>
-                <Row>
-                    <ConfirmModal
-                        visible={this.state.deletingOrdination}
-                        message="Elminare la comanda e tutti gli ordini associati?"
-                        abortType="secondary"
-                        confirmType="danger"
-                        abortAction={() => this.hideDeleteOrdinationModal()}
-                        confirmAction={() => this.doDeleteOrdination()}/>
-                </Row>
-            </Column>
-        </Row>;
-    }
-
-    getDiningTableActions() {
-        let data = this.props.data;
-        let table = data.get('editingTable');
+    static getReviewActions(data) {
+        let table = iGet(data, "diningTablesEditing.diningTable");
 
         let otherOpenTables = data.get('evening').get('diningTables')
             .filter(t => t.get('status') !== "CHIUSO")
@@ -264,7 +200,7 @@ export default class DiningTableReview extends React.Component {
                             icon="plus"
                             type="info"
                             size="lg"
-                            commitAction={ordinationsCreatorActions.beginOrdinationCreation}
+                            commitAction={() => OrdinationsCreatorActions.beginOrdinationCreation()}
                             fullHeight/>
                     </Column>
                 </Row>
@@ -321,7 +257,7 @@ export default class DiningTableReview extends React.Component {
                 </Row>
                 <Row>
                     <ConfirmModal
-                        visible={this.state.deletingDiningTable}
+                        visible={data.get('deletingDiningTable')}
                         message="Elminare il tavolo?"
                         abortType="secondary"
                         confirmType="danger"
@@ -336,7 +272,7 @@ export default class DiningTableReview extends React.Component {
                         size="lg"
                         auto={true}
                         renderer={wData => wData["select_page"] ? wData["select_page"].get('uuid') : "?"}
-                        visible={this.state.mergingDiningTable}
+                        visible={data.get('mergingDiningTable')}
                         message="Scegliere il tavolo destinazione"
                         commitAction={(data) => this.doMergeDiningTable(data['select_page'])}
                         abortAction={() => this.hideMergeDiningTableModal()}>
@@ -355,14 +291,12 @@ export default class DiningTableReview extends React.Component {
     }
 
     render() {
+        let data = this.props.data;
 
-        let table = this.props.data.get('editingTable');
+        let table = iGet(this.props.data, "diningTablesEditing.diningTable");
 
-        let selectedOrdination = this.props.data.get('editingOrdination');
-
-        let content = selectedOrdination ? this.getOrdinationsEditorContent(this.props.data) : DiningTableReview.getReviewContent(this.props.data);
-
-        let actions = selectedOrdination ? this.getOrdinationActions() : this.getDiningTableActions();
+        let content = DiningTableReview.getReviewContent(data);
+        let actions = DiningTableReview.getReviewActions(data);
 
         return <Row topSpaced grow>
             <Column>
@@ -381,7 +315,6 @@ export default class DiningTableReview extends React.Component {
                             <Column>
                                 <PaginatedList
                                     id={ordination => ordination.get("uuid")}
-                                    selected={selectedOrdination ? selectedOrdination.get('uuid') : null}
                                     selectMethod={ordinationsEditorActions.beginOrdinationEditing}
                                     deselectMethod={ordinationsEditorActions.abortOrdinationEditing}
                                     rows={5}

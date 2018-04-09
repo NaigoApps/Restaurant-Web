@@ -66,9 +66,9 @@ export default class SelectEditor extends Component {
 
     findOption(option) {
         if (!this.props.id) {
-            return this.props.options.find(opt => opt === option) || "?";
+            return this.props.options.find(opt => opt === option) || null;
         } else {
-            return this.props.options.find(opt => this.props.id(opt) === option) || "?";
+            return this.props.options.find(opt => this.props.id(opt) === option) || null;
         }
     }
 

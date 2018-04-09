@@ -1,26 +1,20 @@
 import {
-    ACT_ABORT_EVENING_MONTH_EDITING,
-    ACT_ABORT_EVENING_YEAR_EDITING,
     ACT_ASK_SELECTED_EVENING,
-    ACT_CONFIRM_EVENING_MONTH_EDITING,
-    ACT_CONFIRM_EVENING_YEAR_EDITING, ACT_DESELECT_EVENING,
-    ACT_EVENING_YEAR_CHAR,
-    ACT_SELECT_EVENING,
-    ACT_SELECT_EVENING_MONTH,
-    ACT_START_EVENING_MONTH_EDITING,
-    ACT_START_EVENING_YEAR_EDITING
-} from "../actions/ActionTypes";
-import StoresUtils from "../pages/StoresUtils";
-import {iSet} from "../utils/Utils";
-import SubFeatureStore from "./SubFeatureStore";
-import eveningPageStore from "../pages/evening/EveningPageStore";
+    ACT_DESELECT_EVENING,
+    ACT_SELECT_EVENING
+} from "../../../actions/ActionTypes";
+import StoresUtils from "../../StoresUtils";
+import {iSet} from "../../../utils/Utils";
+import SubFeatureStore from "../../../stores/SubFeatureStore";
+import eveningPageStore from "../EveningPageStore";
+import {Actions} from "./EveningSelectorActions";
 
 const {Map} = require('immutable');
 
-class EveningSelectionFormStore extends SubFeatureStore {
+class EveningSelectorStore extends SubFeatureStore {
 
     constructor() {
-        super(eveningPageStore, "eveningSelection");
+        super(eveningPageStore, "eveningSelector");
         let date = new Date();
         this.month = date.getMonth();
         this.year = date.getFullYear();
@@ -43,47 +37,43 @@ class EveningSelectionFormStore extends SubFeatureStore {
             ACT_SELECT_EVENING,
             ACT_DESELECT_EVENING,
             ACT_ASK_SELECTED_EVENING,
-            ACT_START_EVENING_MONTH_EDITING,
-            ACT_SELECT_EVENING_MONTH,
-            ACT_CONFIRM_EVENING_MONTH_EDITING,
-            ACT_ABORT_EVENING_MONTH_EDITING,
-            ACT_START_EVENING_YEAR_EDITING,
-            ACT_EVENING_YEAR_CHAR,
-            ACT_CONFIRM_EVENING_YEAR_EDITING,
-            ACT_ABORT_EVENING_YEAR_EDITING
-        ]
+        ].concat(Object.values(Actions))
     }
 
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_START_EVENING_MONTH_EDITING:
+            case Actions.ACT_START_EVENING_MONTH_EDITING:
                 this.setMonthEditorVisible(true);
                 this.setMonthEditorValue(this.month);
                 break;
-            case ACT_SELECT_EVENING_MONTH:
+            case Actions.ACT_SELECT_EVENING_MONTH:
                 this.setMonthEditorValue(action.body);
                 break;
-            case ACT_CONFIRM_EVENING_MONTH_EDITING:
+            case Actions.ACT_CONFIRM_EVENING_MONTH_EDITING:
                 this.setMonthEditorVisible(false);
                 this.month = action.body;
                 break;
-            case ACT_ABORT_EVENING_MONTH_EDITING:
+            case Actions.ACT_ABORT_EVENING_MONTH_EDITING:
                 this.setMonthEditorVisible(false);
                 this.setMonthEditorValue(this.month);
                 break;
-            case ACT_START_EVENING_YEAR_EDITING:
+            case Actions.ACT_START_EVENING_YEAR_EDITING:
                 this.setYearEditorVisible(true);
                 this.setYearEditorValue(this.year);
                 break;
-            case ACT_EVENING_YEAR_CHAR:
-                this.appendYearChar(action.body);
+            case Actions.ACT_EVENING_YEAR_CHANGE:
+                this.setYearText(action.body);
                 break;
-            case ACT_CONFIRM_EVENING_YEAR_EDITING:
+            case Actions.ACT_EVENING_YEAR_CHAR:
+                this.addYearChar(action.body);
+                break;
+            case Actions.ACT_CONFIRM_EVENING_YEAR_EDITING:
                 this.setYearEditorVisible(false);
                 this.year = action.body;
+                this.setYearEditorValue(this.year);
                 break;
-            case ACT_ABORT_EVENING_YEAR_EDITING:
+            case Actions.ACT_ABORT_EVENING_YEAR_EDITING:
                 this.setYearEditorVisible(false);
                 this.setYearEditorValue(this.year);
                 break;
@@ -110,11 +100,15 @@ class EveningSelectionFormStore extends SubFeatureStore {
         this.monthEditor = iSet(this.monthEditor, "value", value);
     }
 
-    appendYearChar(value) {
-        this.yearEditor = StoresUtils.intChar(this.yearEditor, value)
+    setYearText(text) {
+        this.yearEditor = iSet(this.yearEditor, "text", text.toString());
+    }
+
+    addYearChar(char) {
+        this.yearEditor = StoresUtils.intChar(this.yearEditor, char);
     }
 
 }
 
-const eveningSelectionFormStore = new EveningSelectionFormStore();
-export default eveningSelectionFormStore;
+const eveningSelectorStore = new EveningSelectorStore();
+export default eveningSelectorStore;

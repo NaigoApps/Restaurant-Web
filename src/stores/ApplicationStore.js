@@ -17,14 +17,15 @@ class ApplicationStore extends AbstractStore {
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
+            //FIXME
             case ACT_TOGGLE_FULL_SCREEN:
-                this.isFullScreen = !this.isFullScreen;
+                // this.isFullScreen = !this.isFullScreen;
                 break;
             case ACT_REQUEST_FULL_SCREEN:
-                this.isFullScreen = true;
+                // this.isFullScreen = true;
                 break;
             case ACT_DISMISS_FULL_SCREEN:
-                this.isFullScreen = false;
+                // this.isFullScreen = false;
                 break;
             case ACT_GO_TO_PAGE:
                 this.currentPage = action.body;

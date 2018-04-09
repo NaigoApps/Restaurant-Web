@@ -14,9 +14,10 @@ export function isToday(date){
 }
 
 export function isThisMonth(date){
-    let now = new Date();
-    return date.getMonth() === now.getMonth() &&
-        date.getFullYear() === now.getFullYear();
+    return true;
+    // let now = new Date();
+    // return date.getMonth() === now.getMonth() &&
+    //     date.getFullYear() === now.getFullYear();
 }
 
 export function daysInMonth(month, year){

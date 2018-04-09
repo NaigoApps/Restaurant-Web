@@ -6,8 +6,8 @@ import OrdinationsUtils from "../../../../pages/evening/OrdinationsUtils";
 import Button from "../../../../widgets/Button";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
-import OrdersCrudList from "../../../OrdersCrudList";
-import ordinationsEditorActions from "../../../../pages/evening/OrdinationsEditorActions";
+import OrdersCrudList from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdersCrudList";
+import ordinationsEditorActions from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
 import {findByUuid, findIndexByUuid} from "../../../../utils/Utils";
 import PaginatedList from "../../PaginatedList";
 

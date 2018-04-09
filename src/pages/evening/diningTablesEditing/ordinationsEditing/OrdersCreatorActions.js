@@ -1,5 +1,5 @@
-import {ACT_BEGIN_CREATE_ORDER} from "../../actions/ActionTypes";
-import dispatcher from "../../dispatcher/SimpleDispatcher";
+import {ACT_BEGIN_CREATE_ORDER} from "../../../../actions/ActionTypes";
+import dispatcher from "../../../../dispatcher/SimpleDispatcher";
 
 class OrdersCreatorActions {
 

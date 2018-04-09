@@ -3,13 +3,13 @@ import graphWizardActions from "./GraphWizardActions";
 import GraphWizardPage from "./GraphWizardPage";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
-import OrdersCrudList from "../../../OrdersCrudList";
+import OrdersCrudList from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdersCrudList";
 import FloatInput from "../../inputs/float/FloatInput";
 import Button from "../../../../widgets/Button";
 import {findByUuid} from "../../../../utils/Utils";
 import IntegerInput from "../../inputs/IntegerInput";
 import PaginatedList from "../../PaginatedList";
-import ordinationsEditorActions from "../../../../pages/evening/OrdinationsEditorActions";
+import ordinationsEditorActions from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
 import OrdinationsUtils from "../../../../pages/evening/OrdinationsUtils";
 
 const PRICE = "PRICE";

@@ -13,14 +13,16 @@ export default class OrdinationsUtils {
 
     static makePhaseMap(orders, phases) {
         let result = new OrderedMap();
-        orders = orders.sort((o1, o2) => OrdinationsUtils.phaseComparator(o1, o2, phases));
-        orders.forEach(order => {
-            let phase = order.get('phase');
-            if (!result.get(phase)) {
-                result = result.set(order.get('phase'), List());
-            }
-            result = result.updateIn([order.get('phase')], phaseOrders => phaseOrders.push(order));
-        });
+        if(orders) {
+            orders = orders.sort((o1, o2) => OrdinationsUtils.phaseComparator(o1, o2, phases));
+            orders.forEach(order => {
+                let phase = order.get('phase');
+                if (!result.get(phase)) {
+                    result = result.set(order.get('phase'), List());
+                }
+                result = result.updateIn([order.get('phase')], phaseOrders => phaseOrders.push(order));
+            });
+        }
         return result;
     }
 
@@ -70,8 +72,8 @@ export default class OrdinationsUtils {
         let found = false;
         orders.forEach((o, i) => {
             if (OrdinationsUtils.sameOrder(o, order)) {
-                o = o.updateIn('orders', orders => orders.push(o));
-                orders = orders.set(i, o);
+                let values = o.get('orders');
+                orders = orders.set(i, o.set('orders', values.push(o)));
                 found = true;
             }
         });

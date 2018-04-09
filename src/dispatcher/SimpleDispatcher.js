@@ -13,12 +13,11 @@ import {ACTION_COMPLETED, ACTION_ERROR, ACTION_FAILED, ACTION_STARTED} from "../
 
 class SimpleDispatcher extends Dispatcher {
 
-    buildAction(phase, type, body, topics) {
+    buildAction(phase, type, body) {
         return {
             phase: phase,
             type: type,
             body: body,
-            topics: topics,
             isCompleted: function () {
                 return this.phase === ACTION_COMPLETED;
             },
@@ -40,10 +39,10 @@ class SimpleDispatcher extends Dispatcher {
         console.log(type + " -> STARTED");
     }
 
-    fireEnd(type, body, topics) {
+    fireEnd(type, body) {
         console.log(type + " -> COMPLETING");
         console.log(body);
-        this.dispatch(this.buildAction(ACTION_COMPLETED, type, body, topics || []));
+        this.dispatch(this.buildAction(ACTION_COMPLETED, type, body));
         console.log(type + " -> COMPLETED");
     }
 

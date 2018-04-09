@@ -1,10 +1,10 @@
 import React from 'react';
-import {findByUuid, uuid} from "../utils/Utils";
-import OrdinationsUtils from "../pages/evening/OrdinationsUtils";
-import Scrollable from "./widgets/Scrollable";
-import Column from "../widgets/Column";
-import Row from "../widgets/Row";
-import FormattedParagraph from "../widgets/FormattedParagraph";
+import {findByUuid, iGet, uuid} from "../../../../utils/Utils";
+import OrdinationsUtils from "../../OrdinationsUtils";
+import Scrollable from "../../../../components/widgets/Scrollable";
+import Column from "../../../../widgets/Column";
+import Row from "../../../../widgets/Row";
+import FormattedParagraph from "../../../../widgets/FormattedParagraph";
 
 export default class OrdinationReview extends React.Component {
     constructor(props) {
@@ -47,11 +47,9 @@ export default class OrdinationReview extends React.Component {
     }
 
     render() {
-        let orders = this.props.data.get("editingOrders");
-        if (!orders) {
-            console.log("Beh, no editing")
-            orders = this.props.data.get("editingOrdination").get("orders");
-        }
+        let data = this.props.data;
+        let ordination = iGet(data, "ordinationEditing.ordination");
+        let orders = ordination.get("orders");
         return <Row grow>
             {this.renderOrders(orders)}
         </Row>;

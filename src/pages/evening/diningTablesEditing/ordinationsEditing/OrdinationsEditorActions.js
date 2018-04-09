@@ -1,25 +1,11 @@
-import {ACT_UPDATE_ENTITY} from "../../actions/ActionTypes";
-import dispatcher from "../../dispatcher/SimpleDispatcher";
-import {EntitiesUtils} from "../../utils/EntitiesUtils";
-import {uuid} from "../../utils/Utils";
+import {ACT_UPDATE_ENTITY} from "../../../../actions/ActionTypes";
+import dispatcher from "../../../../dispatcher/SimpleDispatcher";
+import {EntitiesUtils} from "../../../../utils/EntitiesUtils";
+import {uuid} from "../../../../utils/Utils";
 
 const {fromJS, List} = require('immutable');
 
 class OrdinationsEditorActions {
-
-    addOrders(dish, phase, quantity) {
-        let orders = List();
-        for(let i = 0;i < quantity;i++) {
-            let newOrder = EntitiesUtils.newOrder(dish, phase);
-            orders = orders.push(newOrder);
-        }
-
-        //FIXME
-        // dispatcher.fireEnd(ACT_UPDATE_ENTITY, fromJS({
-        //     type: ORDERS_TYPE,
-        //     updater: oldOrders => oldOrders.concat(orders)
-        // }));
-    }
 
     addOrder(order) {
         //FIXME

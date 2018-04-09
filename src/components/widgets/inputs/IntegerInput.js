@@ -16,10 +16,9 @@ export default class IntegerInput extends Component {
         }
     }
 
-    updateCaret() {
-        if(this.props.onSetCaret) {
-            let input = global.$("#" + this.props.uuid)[0];
-            this.props.onSetCaret(input.selectionStart);
+    onChange(evt) {
+        if(this.props.onChange) {
+            this.props.onChange(evt.target.value);
         }
     }
 
@@ -40,8 +39,7 @@ export default class IntegerInput extends Component {
                                 type="text"
                                 disabled={disabled}
                                 value={text || ""}
-                                onMouseUp={() => this.updateCaret()}
-                                onKeyDown={data => this.onChar(data.key, data)}/>
+                                onChange={data => this.onChange(data)}/>
                         </Column>
                     </Row>
                     <Row topSpaced>

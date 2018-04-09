@@ -57,9 +57,11 @@ export default class RootFeatureStore extends EventEmitter{
 
     getState(){
         let data = this.buildState();
-        for(let subFeature in this.subFeatureStores){
-            data = data.set(subFeature.getFeatureName(), subFeature.getState());
-        }
+
+        this.subFeatureStores.forEach(store => {
+            data = data.set(store.getFeatureName(), store.getState());
+        });
+
         return {
             data : data
         }

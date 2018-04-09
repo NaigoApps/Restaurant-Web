@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
-import GraphWizard from "../wizard/graph-wizard/GraphWizard";
-import OrderDishWizardPage from "../wizard/graph-wizard/OrderDishWizardPage";
-import graphWizardActions from "../wizard/graph-wizard/GraphWizardActions";
-import OrderAdditionsWizardPage from "../wizard/graph-wizard/OrderAdditionsWizardPage";
-import OrdinationsUtils from "../../../pages/evening/OrdinationsUtils";
-import OrderFreeAdditionsWizardPage from "../wizard/graph-wizard/OrderFreeAdditionsWizardPage";
-import OrderPriceQuantityWizardPage from "../wizard/graph-wizard/OrderPriceQuantityWizardPage";
-import {findByUuid} from "../../../utils/Utils";
+import GraphWizard from "../../../../../components/widgets/wizard/graph-wizard/GraphWizard";
+import OrderDishWizardPage from "../../../../../components/widgets/wizard/graph-wizard/OrderDishWizardPage";
+import graphWizardActions from "../../../../../components/widgets/wizard/graph-wizard/GraphWizardActions";
+import OrderAdditionsWizardPage from "../../../../../components/widgets/wizard/graph-wizard/OrderAdditionsWizardPage";
+import OrdinationsUtils from "../../../OrdinationsUtils";
+import OrderFreeAdditionsWizardPage from "../../../../../components/widgets/wizard/graph-wizard/OrderFreeAdditionsWizardPage";
+import OrderPriceQuantityWizardPage from "../../../../../components/widgets/wizard/graph-wizard/OrderPriceQuantityWizardPage";
+import {findByUuid, iGet} from "../../../../../utils/Utils";
+import {OrdersWizardPages} from "./OrdersEditingStore";
 
 const {List} = require('immutable');
 
@@ -29,14 +30,14 @@ export default class OrdersEditor extends Component {
     }
 
     render() {
-        let orders = this.props.data.get('editingOrders');
-        if (!orders) {
-            orders = this.props.data.get('editingOrdination').get('orders');
-        }
+        let data = this.props.data;
+        let orders = iGet(data, "ordersEditing.orders");
+        let ordination = iGet(data, "ordinationEditing.ordination");
+        // let orders = ordination.get('orders');
 
         return <GraphWizard
             isValid={data => orders.size > 0}
-            initialPage="orders"
+            page={iGet(data, "ordersEditing.wizardPage")}
             hideForm={true}
             visible={this.props.visible}
             size="lg"
@@ -46,9 +47,8 @@ export default class OrdersEditor extends Component {
             abortAction={this.onWizardAbort.bind(this)}>
 
             <OrderDishWizardPage
-                identifier="orders"
+                identifier={OrdersWizardPages.DISHES_PAGE}
                 name="Piatti"
-                initializer={orders}
                 label={dish => dish.get('name')}
                 data={this.props.data}/>
 

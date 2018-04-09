@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
-import eveningSelectionFormActions from "../../actions/pages/EveningSelectionFormActions";
+import eveningSelectionFormActions from "./eveningSelector/EveningSelectorActions";
 import NavPills from "../../widgets/NavPills";
 import NavElement from "../../widgets/NavElement";
 import diningTablesEditorActions from "./tables/DiningTablesEditorActions";
 import DiningTablesUtils from "./tables/DiningTablesUtils";
-import ordinationsEditorActions from "./OrdinationsEditorActions";
+import ordinationsEditorActions from "./diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
 import OrdinationsUtils from "./OrdinationsUtils";
-import {findByUuid} from "../../utils/Utils";
+import {iGet} from "../../utils/Utils";
+import eveningEditorActions from "./EveningEditorActions";
+import HiddenFloatEditor from "../../components/widgets/inputs/float/HiddenFloatEditor";
 
 export default class EveningNav extends Component {
     constructor(props) {
@@ -27,6 +29,28 @@ export default class EveningNav extends Component {
         let data = this.props.data;
         let pills = [];
 
+        let evening = data.get('evening');
+
+        if (evening) {
+            pills.push(<NavElement
+                key="cc_editor"
+                type="info"
+                text={"Coperto: " + OrdinationsUtils.formatPrice(evening.get('coverCharge'))}
+                active={!!data.get('editingOrdination')}
+                commitAction={() => eveningEditorActions.onStartCCEditing()}
+            />);
+            pills.push(<HiddenFloatEditor
+                key="cc_editor_modal"
+                uuid="evening_cc_editor"
+                label="Coperto"
+                visible={iGet(data, "ccEditor.visible")}
+                text={iGet(data, "ccEditor.text")}
+                onChar={char => eveningEditorActions.onCCChar(char)}
+
+                onConfirm={result => eveningEditorActions.onConfirmCCEditing(iGet(data, "evening.uuid"), result)}
+                onAbort={eveningEditorActions.onAbortCCEditing}/>);
+        }
+
         pills.push(<NavElement
             key="evening_selection"
             text="Selezione serata"
@@ -38,12 +62,12 @@ export default class EveningNav extends Component {
             pills.push(<NavElement
                 key="evening_editor"
                 text="Elenco tavoli"
-                active={!data.get('editingTable')}
+                active={!iGet(data, "diningTablesEditing.diningTable")}
                 commitAction={diningTablesEditorActions.abortDiningTableEditing}
             />);
 
-            if (data.get('editingTable')) {
-                let table = data.get('editingTable');
+            if (iGet(data, 'diningTablesEditing.diningTable')) {
+                let table = iGet(data, 'diningTablesEditing.diningTable');
 
                 pills.push(<NavElement
                     key="table_editor"

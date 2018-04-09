@@ -1,6 +1,6 @@
-import requestBuilder from "../../actions/RequestBuilder";
-import {ACT_DELETE_ORDER, ACT_SELECT_ORDER, ACT_UPDATE_ORDER} from "../../actions/ActionTypes";
-import dispatcher from "../../dispatcher/SimpleDispatcher";
+import requestBuilder from "../../../../actions/RequestBuilder";
+import {ACT_DELETE_ORDER, ACT_SELECT_ORDER, ACT_UPDATE_ORDER} from "../../../../actions/ActionTypes";
+import dispatcher from "../../../../dispatcher/SimpleDispatcher";
 
 class OrdersEditorActions {
 

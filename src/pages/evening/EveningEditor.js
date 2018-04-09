@@ -1,18 +1,15 @@
 import React from 'react';
 import diningTablesEditorActions from "./tables/DiningTablesEditorActions";
 import Button from "../../widgets/Button";
-import DiningTableEditor from "./tables/DiningTableEditor";
-import diningTablesCreatorActions from "./tables/DiningTablesCreatorActions";
-import DiningTableCreator from "./tables/DiningTableCreator";
+import diningTablesCreatorActions from "./diningTablesEditing/DiningTablesCreatorActions";
 import Row from "../../widgets/Row";
 import Column from "../../widgets/Column";
-import eveningEditorActions from "./EveningEditorActions";
-import FloatEditor from "../../components/widgets/inputs/float/FloatEditor";
 import DiningTablesUtils from "./tables/DiningTablesUtils";
-import {NEW_DINING_TABLE_UUID} from "../../utils/EntitiesUtils";
-import PaginatedList from "../../components/widgets/PaginatedList";
 import {iGet} from "../../utils/Utils";
-import {CREATING_MODE, EDITING_MODE} from "../../stores/EntityEditorStore";
+import {EditorStatus} from "../StoresUtils";
+import DiningTableEditor from "./diningTablesEditing/DiningTableEditor";
+import SelectInput from "../../components/widgets/inputs/SelectInput";
+import DiningTableDataEditor from "./diningTablesEditing/DiningTableDataEditor";
 
 export default class EveningEditor extends React.Component {
     constructor(props) {
@@ -25,36 +22,27 @@ export default class EveningEditor extends React.Component {
 
         let editorContent = <span/>;
 
-        let diningTableEditorStatus = iGet(props, "diningTableEditor.editorStatus");
-        if (diningTableEditorStatus === EDITING_MODE) {
-            editorContent = <DiningTableEditor data={props}/>;
-        }else if(diningTableEditorStatus === CREATING_MODE){
-            editorContent = <DiningTableEditor data={props}/>;
-        } else {
-            editorContent = [<Row key="coverCharge" topSpaced>
-                <Column>
-                    <FloatEditor
-                    uuid="evening_cc_editor"
-                    label="Coperto"
-                    visible={iGet(props, "ccEditor.visible")}
-                    text={iGet(props, "ccEditor.text")}
-                    onShowModal={() => eveningEditorActions.onStartCCEditing()}
-                    onChar={char => eveningEditorActions.onCCChar(char)}
+        let editorStatus = iGet(props, "diningTablesEditing.status");
 
-                    onConfirm={result => eveningEditorActions.onConfirmCCEditing(iGet(props, "evening.uuid"), result)}
-                    onAbort={eveningEditorActions.onAbortCCEditing}/>
-                </Column>
-            </Row>,
+        if (editorStatus === EditorStatus.EDITING) {
+            editorContent = <DiningTableEditor data={props}/>;
+        } else if (editorStatus === EditorStatus.CREATING) {
+            editorContent = <DiningTableDataEditor data={props} actionsProvider={diningTablesCreatorActions}/>;
+        } else {
+            editorContent = [
                 <Row key="tablesList" grow>
-                    <PaginatedList
+                    <SelectInput
                         id={table => table.get('uuid')}
                         rows={8}
                         cols={3}
-                        entities={props.get('evening').get('diningTables')}
+                        page={iGet(props, 'diningTablesEditing.page')}
+                        options={iGet(props, "evening.diningTables")}
                         renderer={table => this.renderDiningTable(table)}
                         colorRenderer={table => this.renderDiningTableColor(table)}
-                        selectMethod={diningTablesEditorActions.beginDiningTableEditing}
-                        deselectMethod={diningTablesEditorActions.abortDiningTableEditing}/>,
+                        onSelect={table => diningTablesEditorActions.beginDiningTableEditing(table)}
+                        onDeselect={diningTablesEditorActions.abortDiningTableEditing}
+                        onSelectPage={page => diningTablesEditorActions.onSelectPage(page)}
+                    />
                 </Row>,
                 <Row key="newTable" topSpaced>
                     <Column centered={true}>
@@ -79,11 +67,11 @@ export default class EveningEditor extends React.Component {
         return DiningTablesUtils.renderDiningTable(dt, this.props.data.get('tables'), this.props.data.get('waiters'));
     }
 
-    renderDiningTableColor(dt){
-        if(dt.get('status') === "APERTO"){
+    renderDiningTableColor(dt) {
+        if (dt.get('status') === "APERTO") {
             return "danger";
         }
-        if(dt.get('status') === "IN CHIUSURA"){
+        if (dt.get('status') === "IN CHIUSURA") {
             return "warning";
         }
         return "secondary";
