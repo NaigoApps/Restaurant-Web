@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
-import applicationActions from "../actions/ApplicationActions";
-import Icon from "../widgets/Icon";
+import {ApplicationActions} from "../actions/ApplicationActions";
 import Button from "../widgets/Button";
 import {HOME} from "../App";
+import NavPills from "../widgets/NavPills";
+import Column from "../widgets/Column";
+import Row from "../widgets/Row";
 
 export const SIZES = {
     HIDDEN: "HIDDEN",
@@ -16,33 +18,37 @@ class RestaurantNav extends Component {
         super();
     }
 
-    goHome(){
-        applicationActions.dismissFullScreen();
-        applicationActions.goToPage(HOME)
+    goHome() {
+        ApplicationActions.dismissFullScreen();
+        ApplicationActions.goToPage(HOME)
     }
 
     render() {
 
         return (
-            <nav className="navbar navbar-toggleable-md navbar-light bg-faded fixed-top">
-                <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <Icon name="gear"/>
-                </button>
-                <div id="navbar" className="collapse navbar-collapse">
-                    <Button
-                        text="Home"
-                        icon="home"
-                        commitAction={() => this.goHome()}
-                    />
-                    <ul className="navbar-nav ml-auto">
-                        <li className="nav-item">
+            <NavPills>
+                <Column>
+                    <Row justify="center">
+                        <Column>
+                            <Row>
+                                <Column auto>
+                                    <Button
+                                        text="Home"
+                                        icon="home"
+                                        commitAction={() => this.goHome()}
+                                    />
+                                </Column>
+                                {this.props.children}
+                            </Row>
+                        </Column>
+                        <Column auto>
                             <Button
                                 icon="window-restore"
-                                commitAction={() => applicationActions.toggleFullScreen()}/>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+                                commitAction={() => ApplicationActions.toggleFullScreen()}/>
+                        </Column>
+                    </Row>
+                </Column>
+            </NavPills>
         );
     }
 }

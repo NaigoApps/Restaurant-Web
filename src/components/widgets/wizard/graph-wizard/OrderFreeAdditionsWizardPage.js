@@ -1,8 +1,5 @@
 import React, {Component} from 'react';
 import $ from 'jquery';
-import ordinationsEditorActions from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
-import OrdinationsUtils from "../../../../pages/evening/OrdinationsUtils";
-import graphWizardActions from "./GraphWizardActions";
 import Keyboard, {BACKSPACE, LEFT, RIGHT} from "../../inputs/Keyboard";
 import GraphWizardPage from "./GraphWizardPage";
 import {findByUuid, findIndexByUuid, uuid} from "../../../../utils/Utils";
@@ -35,7 +32,7 @@ export default class OrderFreeAdditionsWizardPage extends Component {
         let orders = this.props.data.get('editingOrders');
         let index = findIndexByUuid(orders, this.props.wizardData["editing"]);
 
-        ordinationsEditorActions.updateOrderFreeAddition(index, text);
+        // ordinationsEditorActions.updateOrderFreeAddition(index, text);
     }
 
     componentDidMount() {

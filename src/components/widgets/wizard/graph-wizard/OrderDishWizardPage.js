@@ -2,18 +2,15 @@ import React, {Component} from 'react';
 import graphWizardActions from "./GraphWizardActions";
 import GraphWizardPage from "./GraphWizardPage";
 import {findByUuid, iGet} from "../../../../utils/Utils";
-import Button from "../../../../widgets/Button";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
-import ordinationsEditorActions from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
-import OrdinationReview from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdinationReview";
 import IntegerInput from "../../inputs/IntegerInput";
-import PaginatedList from "../../PaginatedList";
 import NavPills from "../../../../widgets/NavPills";
 import NavElement from "../../../../widgets/NavElement";
 import SelectInput from "../../inputs/SelectInput";
-import {OrdersActions} from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersActions";
-import OrdinationOrdersReview from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdinationOrdersReview";
+import {OrdersActions} from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersActions";
+import OrdinationOrdersReview
+    from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationOrdersReview";
 
 const {List, fromJS} = require('immutable');
 
@@ -60,7 +57,7 @@ export default class OrderDishWizardPage extends Component {
                 abortAction={this.props.abortAction}
                 confirmAction={this.props.confirmAction}>
                 <Row grow>
-                    <Column lg="5">
+                    <Column lg="6" justify="between">
                         <Row grow>
                             <Column>
                                 <OrdinationOrdersReview
@@ -69,31 +66,42 @@ export default class OrderDishWizardPage extends Component {
                                 />
                             </Column>
                         </Row>
-                        <Row topSpaced>
-                            <Column>
-                                <IntegerInput
-                                    uuid={"dishQuantity"}
-                                    text={quantityText}
-                                    onChar={char => OrdersActions.quantityChar(char)}
-                                    onChange={text => OrdersActions.quantityChange(text)}
-                                />
-                            </Column>
-                        </Row>
-                    </Column>
-                    <Column lg="7">
-                        <Row>
+                        <Row ofList>
                             <Column>
                                 {phasesContent}
                             </Column>
                         </Row>
-                        <Row topSpaced>
+                    </Column>
+                    <Column lg="6" justify="between">
+                        <Row>
                             <Column>
-                                {nav}
+                                <Column auto centered>
+                                    <h5>Quantità</h5>
+                                </Column>
+                                <Row>
+                                    <Column>
+                                        <IntegerInput
+                                            uuid={"dishQuantity"}
+                                            text={quantityText}
+                                            onChar={char => OrdersActions.quantityChar(char)}
+                                            onChange={text => OrdersActions.quantityChange(text)}
+                                        />
+                                    </Column>
+                                </Row>
                             </Column>
                         </Row>
                         <Row topSpaced>
                             <Column>
-                                {content}
+                                <Row>
+                                    <Column>
+                                        {nav}
+                                    </Column>
+                                </Row>
+                                <Row ofList>
+                                    <Column>
+                                        {content}
+                                    </Column>
+                                </Row>
                             </Column>
                         </Row>
                     </Column>
@@ -106,8 +114,6 @@ export default class OrderDishWizardPage extends Component {
         let data = this.props.data;
         let availablePhases = data.get('phases');
         let selectedPhase = iGet(data, 'ordersEditing.selectedPhase');
-        //FIXME?
-        let phasePage = iGet(data, 'ordersEditing.phasePage') || 0;
         return <SelectInput
             rows={1}
             cols={4}
@@ -115,18 +121,11 @@ export default class OrderDishWizardPage extends Component {
             options={availablePhases}
             renderer={phase => phase.get('name')}
             selected={selectedPhase}
-            page={phasePage}
+            page={0}
             onSelect={phase => OrdersActions.selectPhase(phase)}/>;
     }
 
     buildNav() {
-        let navContent = this.buildNavContent();
-        return <NavPills>
-            {navContent}
-        </NavPills>
-    }
-
-    buildNavContent() {
         let data = this.props.data;
         let selectedCategory = iGet(data, "ordersEditing.selectedCategory");
         let buttons = [];
@@ -143,7 +142,9 @@ export default class OrderDishWizardPage extends Component {
                 active={true}
             />);
         }
-        return buttons;
+        return <Row>
+            {buttons}
+        </Row>;
     }
 
     findCategory(catUuid) {
@@ -169,7 +170,9 @@ export default class OrderDishWizardPage extends Component {
             page={categoryPage}
             onSelectPage={page => OrdersActions.selectCategoryPage(page)}
             onSelect={cat => OrdersActions.selectCategory(cat)}
-            onDeselect={() => OrdersActions.selectCategory(null)}/>;
+            onDeselect={() => OrdersActions.selectCategory(null)}
+            alwaysShowPages
+        />;
     }
 
     buildDishesContent(categoryUuid) {
@@ -188,6 +191,8 @@ export default class OrderDishWizardPage extends Component {
             selected={selectedDish}
             page={dishPage}
             onSelectPage={page => OrdersActions.selectDishPage(page)}
-            onSelect={dish => OrdersActions.selectDish(dish)}/>;
+            onSelect={dish => OrdersActions.selectDish(dish)}
+            alwaysShowPages
+        />;
     }
 }

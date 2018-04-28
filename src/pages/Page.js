@@ -3,7 +3,6 @@ import loadingStore from "../stores/LoadingStore";
 import errorsStore from "../stores/ErrorsStore";
 import $ from "jquery";
 import errorActions from "../actions/ErrorsActions";
-import RestaurantNav from "../components/RestaurantNav";
 import applicationStore from "../stores/ApplicationStore";
 
 import * as screenfull from 'screenfull';
@@ -11,12 +10,22 @@ import Modal from "../widgets/modal/Modal";
 import Button from "../widgets/Button";
 import Row from "../widgets/Row";
 import Column from "../widgets/Column";
+import ApplicationKeyboard from "../components/widgets/ApplicationKeyboard";
+import ApplicationFloatInput from "../components/widgets/ApplicationFloatInput";
+import ApplicationIntegerInput from "../components/widgets/ApplicationIntegerInput";
+import ApplicationSelectInput from "../components/widgets/ApplicationSelectInput";
+
+const {Map} = require('immutable');
 
 export default class Page extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            floatInput: Map(),
+            integerInput: Map(),
+            selectInput: Map(),
+            keyboardVisible: false,
             errorMessage: null,
             loading: false
         };
@@ -46,6 +55,10 @@ export default class Page extends Component {
             screenfull.exit();
         }
         this.setState({
+            keyboardVisible: status.keyboardVisible,
+            floatInput: status.floatInput,
+            integerInput: status.integerInput,
+            selectInput: status.selectInput,
             fullScreen: status.fullScreen
         });
     }
@@ -78,8 +91,7 @@ export default class Page extends Component {
     render() {
         return (
             <div className="container-fluid main">
-                <RestaurantNav title={this.props.title} content={this.props.navContent}/>
-                <Row fullHeight underNav>
+                <Row fullHeight>
                     <Column>
                         {this.props.children}
                     </Column>
@@ -96,6 +108,10 @@ export default class Page extends Component {
                             <Button text="Chiudi" commitAction={this.clearMessages}/>
                         </div>
                     </Modal>
+                    <ApplicationKeyboard visible={this.state.keyboardVisible}/>
+                    <ApplicationFloatInput data={this.state.floatInput}/>
+                    <ApplicationIntegerInput data={this.state.integerInput}/>
+                    <ApplicationSelectInput data={this.state.selectInput}/>
                 </Row>
             </div>
         )

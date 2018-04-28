@@ -32,8 +32,11 @@ export default class Column extends Component {
                 classes.push("col");
             }
         }
-        if (this.props.align) {
+        if(this.props.align){
             classes.push("align-items-" + this.props.align);
+        }
+        if (this.props.justify) {
+            classes.push("justify-content-" + this.props.justify);
         }
         if (this.props.centered) {
             classes.push("text-center");
@@ -52,6 +55,9 @@ export default class Column extends Component {
             classes.push("bg-primary");
         } else {
             classes.push("bg-secondary");
+        }
+        if(this.props.customCss){
+            classes.push(this.props.customCss)
         }
         return classes.join(" ");
     }

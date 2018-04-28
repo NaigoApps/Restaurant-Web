@@ -1,31 +1,33 @@
 import React, {Component} from 'react';
+import Column from "./Column";
+import Row from "./Row";
+import {uuid} from "../utils/Utils";
 
 export default class ButtonGroup extends Component {
     constructor(props) {
         super(props);
     }
 
-    getClassName() {
-        let classes = [];
-        classes.push(this.props.vertical ? "btn-group-vertical" : "btn-group");
-        if (this.props.size) {
-            classes.push("btn-group-" + this.props.size);
-        }
-        if (this.props.justified) {
-            if (!this.props.vertical) {
-                classes.push("btn-group-justified");
-            } else {
-                classes.push("btn-group-vertical-justified");
-            }
-        }
-        return classes.join(" ");
-    }
-
     render() {
+
+        let buttons = React.Children.toArray(this.props.children);
+
         return (
-            <div className={this.getClassName()}>
-                {this.props.children}
-            </div>
+            <Row>
+                {buttons.map(button => {
+                    if(this.props.vertical){
+                        return <Row key={uuid()}>
+                            <Column>
+                                {button}
+                            </Column>
+                        </Row>
+                    }else{
+                        return <Column key={uuid()} auto>
+                            {button}
+                        </Column>
+                    }
+                })}
+            </Row>
         );
     }
 

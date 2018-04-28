@@ -19,7 +19,7 @@ export default class SelectInput extends Component {
     }
 
     selectPage(index) {
-        if(this.props.onSelectPage){
+        if (this.props.onSelectPage) {
             this.props.onSelectPage(index);
         }
     }
@@ -27,28 +27,28 @@ export default class SelectInput extends Component {
     select(option) {
         if (!option || this.isSelected(this.id(option)) && this.props.onDeselect) {
             this.props.onDeselect(this.id(option));
-        } else if(this.props.onSelect){
+        } else if (this.props.onSelect) {
             this.props.onSelect(this.id(option));
         }
     }
 
-    id(option){
-        if(option && this.props.id){
+    id(option) {
+        if (option && this.props.id) {
             return this.props.id(option);
         }
         return option;
     }
 
-    isSelected(uuid){
-        if(!this.props.multiSelect){
+    isSelected(uuid) {
+        if (!this.props.multiSelect) {
             return this.props.selected === uuid;
-        }else{
+        } else {
             return this.props.selected.includes(uuid);
         }
     }
 
-    renderOption(option){
-        if(this.props.renderer){
+    renderOption(option) {
+        if (this.props.renderer) {
             return this.props.renderer(option);
         }
         return option;
@@ -71,17 +71,17 @@ export default class SelectInput extends Component {
 
         pageButtons = this.buildPageButtons(optionsList, currentPage);
 
+
         optionsList = optionsList.map((group, index) => {
             if (index === currentPage) {
                 let rowsGroups = distribute(group, cols);
-                let rowsComps = rowsGroups.map((row, index) => {
+                let rowsComps = rowsGroups.map((row, rowIndex) => {
                     let buttons = row.map(option => {
                         return (
                             <Column key={this.id(option)}>
                                 <Button
                                     active={this.isSelected(this.id(option))}
                                     text={this.renderOption(option)}
-                                    size="lg"
                                     type={colorRenderer ? colorRenderer(option) : "secondary"}
                                     commitAction={this.select.bind(this, option)}
                                 />
@@ -93,12 +93,12 @@ export default class SelectInput extends Component {
                         buttons.push(<ColumnSpace key={buttons.length}/>);
                     }
 
-                    return <Row key={index} grow topSpaced>{buttons}</Row>
+                    return <Row key={rowIndex} ofList={rowIndex > 0}>{buttons}</Row>
                 });
 
                 while (rowsComps.length < rows) {
                     rowsComps.push(
-                        <Row key={rowsComps.length} grow topSpaced>
+                        <Row key={rowsComps.length} grow>
                             <ColumnSpace/>
                         </Row>);
                 }
@@ -109,24 +109,20 @@ export default class SelectInput extends Component {
         });
 
 
-        return <Row grow>
+        return <Row>
             <Column>
-                <Row grow>
+                <Row>
                     <Column>
                         {optionsList}
                     </Column>
                 </Row>
-                <Row topSpaced>
-                    <Column>
-                        {pageButtons}
-                    </Column>
-                </Row>
+                {pageButtons}
             </Column>
         </Row>;
     }
 
     buildPageButtons(groups, currentPage) {
-        if (groups.length > 1) {
+        if (groups.length > 1 || this.props.alwaysShowPages) {
             let btns = [];
             groups.forEach((group, index) => {
                 btns.push(
@@ -135,14 +131,17 @@ export default class SelectInput extends Component {
                         active={currentPage === index}
                         commitAction={this.selectPage.bind(this, index)}
                         text={index + 1}
+                        highPadding
                     />
                 );
             });
-            return <nav>
-                <ButtonGroup>
-                    {btns}
-                </ButtonGroup>
-            </nav>
+            return <Row ofList>
+                <Column>
+                    <ButtonGroup>
+                        {btns}
+                    </ButtonGroup>
+                </Column>
+            </Row>
         }
         return null;
     }

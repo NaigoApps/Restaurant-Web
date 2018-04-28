@@ -35,7 +35,7 @@ export default class TextInput extends Component {
                     <Row>
                         <Column>
                             <input
-                                id={this.state.uuid}
+                                id={this.props.uuid}
                                 className="form-control"
                                 placeholder={placeholder}
                                 type="text"

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Button from "./Button";
+import Column from "./Column";
 
 export default class NavElement extends Component {
     constructor(props) {
@@ -19,9 +20,15 @@ export default class NavElement extends Component {
         const type = this.props.type;
 
         return (
-                <li className="nav-item" onClick={this.clickAction.bind(this)}>
-                    <Button type={type || "secondary"} text={text} disabled={disabled} active={active}/>
-                </li>
+            <Column auto>
+                <Button
+                    type={type || "secondary"}
+                    text={text}
+                    disabled={disabled}
+                    active={active}
+                    commitAction={() => this.clickAction()}
+                />
+            </Column>
         );
     }
 

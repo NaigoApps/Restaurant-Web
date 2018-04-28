@@ -29,12 +29,20 @@ export default class Button extends Component {
         }
         if (this.props.size) {
             classes.push("btn-" + this.props.size)
+        }else{
+            classes.push("btn-lg")
         }
-        if (this.props.fullHeight) {
-            classes.push("full-height")
+        if (this.props.fill) {
+            classes.push("fill");
         }
         if (this.props.fullSize) {
             classes.push("col-sm-12");
+        }
+        if (this.props.customClass){
+            classes.push(this.props.customClass);
+        }
+        if(this.props.highPadding){
+            classes.push("high-padding");
         }
         return classes.join(" ");
     }
@@ -46,7 +54,7 @@ export default class Button extends Component {
 
         let content;
         if (text && icon) {
-            content = <span>{text}{separator}<Icon name={icon}/></span>;
+            content = <span><div>{text}</div><Icon name={icon}/></span>;
         } else if (text) {
             content = text;
         } else if (icon) {

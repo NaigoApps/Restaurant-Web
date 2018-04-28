@@ -1,106 +1,57 @@
 import React, {Component} from 'react';
-import {uuid} from "../../../utils/Utils";
-import $ from 'jquery';
-import {CANC} from "../KeyPad";
-import KeyPad from "../KeyPad";
 import IntKeyPad from "../IntKeyPad";
+import Column from "../../../widgets/Column";
+import Row from "../../../widgets/Row";
+import KeyboardButton, {SIZES} from "./KeyboardButton";
 
-/**
- * Expects:
- * - name: label caption
- * - changeAction: action to throw on change
- */
+const {Map} = require('immutable');
 
 export default class PercentInput extends Component {
     constructor(props) {
         super(props);
-        this.state = this.resetState(props)
-    }
-
-    resetState(props) {
-        return {
-            uuid: "perc-input-" + uuid(),
-            text: props.default && props.default.toString() ? props.default.toString() : "0"
-        }
-    }
-
-    componentWillReceiveProps(props){
-        this.setState({
-            text: props.default && props.default.toString() ? props.default.toString() : "0"
-        });
-    }
-
-    static isPercent(text) {
-        return !isNaN(parseInt(text)) && parseInt(text) <= 100;
-    }
-
-    onChange(event) {
-        if(PercentInput.isPercent(event.target.value)) {
-            this.setState({
-                text: event.target.value
-            });
-            this.mayCommitChange(event.target.value);
-        }
-    }
-
-    mayCommitChange(text) {
-        if (PercentInput.isPercent(text) && this.props.commitAction) {
-            this.props.commitAction(parseInt(text));
-        }
     }
 
     onChar(char) {
-        let text = this.state.text;
-        switch (char) {
-            case CANC:
-                text = "0";
-                break;
-            default:
-                if(text === "0"){
-                    text = char;
-                }else {
-                    text += char;
-                }
-                break;
+        if (this.props.onChar) {
+            this.props.onChar(char);
         }
+    }
 
-        if(PercentInput.isPercent(text)) {
-            this.mayCommitChange(text);
-            this.setState({
-                text: text
-            });
+    onChange(evt) {
+        if (this.props.onChange) {
+            this.props.onChange(evt.target.value);
         }
     }
 
     render() {
-        const text = this.state.text;
+        const text = this.props.text;
         const placeholder = this.props.placeholder;
         const disabled = this.props.disabled;
 
         return (
-            <div className="row">
-                <div className="col-sm-12">
-                    <div className="row">
-                        <div className="col-sm-12">
+            <Row>
+                <Column>
+                    <Row>
+                        <Column>
                             <input
-                                id={this.state.uuid}
+                                id={this.props.uuid}
                                 className="form-control"
                                 placeholder={placeholder}
                                 type="text"
                                 disabled={disabled}
                                 value={text ? text + "%" : ""}
-                                onChange={this.onChange.bind(this)}/>
-                        </div>
-                    </div>
-                    <div className="row top-sep">
-                        <div className="col-sm-12">
+                                onChange={data => this.onChange(data)}/>
+                        </Column>
+                    </Row>
+                    <Row justify="center" ofList>
+                        <Column auto>
                             <IntKeyPad
                                 disabled={disabled}
-                                onCharAction={this.onChar.bind(this)}/>
-                        </div>
-                    </div>
-                </div>
-            </div>);
+                                onCharAction={char => this.onChar(char)}/>
+                        </Column>
+                    </Row>
+                </Column>
+            </Row>);
     }
 
 }

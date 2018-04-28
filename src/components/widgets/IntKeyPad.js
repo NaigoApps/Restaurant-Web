@@ -10,8 +10,6 @@ const BUTTONS = [
     ['6', '7', '8', '9', '0']
 ];
 
-export const CANC = "CANC";
-
 export default class IntKeyPad extends Component {
     constructor(props) {
         super(props);
@@ -21,17 +19,13 @@ export default class IntKeyPad extends Component {
         this.props.onCharAction(char);
     }
 
-    onDelClick(char) {
-        this.props.onCharAction(CANC);
-    }
-
     render() {
         const disabled = this.props.disabled;
 
         let n1 = BUTTONS[0].map(n => <KeyboardButton key={n} disabled={disabled} char={n}
-                                                     onClick={this.onButtonClick.bind(this, n)}/>);
+                                                     onClick={() => this.props.onCharAction(n)}/>);
         let n2 = BUTTONS[1].map(n => <KeyboardButton key={n} disabled={disabled} char={n}
-                                                     onClick={this.onButtonClick.bind(this, n)}/>);
+                                                     onClick={() => this.props.onCharAction(n)}/>);
 
 
         return (<Row>
@@ -39,13 +33,19 @@ export default class IntKeyPad extends Component {
                 <Row justify="center">
                     {n1}
                 </Row>
-                <Row justify="center">
+                <Row justify="center" ofList>
                     {n2}
                 </Row>
             </Column>
             <Column auto>
-                <KeyboardButton disabled={disabled} char="C" size={SIZES.XSMALL}
-                                onClick={this.onDelClick.bind(this)} fullHeight/>
+                <Row justify="center" grow>
+                    <KeyboardButton
+                        disabled={disabled}
+                        char="C"
+                        size={SIZES.XSMALL}
+                        onClick={() => this.props.onCharAction("CANC")}
+                    />
+                </Row>
             </Column>
         </Row>);
     }

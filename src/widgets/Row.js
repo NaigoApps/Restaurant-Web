@@ -31,6 +31,15 @@ export default class Row extends Component {
         if(this.props.underNav){
             classes.push("under-nav");
         }
+        if(this.props.ofList){
+            classes.push("of-list");
+        }
+        if(this.props.textColor){
+            classes.push("text-" + this.props.textColor);
+        }
+        if(this.props.customCss){
+            classes.push(this.props.customCss);
+        }
         return classes.join(" ");
     }
 

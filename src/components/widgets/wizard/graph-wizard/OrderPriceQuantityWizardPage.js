@@ -3,14 +3,14 @@ import graphWizardActions from "./GraphWizardActions";
 import GraphWizardPage from "./GraphWizardPage";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
-import OrdersCrudList from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdersCrudList";
+import OrdersCrudList from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationOrdersCrudList";
 import FloatInput from "../../inputs/float/FloatInput";
 import Button from "../../../../widgets/Button";
-import {findByUuid} from "../../../../utils/Utils";
+import {findByUuid, findIndexByUuid, iGet} from "../../../../utils/Utils";
 import IntegerInput from "../../inputs/IntegerInput";
 import PaginatedList from "../../PaginatedList";
-import ordinationsEditorActions from "../../../../pages/evening/diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
-import OrdinationsUtils from "../../../../pages/evening/OrdinationsUtils";
+import OrdinationsUtils from "../../../../pages/eveningsEditing/OrdinationsUtils";
+import {OrdersActions} from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersActions";
 
 const PRICE = "PRICE";
 const QUANTITY = "QUANTITY";
@@ -45,19 +45,19 @@ export default class OrderPriceQuantityWizardPage extends Component {
     }
 
     getSelectedOrder() {
-        let selectedOrderUuid = this.props.wizardData["editing"];
-        let orders = this.props.data.get('editingOrders');
-        return orders.find(order => order.get('uuid') === selectedOrderUuid);
+        let selectedOrderUuid = iGet(this.props.data, "ordersEditing.selectedOrder");
+        let orders = iGet(this.props.data, "ordersEditing.orders");
+        return findByUuid(orders, selectedOrderUuid);
     }
 
     getSelectedOrderIndex() {
-        let selectedOrderUuid = this.props.wizardData["editing"];
-        let orders = this.props.data.get('editingOrders');
-        return orders.findIndex(order => order.get('uuid') === selectedOrderUuid);
+        let selectedOrderUuid = iGet(this.props.data, "ordersEditing.selectedOrder");
+        let orders = iGet(this.props.data, "ordersEditing.orders");
+        return findIndexByUuid(orders, selectedOrderUuid);
     }
 
     updateSelectedOrderPrice(price) {
-        ordinationsEditorActions.updateOrderPrice(this.getSelectedOrderIndex(), price);
+        // ordinationsEditorActions.updateOrderPrice(this.getSelectedOrderIndex(), price);
     }
 
     setQuantity(oldq, newq) {
@@ -81,7 +81,7 @@ export default class OrderPriceQuantityWizardPage extends Component {
         let removables = orders.filter(order => OrdinationsUtils.sameOrder(order, sampleOrder))
             .map(order => order.get('uuid'));
 
-        ordinationsEditorActions.removeOrders(removables);
+        // ordinationsEditorActions.removeOrders(removables);
 
         graphWizardActions.setWizardData(this.props.wizardId, null, "editing");
     }
@@ -102,33 +102,27 @@ export default class OrderPriceQuantityWizardPage extends Component {
         let newSelection = removables.get(0);
         removables = removables.remove(0);
 
-        ordinationsEditorActions.removeOrders(removables);
+        // ordinationsEditorActions.removeOrders(removables);
 
         graphWizardActions.setWizardData(this.props.wizardId, newSelection, "editing");
     }
 
     moreOrders(times) {
         let sampleOrder = this.getSelectedOrder();
-        ordinationsEditorActions.duplicateOrder(sampleOrder.get('uuid'), times);
+        // ordinationsEditorActions.duplicateOrder(sampleOrder.get('uuid'), times);
     }
 
     changeOrderPhase(phase){
         let orderIndex = this.getSelectedOrderIndex();
-        ordinationsEditorActions.updateOrderPhase(orderIndex, phase);
-    }
-
-    selectGroup(sampleOrder) {
-        graphWizardActions.setWizardData(this.props.wizardId, sampleOrder, "editing");
-        this.updateState(this.props);
+        // ordinationsEditorActions.updateOrderPhase(orderIndex, phase);
     }
 
     render() {
         let props = this.props;
-        let selectedOrderUuid = props.wizardData["editing"];
-        let selectedOrder = null;
-        if (props.data.get('editingOrders')) {
-            selectedOrder = findByUuid(props.data.get('editingOrders'), selectedOrderUuid);
-        }
+        let data = this.props.data;
+        let orders = iGet(data, "ordersEditing.orders");
+        let selectedOrderUuid = iGet(data, "ordersEditing.selectedOrder");
+        let selectedOrder = this.getSelectedOrder();
         return (
             <GraphWizardPage
                 abortAction={props.abortAction}
@@ -137,8 +131,9 @@ export default class OrderPriceQuantityWizardPage extends Component {
                     <Column sm="5">
                         <OrdersCrudList
                             data={this.props.data}
+                            orders={orders}
                             selectedOrder={selectedOrderUuid}
-                            commitAction={this.selectGroup.bind(this)}
+                            commitAction={grp => OrdersActions.selectGroup(grp)}
                         />
                     </Column>
                     <Column sm="7">

@@ -15,26 +15,6 @@ require('bootstrap/dist/css/bootstrap.min.css');
 require('font-awesome/css/font-awesome.min.css');
 require('./css/index.css');
 
+require('jquery-color-animation/jquery.animate-colors-min');
+
 ReactDOM.render(<App/>, document.getElementById('root'));
-// ReactDOM.render(
-//     <BrowserRouter>
-//         <div>
-//             <main>
-//
-//                 <Switch>
-//                     <Route exact path="/restaurant" component={HomePage}/>
-//                     <Route exact path="/restaurant/settings" component={SettingsPage}/>
-//                     <Route path="/restaurant/settings/printers" component={PrintersPage}/>
-//                     <Route path="/restaurant/settings/locations" component={LocationsPage}/>
-//                     <Route path="/restaurant/settings/tables" component={TablesPage}/>
-//                     <Route path="/restaurant/settings/waiters" component={WaitersPage}/>
-//                     <Route path="/restaurant/settings/additions" component={AdditionsPage}/>
-//                     <Route path="/restaurant/settings/customers" component={CustomersPage}/>
-//                     <Route path="/restaurant/settings/menu" component={MenuPage}/>
-//                     <Route path="/restaurant/evening" component={EveningPage}/>
-//                 </Switch>
-//             </main>
-//         </div>
-//     </BrowserRouter>,
-//     document.getElementById('root'));
-// registerServiceWorker();

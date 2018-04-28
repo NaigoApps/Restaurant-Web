@@ -17,23 +17,21 @@ export default class FormattedParagraph extends Component {
         let left = this.props.leftText;
         let right = this.props.rightText;
 
-        if(this.props.leftBold){
+        if (this.props.leftBold) {
             left = <b>{left}</b>;
         }
 
         let leftColumn = null;
-        if(this.props.leftRight){
+        if (this.props.leftRight) {
             leftColumn = <Column right>{left}</Column>;
-        }else{
+        } else {
             leftColumn = <Column left>{left}</Column>;
         }
         return (
-            <div>
-                <Row>
-                    {leftColumn}
-                    <Column right auto>{right}</Column>
-                </Row>
-            </div>
+            <Row textColor={this.props.textColor}>
+                {leftColumn}
+                <Column right auto>{right}</Column>
+            </Row>
         );
     }
 

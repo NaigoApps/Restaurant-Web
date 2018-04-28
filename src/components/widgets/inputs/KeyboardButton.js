@@ -1,7 +1,16 @@
 import React, {Component} from 'react';
 import {uuid} from "../../../utils/Utils";
+import Button from "../../../widgets/Button";
+import Column from "../../../widgets/Column";
 
-export const SIZES = {XXSMALL: "XXSMALL",XSMALL: "XSMALL", SMALL: "SMALL", MEDIUM: "MEDIUM", HUGE: "HUGE", SPACE: "SPACE"};
+export const SIZES = {
+    XXSMALL: "XXSMALL",
+    XSMALL: "XSMALL",
+    SMALL: "SMALL",
+    MEDIUM: "MEDIUM",
+    HUGE: "HUGE",
+    SPACE: "SPACE"
+};
 
 export default class KeyboardButton extends Component {
     constructor(props) {
@@ -11,12 +20,8 @@ export default class KeyboardButton extends Component {
         }
     }
 
-    onButtonClick(char) {
-        this.props.onClick(char);
-    }
-
     computeStyle() {
-        let style = ["btn", "btn-lg", "btn-secondary", "keyboard-character"];
+        let style = ["keyboard-character"];
         switch (this.props.size) {
             case SIZES.XXSMALL:
                 style.push("xxs");
@@ -40,33 +45,23 @@ export default class KeyboardButton extends Component {
                 style.push("xs");
                 break;
         }
-        if(this.props.reduced){
-            style.push("reduced");
-        }
-        if(this.props.fullHeight){
-            style.push("full-height");
-        }
         return style.join(" ");
     }
 
     render() {
-        const disabled = this.props.disabled;
+        const disabled = !!this.props.disabled;
         let style = this.computeStyle();
-        let content = "";
-        if (this.props.text || this.props.char) {
-            content = this.props.text || this.props.char;
-        } else if (this.props.icon) {
-            content = <span className={"fa fa-" + this.props.icon}/>
-        }
         let c = this.props.char;
-        let button = <button
-            disabled={disabled}
-            type="button"
-            key={this.state.uuid}
-            className={style}
-            onClick={this.onButtonClick.bind(this, c)}>{content}</button>;
-
-        return button
+        return <Column customCss={style}>
+            <Button
+                key={this.state.uuid}
+                text={this.props.text || c}
+                icon={this.props.icon}
+                disabled={disabled}
+                commitAction={() => this.props.onClick(c)}
+                fill
+            />
+        </Column>;
     }
 
 }

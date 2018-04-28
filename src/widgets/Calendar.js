@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Icon from "./Icon";
 import {isThisMonth, isToday} from "../components/widgets/inputs/DateInput";
 import Row from "./Row";
 import Column from "./Column";
@@ -7,7 +6,6 @@ import CalendarButton from "./CalendarButton";
 import {distribute, iGet} from "../utils/Utils";
 import SelectEditor from "../components/widgets/inputs/SelectEditor";
 import IntegerEditor from "../components/widgets/inputs/IntegerEditor";
-import eveningSelectionFormActions from "../pages/evening/eveningSelector/EveningSelectorActions";
 
 /**
  * Expects:
@@ -43,6 +41,7 @@ export default class Calendar extends Component {
         let data = this.props.data;
         let month = data.get('month');
         let year = data.get('year');
+        console.log(year);
         let current = new Date(year, month, day);
 
         while (current.getDay() !== 1) {
@@ -68,42 +67,36 @@ export default class Calendar extends Component {
 
         let rows = distribute(dates, 7);
 
+        let editorYear = iGet(data, "yearEditor.value")
+
         return (
             <Row>
                 <Column>
                     <Row>
                         <Column>
                             <SelectEditor
-                                rows={4}
-                                cols={3}
-                                label="Mese"
-                                page={0}
-                                visible={iGet(data, "monthEditor.visible")}
-                                id={value => MONTHS.indexOf(value)}
-                                options={MONTHS}
-                                value={iGet(data, "monthEditor.value")}
-                                onSelect={value => monthActionsProvider.onSelectMonth(value)}
-                                onDeselect={value => monthActionsProvider.onSelectMonth(null)}
-                                onShowModal={() => monthActionsProvider.onStartMonthEditing()}
-
-                                onAbort={monthActionsProvider.onAbortMonthEditing}
-                                onConfirm={result => monthActionsProvider.onConfirmMonthEditing(result)}
+                                options={{
+                                    label: 'Mese',
+                                    rows: 4,
+                                    cols: 3,
+                                    id: value => MONTHS.indexOf(value),
+                                    values: MONTHS,
+                                    value: month,
+                                    callback: result => monthActionsProvider.confirmMonth(result)
+                                }}
                             />
                         </Column>
                     </Row>
                     <Row topSpaced>
                         <Column>
                             <IntegerEditor
-                                uuid="calendar_year"
-                                label="Anno"
-                                visible={iGet(data, "yearEditor.visible")}
-                                text={iGet(data, "yearEditor.text")}
-                                onShowModal={() => yearActionsProvider.onStartDayEditing()}
-                                onChar={char => yearActionsProvider.onDayChar(char)}
-                                onChange={text => yearActionsProvider.onDayChange(text)}
-
-                                onConfirm={result => yearActionsProvider.onConfirmDayEditing(result)}
-                                onAbort={yearActionsProvider.onAbortDayEditing}
+                                options={{
+                                    label: 'Anno',
+                                    value: year,
+                                    min: 1999,
+                                    max: 2100,
+                                    callback: result => yearActionsProvider.confirmYear(result)
+                                }}
                             />
                         </Column>
                     </Row>

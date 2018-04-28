@@ -77,9 +77,9 @@ export default class Scrollable extends Component {
     updatePosition() {
         let children = global.$("#" + this.state.uuid);
         let parent = children.parent();
-        if(this.state.scrollbarNeeded) {
+        if (this.state.scrollbarNeeded) {
             children.css('top', (this.state.percent * (parent.height() - children.height())) + "px");
-        }else{
+        } else {
             children.css('top', "0");
         }
     }
@@ -91,11 +91,13 @@ export default class Scrollable extends Component {
                     {this.props.children}
                 </div>
             </Column>
-            <ScrollBar
-                visible={this.state.scrollbarNeeded}
-                percent={this.state.percent}
-                onScroll={(percent) => this.onScroll(percent)}
-            />
+            <Column auto>
+                <ScrollBar
+                    visible={this.state.scrollbarNeeded}
+                    percent={this.state.percent}
+                    onScroll={(percent) => this.onScroll(percent)}
+                />
+            </Column>
         </div>;
     }
 

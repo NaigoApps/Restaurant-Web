@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Button from "./Button";
-import applicationActions from "../actions/ApplicationActions";
+import {ApplicationActions} from "../actions/ApplicationActions";
 
 export default class NavElementLink extends Component {
     constructor(props) {
@@ -19,7 +19,7 @@ export default class NavElementLink extends Component {
     }
 
     goToPage(page){
-        applicationActions.goToPage(page);
+        ApplicationActions.goToPage(page);
     }
 
     render() {

@@ -33,7 +33,6 @@ export default class FloatInput extends Component {
                     <Row>
                         <Column>
                             <input
-                                id={this.props.uuid}
                                 className="form-control"
                                 placeholder={placeholder}
                                 type="text"
@@ -42,8 +41,8 @@ export default class FloatInput extends Component {
                                 onChange={evt => this.onChange(evt)}/>
                         </Column>
                     </Row>
-                    <Row topSpaced>
-                        <Column>
+                    <Row justify="center" topSpaced>
+                        <Column auto>
                             <KeyPad
                                 disabled={disabled}
                                 onCharAction={this.onChar.bind(this)}/>

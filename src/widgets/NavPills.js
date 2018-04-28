@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Row from "./Row";
 
 export default class NavPills extends Component {
     constructor(props) {
@@ -7,9 +8,9 @@ export default class NavPills extends Component {
 
     render() {
         return (
-            <ul className="nav nav-pills">
+            <Row>
                 {this.props.children}
-            </ul>
+            </Row>
         );
     }
 

@@ -8,12 +8,14 @@ import WaitersPage from "./pages/waiters/WaitersPage";
 import MenuPage from "./pages/menu/MenuPage";
 import AdditionsPage from "./pages/additions/AdditionsPage";
 import CustomersPage from "./pages/customers/CustomersPage";
-import EveningPage from "./pages/evening/EveningPage";
+import EveningPage from "./pages/eveningsEditing/EveningPage";
 import applicationStore from "./stores/ApplicationStore";
-import eveningSelectorStore from "./pages/evening/eveningSelector/EveningSelectorStore";
-import diningTablesEditingStore from "./pages/evening/diningTablesEditing/DiningTableEditorStore";
-import ordinationEditingStore from "./pages/evening/diningTablesEditing/ordinationsEditing/OrdinationEditingStore";
-import ordersEditingStore from "./pages/evening/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
+import eveningSelectorStore from "./pages/eveningsEditing/eveningSelector/EveningSelectorStore";
+import diningTablesEditingStore from "./pages/eveningsEditing/diningTablesEditing/DiningTableEditorStore";
+import ordinationEditingStore from "./pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationEditingStore";
+import ordersEditingStore from "./pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
+import diningTableClosingStore
+    from "./pages/eveningsEditing/diningTablesEditing/diningTableClosing/DiningTableClosingStore";
 
 const {Map} = require('immutable');
 
@@ -59,6 +61,7 @@ class App extends Component {
         console.log("Requiring " + diningTablesEditingStore.getFeatureName());
         console.log("Requiring " + ordinationEditingStore.getFeatureName());
         console.log("Requiring " + ordersEditingStore.getFeatureName());
+        console.log("Requiring " + diningTableClosingStore.getFeatureName());
     }
 
     componentDidMount() {

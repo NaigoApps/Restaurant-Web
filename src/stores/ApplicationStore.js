@@ -1,8 +1,8 @@
 import AbstractStore from "./RootFeatureStore";
-import {
-    ACT_DISMISS_FULL_SCREEN, ACT_GO_TO_PAGE, ACT_GOTO_FULLSCREEN, ACT_REQUEST_FULL_SCREEN,
-    ACT_TOGGLE_FULL_SCREEN
-} from "../actions/ActionTypes";
+import {ApplicationActionTypes} from "../actions/ApplicationActions";
+import StoresUtils from "../pages/StoresUtils";
+
+const {Map} = require('immutable');
 
 export const EVT_APPLICATION_STORE_CHANGED = "EVT_APPLICATION_STORE_CHANGED";
 
@@ -12,23 +12,68 @@ class ApplicationStore extends AbstractStore {
         super(EVT_APPLICATION_STORE_CHANGED);
         this.isFullScreen = false;
         this.currentPage = null;
+        this.keyboardVisible = false;
+        this.floatInput = Map();
+        this.integerInput = Map();
+        this.selectInput = Map();
     }
 
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            //FIXME
-            case ACT_TOGGLE_FULL_SCREEN:
-                // this.isFullScreen = !this.isFullScreen;
+            case ApplicationActionTypes.TOGGLE_FULL_SCREEN:
+                this.isFullScreen = !this.isFullScreen;
                 break;
-            case ACT_REQUEST_FULL_SCREEN:
-                // this.isFullScreen = true;
+            case ApplicationActionTypes.REQUEST_FULL_SCREEN:
+                this.isFullScreen = true;
                 break;
-            case ACT_DISMISS_FULL_SCREEN:
-                // this.isFullScreen = false;
+            case ApplicationActionTypes.DISMISS_FULL_SCREEN:
+                this.isFullScreen = false;
                 break;
-            case ACT_GO_TO_PAGE:
+            case ApplicationActionTypes.GO_TO_PAGE:
                 this.currentPage = action.body;
+                break;
+            case ApplicationActionTypes.SET_KEYBOARD_VISIBLE:
+                this.keyboardVisible = action.body;
+                break;
+
+            case ApplicationActionTypes.SHOW_FLOAT_INPUT:
+                this.floatInput = StoresUtils.initFloatInput(action.body.value, action.body.callback, action.body.label);
+                break;
+            case ApplicationActionTypes.FLOAT_INPUT_CHAR:
+                this.floatInput = StoresUtils.floatChar(this.floatInput, action.body);
+                break;
+            case ApplicationActionTypes.FLOAT_INPUT_CHANGE:
+                this.floatInput = StoresUtils.floatChange(this.floatInput, action.body);
+                break;
+            case ApplicationActionTypes.HIDE_FLOAT_INPUT:
+                this.floatInput = StoresUtils.resetFloatInput();
+                break;
+
+            case ApplicationActionTypes.SHOW_INTEGER_INPUT:
+                this.integerInput = StoresUtils.initIntInput(action.body);
+                break;
+            case ApplicationActionTypes.INTEGER_INPUT_CHAR:
+                this.integerInput = StoresUtils.intChar(this.integerInput, action.body);
+                break;
+            case ApplicationActionTypes.INTEGER_INPUT_CHANGE:
+                this.integerInput = StoresUtils.intChange(this.integerInput, action.body);
+                break;
+            case ApplicationActionTypes.HIDE_INTEGER_INPUT:
+                this.integerInput = StoresUtils.resetIntInput();
+                break;
+
+            case ApplicationActionTypes.SHOW_SELECT_INPUT:
+                this.selectInput = StoresUtils.initSelectInput(action.body);
+                break;
+            case ApplicationActionTypes.SELECT_INPUT_CHANGE:
+                this.selectInput = StoresUtils.selectChange(this.selectInput, action.body);
+                break;
+            case ApplicationActionTypes.SELECT_INPUT_PAGE_CHANGE:
+                this.selectInput = StoresUtils.selectPageChange(this.selectInput, action.body);
+                break;
+            case ApplicationActionTypes.HIDE_SELECT_INPUT:
+                this.selectInput = StoresUtils.resetSelectInput(this.selectInput);
                 break;
             default:
                 changed = false;
@@ -40,7 +85,11 @@ class ApplicationStore extends AbstractStore {
     getState(){
         return {
             fullScreen: this.isFullScreen,
-            currentPage: this.currentPage
+            currentPage: this.currentPage,
+            keyboardVisible: this.keyboardVisible,
+            floatInput: this.floatInput,
+            integerInput: this.integerInput,
+            selectInput: this.selectInput,
         };
     }
 

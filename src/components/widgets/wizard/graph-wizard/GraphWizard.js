@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import graphWizardStore from "./GraphWizardStore";
 import graphWizardActions from "./GraphWizardActions";
 import Button from "../../../../widgets/Button";
 import GraphWizardPage from "./GraphWizardPage";
@@ -80,19 +79,12 @@ export default class GraphWizard extends Component {
         this.setState((prevState, props) => (state.get(prevState.uuid)));
     }
 
-    movePage(pageProps) {
-        graphWizardActions.movePage(this.state.uuid, pageProps.identifier);
-        if (pageProps.onEnter) {
-            pageProps.onEnter(this.state.uuid, this.state.data);
-        }
-    }
-
     pagesNumber() {
         return React.Children.count(this.props.children);
     }
 
     render() {
-        if(!this.props.auto) {
+        if (!this.props.auto) {
             if (this.props.hideForm) {
                 return <div className="form-horizontal">
                     {this.buildModal()}
@@ -149,19 +141,13 @@ export default class GraphWizard extends Component {
 
         const currentPage = React.Children.toArray(pages).find(page => page.props.identifier === pageName);
 
-        let review;
-        if (!this.props.hideReview) {
-            let value = this.props.renderer(this.state.data);
-            review = <div className="well well-sm text-left">
-                {value}
-            </div>
-        }
+        const final = currentPage && currentPage.props.final;
 
         let nav = React.Children.map(this.props.children, (child) => {
             return <NavElement
                 text={child.props.name}
-                active={this.state.page === child.props.identifier}
-                commitAction={this.movePage.bind(this, child.props)}
+                active={pageName === child.props.identifier}
+                commitAction={() => this.props.onMovePage(child.props.identifier)}
                 disabled={child.props.canEnter ? !child.props.canEnter(this.state.data) : false}
             />;
         });
@@ -175,6 +161,13 @@ export default class GraphWizard extends Component {
             </div>;
         }
 
+        let buttons;
+        if (final) {
+            buttons = <Row justify="center">
+                {this.buildAbortButton()}{this.buildConfirmButton()}
+            </Row>;
+        }
+
         return <Modal visible={this.props.visible || this.state.open} lg={this.props.size === "lg"}
                       onModalShown={() => this.cssUpdate()}
                       onModalHidden={() => this.cssUpdate()}>
@@ -186,12 +179,7 @@ export default class GraphWizard extends Component {
             </div>
             <div className="modal-footer">
                 <Column>
-                    <Row>
-                        {review}
-                    </Row>
-                    <Row justify="center">
-                        {this.buildAbortButton()}{this.buildConfirmButton()}
-                    </Row>
+                    {buttons}
                 </Column>
             </div>
         </Modal>

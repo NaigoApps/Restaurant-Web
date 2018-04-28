@@ -80,15 +80,12 @@ export default class PrinterEditor extends React.Component {
     static buildLineCharactersEditor(editorData, actionsProvider, printer){
         return <IntegerEditor
             key="lcs"
-            uuid="printer_editor_lcs"
-            label="Lunghezza riga"
-            visible={iGet(editorData, "editor.lineCharacters.visible")}
-            text={iGet(editorData, "editor.lineCharacters.text")}
-            onShowModal={() => printersEditorActions.onStartLineCharactersEditing()}
-            onChar={char => printersEditorActions.onLineCharactersChar(char)}
-
-            onConfirm={result => actionsProvider.onConfirmLineCharactersEditing(iGet(printer, "uuid"), result)}
-            onAbort={actionsProvider.onAbortLineCharactersEditing}
+            options={{
+                label: "Lunghezza riga",
+                value: printer.get('lineCharacters'),
+                min: 1,
+                callback: result => actionsProvider.onConfirmLineCharactersEditing(printer.get('uuid'), result)
+            }}
         />;
     }
 

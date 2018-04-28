@@ -1,23 +1,18 @@
 import {
-    ACT_ABORT_ENTITY_EDITING,
-    ACT_ASK_SELECTED_EVENING,
-    ACT_CREATE_BILL,
-    ACT_CREATE_DINING_TABLE,
-    ACT_CREATE_ORDINATION,
     ACT_DELETE_BILL,
-    ACT_DELETE_DINING_TABLE, ACT_DELETE_ORDINATION, ACT_DESELECT_EVENING,
-    ACT_EDIT_ORDINATION,
-    ACT_PRINT_ORDINATION, ACT_PRINT_PARTIAL_BILL,
-    ACT_SELECT_EVENING,
-    ACT_UPDATE_DINING_TABLE,
-    ACT_UPDATE_EVENING,
+    ACT_DELETE_DINING_TABLE,
+    ACT_DELETE_ORDINATION,
     ACT_UPDATE_ORDINATION
 } from "../actions/ActionTypes";
 import {STATUSES} from "./LazyData";
 import AbstractEntityStore from "./generic/AbstractEntityStore";
 import {findIndexByUuid} from "../utils/Utils";
-import {ACT_EVENING_EDITOR_CC_CONFIRM} from "../pages/evening/EveningEditorActionTypes";
-import {Actions} from "../pages/evening/diningTablesEditing/DiningTablesEditingActions";
+import {OrdinationCreatorActionTypes} from "../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationsCreatorActions";
+import {OrdinationEditorActionTypes} from "../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
+import {EveningEditingActionTypes} from "../pages/eveningsEditing/EveningEditorActions";
+import {EveningSelectorActionTypes} from "../pages/eveningsEditing/eveningSelector/EveningSelectorActions";
+import {DiningTablesEditorActionTypes} from "../pages/eveningsEditing/diningTablesEditing/DiningTablesEditorActions";
+import {DiningTablesClosingActionTypes} from "../pages/eveningsEditing/diningTablesEditing/diningTableClosing/DiningTablesClosingActions";
 
 const {fromJS} = require('immutable');
 
@@ -35,8 +30,8 @@ class EveningStore extends AbstractEntityStore {
     handleStartedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_SELECT_EVENING:
-            case ACT_ASK_SELECTED_EVENING:
+            case EveningSelectorActionTypes.CHOOSE:
+            // case ACT_ASK_SELECTED_EVENING:
                 this.setStatus(STATUSES.LOADING);
                 break;
             default:
@@ -49,26 +44,20 @@ class EveningStore extends AbstractEntityStore {
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_SELECT_EVENING:
-            case ACT_ASK_SELECTED_EVENING:
+            case EveningSelectorActionTypes.CHOOSE:
+            case EveningEditingActionTypes.GET_SELECTED:
+            case DiningTablesEditorActionTypes.MERGE_DINING_TABLE:
                 this.setData([action.body]);
                 this.setStatus(STATUSES.LOADED);
                 this.sortTables();
                 break;
-            case ACT_DESELECT_EVENING:
+            case EveningEditingActionTypes.DESELECT:
                 this.setData([]);
                 break;
-            // case ACT_ABORT_ENTITY_EDITING:
-            //     if (action.body === EVENING_TYPE) {
-            //         this.setData([]);
-            //         this.setStatus(STATUSES.LOADED);
-            //     }
-            //     break;
-            case ACT_EVENING_EDITOR_CC_CONFIRM:
-            case ACT_UPDATE_EVENING:
+            case EveningEditingActionTypes.CONFIRM_COVER_CHARGE_EDITING:
                 this.updateData(action.body);
                 break;
-            case Actions.CREATE_DINING_TABLE: {
+            case DiningTablesEditorActionTypes.CREATE_DINING_TABLE: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
                     let tables = evening.getPayload().get('diningTables');
@@ -78,7 +67,7 @@ class EveningStore extends AbstractEntityStore {
                 }
                 break;
             }
-            case ACT_DELETE_DINING_TABLE: {
+            case DiningTablesEditorActionTypes.DELETE_DINING_TABLE: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
                     let diningTables = evening.getPayload().get('diningTables');
@@ -87,24 +76,31 @@ class EveningStore extends AbstractEntityStore {
                 }
                 break;
             }
-            case ACT_CREATE_ORDINATION: {
+            case OrdinationCreatorActionTypes.CREATE_ORDINATION: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
-                    let diningTableIndex = findIndexByUuid(evening.getPayload().get('diningTables'), action.body.get(0).get('uuid'));
+                    let diningTableIndex = findIndexByUuid(evening.getPayload().get('diningTables'), action.body.get('table'));
                     if (diningTableIndex !== -1) {
-                        let diningTable = action.body.get(0);
-                        let newEvening = evening.getPayload().updateIn(['diningTables'], tables =>
-                            tables.splice(diningTableIndex, 1, diningTable));
+                        let diningTable = evening.getPayload().get('diningTables').get(diningTableIndex);
+                        diningTable = diningTable.set('ordinations', diningTable.get('ordinations').push(action.body));
+                        let tables = evening.getPayload().get('diningTables');
+                        tables = tables.splice(diningTableIndex, 1);
+                        tables = tables.push(diningTable);
+                        let newEvening = evening.getPayload().set('diningTables', tables);
                         this.updateData(newEvening);
+                        this.sortTables();
                     }
                 }
                 break;
             }
-            case ACT_DELETE_BILL:
-            case ACT_CREATE_BILL:
-            case ACT_PRINT_PARTIAL_BILL:
-            case ACT_DELETE_ORDINATION:
-            case ACT_UPDATE_DINING_TABLE: {
+            case DiningTablesClosingActionTypes.DELETE_BILL:
+            case DiningTablesClosingActionTypes.CONFIRM_CLOSING:
+            case OrdinationEditorActionTypes.DELETE_ORDINATION:
+            case DiningTablesEditorActionTypes.CONFIRM_CCS:
+            case DiningTablesEditorActionTypes.CONFIRM_WAITER:
+            case DiningTablesEditorActionTypes.CONFIRM_TABLE:
+            case DiningTablesEditorActionTypes.PRINT_PARTIAL_BILL:
+            case ACT_DELETE_ORDINATION: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
                     let diningTableIndex = findIndexByUuid(evening.getPayload().get('diningTables'), action.body.get('uuid'));
@@ -114,7 +110,8 @@ class EveningStore extends AbstractEntityStore {
                 }
                 break;
             }
-            case ACT_PRINT_ORDINATION:
+            case OrdinationEditorActionTypes.PRINT_ORDINATION:
+            case OrdinationEditorActionTypes.UPDATE_ORDERS:
             case ACT_UPDATE_ORDINATION: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
@@ -125,6 +122,25 @@ class EveningStore extends AbstractEntityStore {
                         if (ordinationIndex !== -1) {
                             let ordinations = diningTable.get('ordinations').splice(ordinationIndex, 1, action.body);
                             diningTable = diningTable.set('ordinations', ordinations);
+                            let newEvening = evening.getPayload().updateIn(['diningTables'], tables =>
+                                tables.splice(diningTableIndex, 1, diningTable));
+                            this.updateData(newEvening);
+                        }
+                    }
+                }
+
+                break;
+            }
+            case DiningTablesClosingActionTypes.PRINT_BILL: {
+                let evening = this.getSingleData();
+                if (evening.isLoaded()) {
+                    let diningTableIndex = findIndexByUuid(evening.getPayload().get('diningTables'), action.body.get('table'));
+                    if (diningTableIndex !== -1) {
+                        let diningTable = evening.getPayload().get('diningTables').get(diningTableIndex);
+                        let billIndex = findIndexByUuid(diningTable.get('bills'), action.body.get('uuid'));
+                        if (billIndex !== -1) {
+                            let bills = diningTable.get('bills').splice(billIndex, 1, action.body);
+                            diningTable = diningTable.set('bills', bills);
                             let newEvening = evening.getPayload().updateIn(['diningTables'], tables =>
                                 tables.splice(diningTableIndex, 1, diningTable));
                             this.updateData(newEvening);

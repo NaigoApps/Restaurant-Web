@@ -1,15 +1,22 @@
 import React, {Component} from 'react';
 import {SIZES} from "./RestaurantNav";
-import FullPageLink from "../widgets/FullPageLink";
 import Row from "../widgets/Row";
 import Column from "../widgets/Column";
 import {ADDITIONS, CUSTOMERS, LOCATIONS, MENU, PRINTERS, TABLES, WAITERS} from "../App";
+import Button from "../widgets/Button";
+import {ApplicationActions} from "../actions/ApplicationActions";
 
 export default class RestaurantSettingsNav extends Component {
 
     constructor() {
         super();
     }
+
+    goToPage(page) {
+        ApplicationActions.requestFullScreen();
+        ApplicationActions.goToPage(page);
+    }
+
 
     linkClass(link) {
         let classes = ["home-link"];
@@ -25,27 +32,27 @@ export default class RestaurantSettingsNav extends Component {
                 <Column>
                     <Row grow>
                         <Column>
-                            <FullPageLink page={PRINTERS} icon="print" text="Stampanti"/>
+                            <Button icon="print" text="Stampanti" commitAction={() => this.goToPage(PRINTERS)}/>
                         </Column>
                         <Column>
-                            <FullPageLink page={LOCATIONS} icon="print" text="Postazioni"/>
+                            <Button page={LOCATIONS} icon="print" text="Postazioni"/>
                         </Column>
                         <Column>
-                            <FullPageLink page={TABLES} icon="sun-o" text="Tavoli"/>
+                            <Button page={TABLES} icon="sun-o" text="Tavoli"/>
                         </Column>
                         <Column>
-                            <FullPageLink page={WAITERS} icon="male" text="Camerieri"/>
+                            <Button page={WAITERS} icon="male" text="Camerieri"/>
                         </Column>
                     </Row>
                     <Row grow topSpaced>
                         <Column>
-                            <FullPageLink page={MENU} icon="cutlery" text="Menu"/>
+                            <Button page={MENU} icon="cutlery" text="Menu"/>
                         </Column>
                         <Column>
-                            <FullPageLink page={ADDITIONS} icon="sliders" text="Varianti"/>
+                            <Button page={ADDITIONS} icon="sliders" text="Varianti"/>
                         </Column>
                         <Column>
-                            <FullPageLink page={CUSTOMERS} icon="male" text="Clienti"/>
+                            <Button page={CUSTOMERS} icon="male" text="Clienti"/>
                         </Column>
                     </Row>
                 </Column>

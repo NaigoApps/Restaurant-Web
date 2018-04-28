@@ -1,5 +1,10 @@
-html{
+html {
     font-size: 16px;
+}
+
+.navbar {
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .top-sep {
@@ -10,82 +15,49 @@ html{
     margin-left: 10px;
 }
 
-.keyboard-character {
-    display: inline-block;
-    padding-left: 0;
-    padding-right: 0;
+/* KEYBOARD */
+
+.btn:not(.high-padding) {
+    padding: 0 .5rem;
 }
 
-.keyboard-character.xs {
-    width: 6.25%;
-    min-width: 60px;
+.keyboard-character .btn {
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
-.keyboard-character.xs.reduced {
-    width: 5%;
-    min-width: 50px;
+.keyboard .keyboard-character.xxs {
+    flex-grow: 1;
 }
 
-.keyboard-character.sm {
-    width: 9.375%;
-    min-width: 90px;
+.keyboard .keyboard-character.xs {
+    flex-grow: 2;
 }
 
-.keyboard-character.sm.reduced {
-    width: 7.5%;
-    min-width: 75px;
+.keyboard .keyboard-character.sm {
+    flex-grow: 4;
 }
 
-.keyboard-character.md {
-    width: 12.5%;
-    min-width: 120px;
+.keyboard .keyboard-character.md {
+    flex-grow: 8;
 }
 
-.keyboard-character.md.reduced {
-    width: 10%;
-    min-width: 100px;
+.keyboard .keyboard-character.lg {
+    flex-grow: 16;
 }
 
-.keyboard-character.lg {
-    width: 25%;
-    min-width: 240px;
-}
-
-.keyboard-character.lg.reduced {
-    width: 20%;
-    min-width: 200px;
-}
-
-.keyboard-character.space {
-    width: 31.25%;
-    min-width: 300px;
-}
-
-.keyboard-character.space.reduced {
-    width: 25%;
-    min-width: 250px;
-}
-
-.editor-body {
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-.clickable {
-    cursor: pointer;
+.keyboard .keyboard-character.space {
+    flex-grow: 32;
 }
 
 .container-fluid.main {
     height: 100vh;
-    margin: 0 15px;
+    margin: 0;
+    padding: 5px 10px;
 }
 
 .icon-size-big {
     font-size: 80pt;
-}
-
-.btn {
-    white-space: normal;
 }
 
 .btn.touch, .touch {
@@ -108,28 +80,23 @@ html{
     vertical-align: middle;
 }
 
-.btn-group-vertical-justified {
-    width: 100%;
+.modal {
+    padding: 5px !important;
 }
 
-@media (min-width: 1200px) {
-    .modal-lg {
-        max-width: 98%;
-        width: 98%;
-        margin: 0 1%;
-        height: 98%;
-        top: 1%;
-    }
+.modal-dialog.modal-lg {
+    max-width: none;
+    margin: 0;
+    height: 100%;
 }
 
-@media (min-width: 992px) {
-    .modal-lg {
-        max-width: 98%;
-        width: 98%;
-        margin: 0 1%;
-        height: 98%;
-        top: 1%;
-    }
+.modal-content {
+    height: 100%;
+}
+
+.modal-body {
+    flex-grow: 1;
+    padding: 5px;
 }
 
 a[disabled] {
@@ -164,11 +131,12 @@ a.button-link {
 .draggable-content {
     position: absolute;
     width: 100%;
-    padding-right: 44px;
+    padding-right: 5px;
 }
 
 .scrollbar {
     background-color: #FFFFFF;
+    height: 100%;
     width: 46px;
     position: relative;
     border-radius: 4px;
@@ -193,18 +161,6 @@ a.button-link {
     padding-bottom: 15px;
 }
 
-.modal-content {
-    height: 100%;
-}
-
-.modal-body {
-    flex-grow: 1;
-}
-
-.full-height {
-    height: 100%;
-}
-
 .grid-button {
     width: 100%;
     height: 100%;
@@ -225,39 +181,54 @@ a.button-link {
     border: 1px solid #cccccc;
 }
 
-.nav-pills > .nav-item{
+.nav-pills > .nav-item {
     margin-right: 5px;
 }
 
-.switch-container{
+.switch-container {
     padding: 0.2rem 2rem 0.2rem 0.2rem;
-    border-radius: 1.3rem;
+    border-radius: 1.4rem;
     transition: padding 0.25s;
 }
 
-.switch-container.checked{
+.switch-container.checked {
     padding: 0.2rem 0.2rem 0.2rem 2rem;
 }
 
-.switch-container .btn{
+.switch-container .btn {
     height: 2.6rem;
+    width: 2.6rem;
     border-radius: 1.3rem;
 }
 
-.card{
+.card {
     background-color: #f7f7f7;
 }
 
-body{
+body {
     background-color: #f7f7f7;
 }
 
-.btn{
-    height: 3rem;
+.full-height {
+    height: 100%;
+}
+
+.btn {
+    white-space: normal;
+    min-height: 48px;
+    height: 48px;
     line-height: 1.0rem;
     font-size: 1.0rem;
     padding-top: 0;
     padding-bottom: 0;
+}
+
+.btn:not(.keyboard-character .btn) {
+    min-width: 48px;
+}
+
+.btn.fill {
+    height: 100%;
 }
 
 .button-padding {
@@ -270,4 +241,52 @@ body{
     padding: .75rem 1.5rem;
     font-size: 2.00rem;
     border-radius: .3rem;
+}
+
+.col:not(.high-padding) {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.row:not(.under-nav) {
+    margin-left: -5px;
+    margin-right: -5px;
+}
+
+.row.of-list {
+    padding-top: 5px;
+}
+
+.popup-container {
+    position: fixed;
+    padding-bottom: 10px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5000;
+    background-color: rgba(255, 255, 255, 0);
+    visibility: hidden;
+}
+
+.popup-content-container {
+    position: absolute;
+    bottom: 0;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: white;
+    border: 1px solid rgb(204, 204, 204);
+    z-index: 5010;
+    min-width: 500px;
+}
+
+.btn.round {
+    padding: 40px;
+    border-radius: 50%;
+}
+
+/*BGS*/
+
+.bg-orange {
+    background-color: #eb9316 !important;
 }

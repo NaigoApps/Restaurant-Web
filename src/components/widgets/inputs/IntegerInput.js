@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import IntKeyPad from "../IntKeyPad";
 import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
+import KeyboardButton, {SIZES} from "./KeyboardButton";
 
 const {Map} = require('immutable');
 
@@ -11,13 +12,13 @@ export default class IntegerInput extends Component {
     }
 
     onChar(char) {
-        if(this.props.onChar) {
+        if (this.props.onChar) {
             this.props.onChar(char);
         }
     }
 
     onChange(evt) {
-        if(this.props.onChange) {
+        if (this.props.onChange) {
             this.props.onChange(evt.target.value);
         }
     }
@@ -42,11 +43,11 @@ export default class IntegerInput extends Component {
                                 onChange={data => this.onChange(data)}/>
                         </Column>
                     </Row>
-                    <Row topSpaced>
-                        <Column>
+                    <Row justify="center" ofList>
+                        <Column auto>
                             <IntKeyPad
                                 disabled={disabled}
-                                onCharAction={this.onChar.bind(this)}/>
+                                onCharAction={char => this.onChar(char)}/>
                         </Column>
                     </Row>
                 </Column>

@@ -18,7 +18,7 @@ class RequestBuilder {
         return url;
     }
 
-    get(action, resource, params, topics) {
+    get(action, resource, params) {
         if (params) {
             resource += this.buildParams(params);
         }
@@ -34,12 +34,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result), topics);
+                            dispatcher.fireEnd(action, fromJS(result));
                             resolve(fromJS(result));
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result, topics);
+                            dispatcher.fireEnd(action, result);
                             resolve(result);
                         });
                     }
@@ -56,7 +56,7 @@ class RequestBuilder {
         })
     }
 
-    post(action, resource, target, topics) {
+    post(action, resource, target) {
         dispatcher.fireStart(action);
 
         return new Promise((resolve, reject) => {
@@ -76,12 +76,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result), topics);
+                            dispatcher.fireEnd(action, fromJS(result));
                             resolve(fromJS(result));
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result, topics);
+                            dispatcher.fireEnd(action, result);
                             resolve(result);
                         });
                     }
@@ -98,7 +98,7 @@ class RequestBuilder {
         })
     }
 
-    put(action, resource, target, params, topics) {
+    put(action, resource, target, params) {
         dispatcher.fireStart(action);
 
         if (params) {
@@ -122,12 +122,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result), topics);
+                            dispatcher.fireEnd(action, fromJS(result));
                             resolve(fromJS(result));
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result, topics);
+                            dispatcher.fireEnd(action, result);
                             resolve(result);
                         });
                     }
@@ -145,7 +145,7 @@ class RequestBuilder {
 
     }
 
-    remove(action, resource, target, topics) {
+    remove(action, resource, target) {
         dispatcher.fireStart(action);
 
         return new Promise((resolve, reject) => {
@@ -165,12 +165,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result), topics);
+                            dispatcher.fireEnd(action, fromJS(result));
                             resolve(fromJS(result));
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result, topics);
+                            dispatcher.fireEnd(action, result);
                             resolve(result);
                         });
                     }

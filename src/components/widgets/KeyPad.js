@@ -45,13 +45,13 @@ export default class KeyPad extends Component {
                 <Row justify="center">
                     {n1}
                 </Row>
-                <Row justify="center">
+                <Row justify="center" ofList>
                     {n2}
                 </Row>
-                <Row justify="center">
+                <Row justify="center" ofList>
                     {n3}
                 </Row>
-                <Row justify="center">
+                <Row justify="center" ofList>
                     {n4}
                     <KeyboardButton disabled={disabled} char="C" size={SIZES.XSMALL}
                                     onClick={this.onDelClick.bind(this)}/>
