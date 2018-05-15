@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`basic button 1`] = `
+<button
+  className="btn btn-secondary"
+  disabled={false}
+  onClick={[Function]}
+  type="button"
+>
+   
+</button>
+`;
+
+exports[`disabled button 1`] = `
+<button
+  className="btn btn-secondary"
+  disabled={true}
+  onClick={[Function]}
+  type="button"
+>
+   
+</button>
+`;
+
+exports[`icon button 1`] = `
+<button
+  className="btn btn-secondary"
+  disabled={false}
+  onClick={[Function]}
+  type="button"
+>
+   
+  <span
+    className="fa fa-ICON"
+  />
+</button>
+`;
+
+exports[`text button 1`] = `
+<button
+  className="btn btn-secondary"
+  disabled={false}
+  onClick={[Function]}
+  type="button"
+>
+  TEST
+   
+</button>
+`;
