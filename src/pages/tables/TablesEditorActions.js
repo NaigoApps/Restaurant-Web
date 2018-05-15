@@ -1,30 +1,46 @@
-import {
-    ACT_BEGIN_CREATE_RESTAURANT_TABLE, ACT_DELETE_RESTAURANT_TABLE,
-    ACT_DESELECT_RESTAURANT_TABLE,
-    ACT_SELECT_RESTAURANT_TABLE, ACT_UPDATE_RESTAURANT_TABLE
-} from "../../actions/ActionTypes"
+import {ACT_DELETE_RESTAURANT_TABLE} from "../../actions/ActionTypes"
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
-class TablesEditorActions {
+export const TablesEditorActionTypes = {
+    SELECT_R_TABLE_PAGE: "SELECT_R_TABLE_PAGE",
+    SELECT_EDITING_R_TABLE: "SELECT_EDITING_R_TABLE",
+    DESELECT_EDITING_R_TABLE: "DESELECT_EDITING_R_TABLE",
+    UPDATE_R_TABLE: "UPDATE_R_TABLE",
+    DELETE_EDITING_R_TABLE: "DELETE_EDITING_R_TABLE",
+};
 
-    selectTable(table) {
-        dispatcher.fireEnd(ACT_SELECT_RESTAURANT_TABLE, table);
-    }
+export const TablesEditorActions = {
 
-    deselectTable(){
-        dispatcher.fireEnd(ACT_DESELECT_RESTAURANT_TABLE);
-    }
+    selectTable: (table) =>
+        dispatcher.fireEnd(
+            TablesEditorActionTypes.SELECT_EDITING_R_TABLE,
+            table
+        ),
 
-    updateTableName(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_RESTAURANT_TABLE, 'restaurant-tables/' + uuid + '/name', value);
-    }
+    selectTablePage: page =>
+        dispatcher.fireEnd(
+            TablesEditorActionTypes.SELECT_R_TABLE_PAGE,
+            page
+        ),
 
-    deleteTable(uuid) {
-        asyncActionBuilder.remove(ACT_DELETE_RESTAURANT_TABLE, 'restaurant-tables', uuid);
-    }
+    deselectTable: () =>
+        dispatcher.fireEnd(
+            TablesEditorActionTypes.DESELECT_EDITING_R_TABLE
+        ),
 
-}
+    confirmName: (uuid, value) =>
+        asyncActionBuilder.put(
+            TablesEditorActionTypes.UPDATE_R_TABLE,
+            'restaurant-tables/' + uuid + '/name',
+            value
+        ),
 
-const tablesEditorActions = new TablesEditorActions();
-export default tablesEditorActions;
+    onDelete: (uuid) =>
+        asyncActionBuilder.remove(
+            TablesEditorActionTypes.DELETE_EDITING_R_TABLE,
+            'restaurant-tables',
+            uuid
+        )
+
+};

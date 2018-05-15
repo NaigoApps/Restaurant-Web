@@ -1,6 +1,8 @@
 import {ACT_CREATE_WAITER, ACT_DELETE_WAITER, ACT_RETRIEVE_WAITERS, ACT_UPDATE_WAITER} from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
+import {WaitersCreatorActionTypes} from "../../pages/waiters/WaitersCreatorActions";
+import {WaitersEditorActions, WaitersEditorActionTypes} from "../../pages/waiters/WaitersEditorActions";
 
 export const EVT_WAITERS_STORE_CHANGED = "EVT_WAITERS_STORE_CHANGED";
 
@@ -41,17 +43,17 @@ class WaitersStore extends AbstractEntityStore {
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_CREATE_WAITER:
+            case WaitersCreatorActionTypes.CREATE_WAITER:
                 this.createData(action.body);
                 break;
             case ACT_RETRIEVE_WAITERS:
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;
-            case ACT_UPDATE_WAITER:
+            case WaitersEditorActionTypes.UPDATE_EDITING_WAITER:
                 this.updateData(action.body);
                 break;
-            case ACT_DELETE_WAITER:
+            case WaitersEditorActionTypes.DELETE_EDITING_WAITER:
                 this.deleteData(action.body);
                 break;
             default:

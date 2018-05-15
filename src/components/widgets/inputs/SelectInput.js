@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {distribute} from "../../../utils/Utils";
+import {distribute, uuid} from "../../../utils/Utils";
 import Row from "../../../widgets/Row";
 import ColumnSpace from "../../../widgets/ColumnSpace";
 import Column from "../../../widgets/Column";
@@ -96,21 +96,20 @@ export default class SelectInput extends Component {
                     return <Row key={rowIndex} ofList={rowIndex > 0}>{buttons}</Row>
                 });
 
-                while (rowsComps.length < rows) {
-                    rowsComps.push(
-                        <Row key={rowsComps.length} grow>
-                            <ColumnSpace/>
-                        </Row>);
-                }
-
                 return rowsComps;
             }
             return null;
         });
 
+        while (optionsList.length < rows) {
+            optionsList.push(
+                <Row key={optionsList.length + uuid()} grow ofList>
+                    <ColumnSpace/>
+                </Row>);
+        }
 
         return <Row>
-            <Column>
+            <Column bordered={this.props.bordered}>
                 <Row>
                     <Column>
                         {optionsList}

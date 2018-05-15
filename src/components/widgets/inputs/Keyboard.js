@@ -93,10 +93,12 @@ export default class Keyboard extends Component {
                 </Row>
                 <Row topSpaced>
                     <KeyboardButton icon="angle-left" size={SIZES.XXSMALL}
+                                    type="info"
                                     onClick={this.onLeftClick.bind(this)}/>
                     <KeyboardButton text="&nbsp;" char=" " size={SIZES.MEDIUM}
                                     onClick={this.onButtonClick.bind(this)}/>
                     <KeyboardButton icon="angle-right" size={SIZES.XXSMALL}
+                                    type="info"
                                     onClick={this.onRightClick.bind(this)}/>
                 </Row>
             </Column>

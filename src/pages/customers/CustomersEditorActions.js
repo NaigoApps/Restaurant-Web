@@ -1,66 +1,95 @@
-import {
-    ACT_ABORT_ENTITY_EDITING,
-    ACT_BEGIN_ENTITY_EDITING,
-    ACT_DELETE_CUSTOMER,
-    ACT_UPDATE_CUSTOMER
-} from "../../actions/ActionTypes"
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
 const {fromJS} = require('immutable');
 
-class CustomersEditorActions {
+export const CustomersEditorActionTypes = {
+    SELECT_EDITING_CUSTOMER: "SELECT_EDITING_CUSTOMER",
+    SELECT_EDITING_CUSTOMER_PAGE: "SELECT_EDITING_CUSTOMER_PAGE",
+    DESELECT_EDITING_CUSTOMER: "DESELECT_EDITING_CUSTOMER",
+    UPDATE_EDITING_CUSTOMER: "UPDATE_EDITING_CUSTOMER",
+    DELETE_EDITING_CUSTOMER: "DELETE_EDITING_CUSTOMER",
+};
 
-    selectCustomer(customer) {
-        //FIXME
-        // dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
-        //     type: CUSTOMER_TYPE,
-        //     entity: customer
-        // }));
-    }
+export const CustomersEditorActions = {
 
-    deselectCustomer(){
-        //FIXME
-        // dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, CUSTOMER_TYPE);
-    }
+    selectCustomer: (customer) =>
+        dispatcher.fireEnd(
+            CustomersEditorActionTypes.SELECT_EDITING_CUSTOMER,
+            customer
+        ),
 
-    updateCustomerName(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_CUSTOMER, 'customers/' + uuid + '/name', value);
-    }
+    selectCustomerPage: (page) =>
+        dispatcher.fireEnd(
+            CustomersEditorActionTypes.SELECT_EDITING_CUSTOMER_PAGE,
+            page
+        ),
 
-    updateCustomerSurname(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_CUSTOMER, 'customers/' + uuid + '/surname', value);
-    }
+    deselectCustomer: () =>
+        dispatcher.fireEnd(
+            CustomersEditorActionTypes.DESELECT_EDITING_CUSTOMER
+        ),
 
-    updateCustomerCf(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_CUSTOMER, 'customers/' + uuid + '/cf', value);
-    }
+    confirmName: (uuid, value) =>
+        asyncActionBuilder.put(
+            CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER,
+            'customers/' + uuid + '/name',
+            value
+        ),
 
-    updateCustomerPiva(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_CUSTOMER, 'customers/' + uuid + '/piva', value);
-    }
+    confirmSurname: (uuid, value) =>
+        asyncActionBuilder.put(
+            CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER,
+            'customers/' + uuid + '/surname',
+            value
+        ),
 
-    updateCustomerCity(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_CUSTOMER, 'customers/' + uuid + '/city', value);
-    }
+    confirmCf: (uuid, value) =>
+        asyncActionBuilder.put(
+            CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER,
+            'customers/' + uuid + '/cf',
+            value
+        ),
 
-    updateCustomerCap(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_CUSTOMER, 'customers/' + uuid + '/cap', value);
-    }
+    confirmPiva: (uuid, value) =>
+        asyncActionBuilder.put(
+            CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER,
+            'customers/' + uuid + '/piva',
+            value
+        ),
 
-    updateCustomerAddress(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_CUSTOMER, 'customers/' + uuid + '/address', value);
-    }
+    confirmCity: (uuid, value) =>
+        asyncActionBuilder.put(
+            CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER,
+            'customers/' + uuid + '/city',
+            value
+        ),
 
-    updateCustomerDistrict(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_CUSTOMER, 'customers/' + uuid + '/district', value);
-    }
+    confirmCap: (uuid, value) =>
+        asyncActionBuilder.put(
+            CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER,
+            'customers/' + uuid + '/cap',
+            value
+        ),
 
-    deleteCustomer(uuid) {
-        asyncActionBuilder.remove(ACT_DELETE_CUSTOMER, 'customers', uuid);
-    }
+    confirmAddress: (uuid, value) =>
+        asyncActionBuilder.put(
+            CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER,
+            'customers/' + uuid + '/address',
+            value
+        ),
 
-}
+    confirmDistrict: (uuid, value) =>
+        asyncActionBuilder.put(
+            CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER,
+            'customers/' + uuid + '/district',
+            value
+        ),
 
-const customersEditorActions = new CustomersEditorActions();
-export default customersEditorActions;
+    onDelete: (uuid) =>
+        asyncActionBuilder.remove(
+            CustomersEditorActionTypes.DELETE_EDITING_CUSTOMER,
+            'customers',
+            uuid
+        ),
+};

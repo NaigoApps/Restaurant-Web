@@ -1,18 +1,19 @@
 import DiningTablesUtils from "../../tables/DiningTablesUtils";
 import eveningPageStore from "../../EveningPageStore";
-import {INVOICE, RECEIPT} from "./DiningTableClosingView";
 import OrdinationsUtils from "../../OrdinationsUtils";
 import SubFeatureStore from "../../../../stores/SubFeatureStore";
 import {DiningTablesClosingActionTypes} from "./DiningTablesClosingActions";
 import diningTablesEditingStore from "../DiningTableEditorStore";
-import StoresUtils from "../../../StoresUtils";
+import {EditorStatus} from "../../../StoresUtils";
 import {findByUuid, iGet} from "../../../../utils/Utils";
+import {DiningTablesEditorActionTypes} from "../DiningTablesEditorActions";
+import {EntitiesUtils} from "../../../../utils/EntitiesUtils";
 
 const {Map, List, fromJS} = require('immutable');
 
 const EVT_DINING_TABLE_CLOSING_WIZARD_STORE_CHANGED = "EVT_DINING_TABLE_CLOSING_WIZARD_STORE_CHANGED";
 
-const DiningTableClosingWizardPages = {
+export const DiningTableClosingWizardPages = {
     MODE_PAGE: "MODE_PAGE",
     SPLIT_PAGE: "SPLIT_PAGE",
     CUSTOMER_PAGE: "CUSTOMER_PAGE",
@@ -24,24 +25,25 @@ class DiningTableClosingStore extends SubFeatureStore {
     constructor() {
         super(eveningPageStore, "diningTableClosing");
         this.init();
+        this.editorStatus = EditorStatus.SURFING;
     }
 
     init() {
         this.selectedBill = null;
+
         this.billPage = 0;
 
         this.deletingBill = false;
 
         this.page = 0;
+        this.wizardEditingMode = false;
         this.wizardVisible = false;
 
-        this.orders = List();
+        this.printWizard = Map();
+
         this.quick = true;
-        this.splitInput = StoresUtils.initIntInput(1);
-        this.finalTotalInput = StoresUtils.initFloatInput(0);
-        this.percentInput = StoresUtils.initPercentInput(0);
-        this.type = RECEIPT;
-        this.coverCharges = 0;
+        this.split = 1;
+        this.percent = 0;
         this.customer = null;
         this.customerPage = 0;
         this.updatePages();
@@ -53,6 +55,8 @@ class DiningTableClosingStore extends SubFeatureStore {
 
     getState() {
         return Map({
+            editorStatus: this.editorStatus,
+
             selectedBill: this.selectedBill,
             billPage: this.billPage,
 
@@ -60,30 +64,27 @@ class DiningTableClosingStore extends SubFeatureStore {
 
             page: this.page,
             wizardVisible: this.wizardVisible,
-            type: this.type,
-            orders: this.orders,
             quick: this.quick,
 
-            splitInput: this.splitInput,
-            finalTotalInput: this.finalTotalInput,
-            percentInput: this.percentInput,
+            split: this.split,
+            percent: this.percent,
 
             customer: this.customer,
             customerPage: this.customerPage,
 
-            coverCharges: this.coverCharges,
-            pages: this.pages
+            pages: this.pages,
+
+            printWizard: this.printWizard
         });
     }
 
     updatePages() {
         let pages = [];
-        pages.push(DiningTableClosingWizardPages.MODE_PAGE);
-        if (!this.quick) {
-            pages.push(DiningTableClosingWizardPages.SPLIT_PAGE);
+        if (this.editorStatus !== EditorStatus.EDITING) {
+            pages.push(DiningTableClosingWizardPages.MODE_PAGE);
         }
-        if (this.type === INVOICE) {
-            pages.push(DiningTableClosingWizardPages.CUSTOMER_PAGE);
+        if (!this.quick || this.editorStatus === EditorStatus.EDITING) {
+            pages.push(DiningTableClosingWizardPages.SPLIT_PAGE);
         }
         pages.push(DiningTableClosingWizardPages.REVIEW_PAGE);
         this.pages = pages;
@@ -93,18 +94,49 @@ class DiningTableClosingStore extends SubFeatureStore {
         let changed = true;
 
         switch (action.type) {
+            case DiningTablesEditorActionTypes.BEGIN_ORDINATIONS_EDITING:
+            case DiningTablesEditorActionTypes.BEGIN_DATA_EDITING:
+            case DiningTablesEditorActionTypes.BEGIN_BILLS_EDITING:
+                this.selectedBill = null;
+                this.editorStatus = EditorStatus.SURFING;
+                break;
             case DiningTablesClosingActionTypes.SELECT_BILL_PAGE:
                 this.billPage = action.body;
                 break;
+            case DiningTablesClosingActionTypes.BEGIN_BILL_PRINTING:
+                this.printWizard = Map({
+                    visible: true,
+                    page: 0,
+                    customer: null
+                });
+                break;
+            case DiningTablesClosingActionTypes.SELECT_CUSTOMER:
+                this.printWizard = this.printWizard.set('customer', action.body);
+                break;
+            case DiningTablesClosingActionTypes.SELECT_CUSTOMER_PAGE:
+                this.printWizard = this.printWizard.set('page', action.body);
+                break;
+            case DiningTablesClosingActionTypes.ABORT_BILL_PRINTING:
+                this.printWizard = Map({
+                    visible: false,
+                    page: 0,
+                    customer: null
+                });
+                break;
             case DiningTablesClosingActionTypes.PRINT_BILL:
-                //FIXME, meglio non copiare i dati del conto ma tenere solo l'uuid
-                this.selectedBill = findByUuid(iGet(diningTablesEditingStore.getState(), 'diningTable.bills'), action.body.get('uuid'));
+                this.printWizard = Map({
+                    visible: false,
+                    page: 0,
+                    customer: null
+                });
                 break;
             case DiningTablesClosingActionTypes.SELECT_BILL:
                 this.selectedBill = findByUuid(iGet(diningTablesEditingStore.getState(), 'diningTable.bills'), action.body);
+                this.editorStatus = EditorStatus.EDITING;
                 break;
             case DiningTablesClosingActionTypes.DESELECT_BILL:
                 this.selectedBill = null;
+                this.editorStatus = EditorStatus.SURFING;
                 break;
             case DiningTablesClosingActionTypes.BEGIN_BILL_DELETION:
                 this.deletingBill = true;
@@ -113,15 +145,29 @@ class DiningTableClosingStore extends SubFeatureStore {
                 this.deletingBill = false;
                 break;
             case DiningTablesClosingActionTypes.DELETE_BILL:
+                this.editorStatus = EditorStatus.SURFING;
                 this.selectedBill = null;
                 this.billPage = 0;
                 this.deletingBill = false;
                 break;
-            case DiningTablesClosingActionTypes.BEGIN_CLOSING:
-                this.init();
+            case DiningTablesClosingActionTypes.BEGIN_BILL_CREATION:
+                this.editorStatus = EditorStatus.CREATING;
+                this.selectedBill = EntitiesUtils.newBill();
+
+                this.page = 0;
+
+                this.quick = true;
+                this.split = 1;
+                this.percent = 0;
+
                 this.closeAllOrders();
                 this.closeAllCoverCharges();
                 this.updateFinalTotal();
+                this.wizardVisible = true;
+                this.updatePages();
+                break;
+            case DiningTablesClosingActionTypes.BEGIN_BILL_EDITING:
+                this.page = 0;
                 this.wizardVisible = true;
                 this.updatePages();
                 break;
@@ -135,56 +181,23 @@ class DiningTableClosingStore extends SubFeatureStore {
                     this.page++;
                 }
                 break;
-            case DiningTablesClosingActionTypes.SET_BILL_TYPE: {
-                this.type = action.body;
-                this.updatePages();
-                break;
-            }
-            case DiningTablesClosingActionTypes.SPLIT_CHANGE: {
-                if (StoresUtils.isInteger(action.body)) {
-                    this.splitInput = StoresUtils.initIntInput(parseInt(action.body));
-                    this.updateFinalTotal();
-                }
-                break;
-            }
-            case DiningTablesClosingActionTypes.SPLIT_CHAR: {
-                this.splitInput = StoresUtils.intChar(this.splitInput, action.body);
+            case DiningTablesClosingActionTypes.SET_SPLIT: {
+                this.split = action.body;
                 this.updateFinalTotal();
                 break;
             }
-            case DiningTablesClosingActionTypes.FINAL_TOTAL_CHANGE: {
-                if (StoresUtils.isFloat(action.body)) {
-                    this.finalTotalInput = StoresUtils.initFloatInput(parseFloat(action.body));
-                }
+            case DiningTablesClosingActionTypes.SET_FINAL_TOTAL: {
+                this.selectedBill = this.selectedBill.set('total', action.body);
                 break;
             }
-            case DiningTablesClosingActionTypes.FINAL_TOTAL_CHAR: {
-                this.finalTotalInput = StoresUtils.floatChar(this.finalTotalInput, action.body);
-                break;
-            }
-            case DiningTablesClosingActionTypes.PERCENT_CHANGE: {
-                if (StoresUtils.isPercent(action.body)) {
-                    this.percentInput = StoresUtils.initPercentInput(parseInt(action.body));
-                    this.updateFinalTotal();
-                }
-                break;
-            }
-            case DiningTablesClosingActionTypes.PERCENT_CHAR: {
-                this.percentInput = StoresUtils.percentChar(this.percentInput, action.body);
+            case DiningTablesClosingActionTypes.SET_PERCENT: {
+                this.percent = action.body;
                 this.updateFinalTotal();
                 break;
             }
             case DiningTablesClosingActionTypes.SET_QUICK: {
                 this.quick = action.body;
                 this.updatePages();
-                break;
-            }
-            case DiningTablesClosingActionTypes.SELECT_CUSTOMER: {
-                this.customer = action.body;
-                break;
-            }
-            case DiningTablesClosingActionTypes.SELECT_CUSTOMER_PAGE: {
-                this.customerPage = action.body;
                 break;
             }
             case DiningTablesClosingActionTypes.CLOSE_ORDERS:
@@ -214,12 +227,14 @@ class DiningTableClosingStore extends SubFeatureStore {
                 break;
             }
             case DiningTablesClosingActionTypes.CLOSE_COVER_CHARGES: {
-                this.coverCharges += action.body;
+                this.selectedBill = this.selectedBill.set('coverCharges',
+                    this.selectedBill.get('coverCharges') + action.body);
                 this.updateFinalTotal();
                 break;
             }
             case DiningTablesClosingActionTypes.OPEN_COVER_CHARGES: {
-                this.coverCharges -= action.body;
+                this.selectedBill = this.selectedBill.set('coverCharges',
+                    this.selectedBill.get('coverCharges') - action.body);
                 this.updateFinalTotal();
                 break;
             }
@@ -228,6 +243,7 @@ class DiningTableClosingStore extends SubFeatureStore {
                 break;
             case DiningTablesClosingActionTypes.ABORT_CLOSING:
                 this.wizardVisible = false;
+                this.editorStatus = EditorStatus.SURFING;
                 break;
             default:
                 changed = false;
@@ -238,62 +254,72 @@ class DiningTableClosingStore extends SubFeatureStore {
 
     closeAllCoverCharges() {
         let currentTable = diningTablesEditingStore.getState().get('diningTable');
-        let all = currentTable.get('coverCharges');
-        let otherBills = currentTable.get('bills');
-        otherBills.forEach(bill => all -= bill.get('coverCharges'));
-        this.coverCharges = all;
+        let openedCcs = DiningTablesUtils.findTableOpenedCoverCharges(currentTable, this.selectedBill);
+        this.selectedBill = this.selectedBill.set('coverCharges', openedCcs + this.selectedBill.get('coverCharges'));
     }
 
     openAllCoverCharges() {
-        this.coverCharges = 0;
+        this.selectedBill = this.selectedBill.set('coverCharges', 0);
     }
 
     updateFinalTotal() {
         let table = diningTablesEditingStore.getState().get('diningTable');
         let orders = DiningTablesUtils.findTableOrders(table);
-        const split = this.splitInput.get('value');
-        const percent = this.percentInput.get('value');
         if (orders) {
-            orders = orders.filter(order => this.orders.includes(order.get('uuid')));
+            let billOrders = this.selectedBill.get('orders');
+            let billCcs = this.selectedBill.get('coverCharges');
+
+            orders = orders.filter(order => billOrders.includes(order.get('uuid')));
             let total = OrdinationsUtils.total(orders);
-            total += eveningPageStore.getState().data.get('evening').get('coverCharge') * this.coverCharges;
-            total = total - percent * total / 100;
-            total = split > 0 ? total / split : total;
-            this.finalTotalInput = StoresUtils.initFloatInput(parseFloat(total.toFixed(2)));
+            total += eveningPageStore.getState().data.get('evening').get('coverCharge') * billCcs;
+            total = total - this.percent * total / 100;
+            total = this.split > 0 ? Math.floor(total * 100 / this.split) * this.split / 100 : total;
+
+            this.selectedBill = this.selectedBill.set('total', parseFloat(total.toFixed(2)));
         }
     }
 
     closeOrders(sample, n) {
         let table = diningTablesEditingStore.getState().get('diningTable');
-        let openedOrders = DiningTablesUtils.findTableOpenedOrders(table);
-        openedOrders = openedOrders.filter(order => !this.orders.includes(order.get('uuid')));
+        let openedOrders = DiningTablesUtils.findTableOpenedOrders(table, this.selectedBill);
+        openedOrders = openedOrders.filter(order => !this.selectedBill.get('orders').includes(order.get('uuid')));
         openedOrders = DiningTablesUtils.findSimilarTo(openedOrders, sample);
+
+        let billOrders = this.selectedBill.get('orders');
         for (let i = 0; i < openedOrders.size && i < n; i++) {
-            this.orders = this.orders.push(openedOrders.get(i).get('uuid'));
+            billOrders = billOrders.push(openedOrders.get(i).get('uuid'));
         }
+        this.selectedBill = this.selectedBill.set('orders', billOrders);
     }
 
     openOrders(sample, n) {
         let table = diningTablesEditingStore.getState().get('diningTable');
-        let openedOrders = DiningTablesUtils.findTableOpenedOrders(table);
-        openedOrders = openedOrders.filter(order => this.orders.includes(order.get('uuid')));
-        openedOrders = DiningTablesUtils.findSimilarTo(openedOrders, sample);
+        let billOrders = this.selectedBill.get('orders');
+
+        let ordersPool = DiningTablesUtils.findTableOrders(table)
+            .filter(order => billOrders.includes(order.get('uuid')));
+
+        ordersPool = DiningTablesUtils.findSimilarTo(ordersPool, sample);
         for (let i = 0; i < n; i++) {
-            this.orders = this.orders.splice(this.orders.indexOf(openedOrders.get(i).get('uuid')), 1);
+            billOrders = billOrders.splice(billOrders.indexOf(ordersPool.get(i).get('uuid')), 1);
         }
+        this.selectedBill = this.selectedBill.set('orders', billOrders);
     }
 
     closeAllOrders() {
         let table = diningTablesEditingStore.getState().get('diningTable');
-        let openedOrders = DiningTablesUtils.findTableOpenedOrders(table);
-        openedOrders = openedOrders.filter(order => !this.orders.includes(order.get('uuid')));
+        let openedOrders = DiningTablesUtils.findTableOpenedOrders(table, this.selectedBill);
+        openedOrders = openedOrders.filter(order => !this.selectedBill.get('orders').includes(order.get('uuid')));
+
+        let billOrders = this.selectedBill.get('orders');
         for (let i = 0; i < openedOrders.size; i++) {
-            this.orders = this.orders.push(openedOrders.get(i).get('uuid'));
+            billOrders = billOrders.push(openedOrders.get(i).get('uuid'));
         }
+        this.selectedBill = this.selectedBill.set('orders', billOrders);
     }
 
     openAllOrders() {
-        this.orders = List();
+        this.selectedBill = this.selectedBill.set('orders', List());
     }
 
 }

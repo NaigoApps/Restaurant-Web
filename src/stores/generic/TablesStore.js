@@ -7,6 +7,8 @@ import {
 } from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
+import {TablesCreatorActionTypes} from "../../pages/tables/TablesCreatorActions";
+import {TablesEditorActionTypes} from "../../pages/tables/TablesEditorActions";
 
 export const EVT_TABLE_STORE_CHANGED = "EVT_TABLE_STORE_CHANGED";
 
@@ -40,17 +42,17 @@ class TablesStore extends AbstractEntityStore {
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_CREATE_RESTAURANT_TABLE:
+            case TablesCreatorActionTypes.CREATE_R_TABLE:
                 this.createData(action.body);
                 break;
             case ACT_RETRIEVE_RESTAURANT_TABLES:
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;
-            case ACT_UPDATE_RESTAURANT_TABLE:
+            case TablesEditorActionTypes.UPDATE_R_TABLE:
                 this.updateData(action.body);
                 break;
-            case ACT_DELETE_RESTAURANT_TABLE:
+            case TablesEditorActionTypes.DELETE_EDITING_R_TABLE:
                 this.deleteData(action.body);
                 break;
             default:

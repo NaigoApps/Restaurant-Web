@@ -55,6 +55,7 @@ export default class KeyboardButton extends Component {
         return <Column customCss={style}>
             <Button
                 key={this.state.uuid}
+                type={this.props.type}
                 text={this.props.text || c}
                 icon={this.props.icon}
                 disabled={disabled}

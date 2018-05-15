@@ -1,5 +1,6 @@
 import {CANC} from "../utils/Characters";
 import {BACKSPACE, LEFT, RIGHT} from "../components/widgets/inputs/Keyboard";
+import {iGet} from "../utils/Utils";
 
 const {Map, List} = require('immutable');
 
@@ -14,25 +15,39 @@ export default class StoresUtils {
             values: options.values,
             id: options.id,
             renderer: options.renderer,
+            label: options.label,
             colorRenderer: options.colorRenderer,
             rows: options.rows,
             cols: options.cols,
             value: options.value,
             visible: true,
+            isValid: options.isValid,
             page: 0,
+            multiSelect: options.multiSelect,
             callback: options.callback
         });
     }
 
-    static selectChange(editor, value){
-        return editor.set('value', value);
+    static selectInputSelect(editor, value) {
+        if (!editor.get('multiSelect')) {
+            return editor.set('value', value);
+        }
+        return editor.set('value', editor.get('value').push(value));
     }
 
-    static selectPageChange(editor, page){
+    static selectInputDeselect(editor, value) {
+        if (!editor.get('multiSelect')) {
+            return editor.set('value', null);
+        }
+        let index = editor.get('value').indexOf(value);
+        return editor.set('value', editor.get('value').splice(index, 1));
+    }
+
+    static selectPageChange(editor, page) {
         return editor.set('page', page);
     }
 
-    static resetSelectInput(editor){
+    static resetSelectInput(editor) {
         return editor.set('visible', false);
     }
 
@@ -48,7 +63,8 @@ export default class StoresUtils {
             value: options.value,
             callback: options.callback,
             min: options.min,
-            max: options.max
+            max: options.max,
+            hit: false
         });
     }
 
@@ -58,9 +74,10 @@ export default class StoresUtils {
             editor = editor.set('text', "0");
             return editor.set('value', 0);
         }
-        if (oldText === "0") {
+        if (oldText === "0" || !editor.get('hit')) {
             oldText = "";
         }
+        editor = editor.set('hit', true);
         let newText = oldText + char;
         if (!isNaN(parseInt(newText))) {
             editor = editor.set('text', newText);
@@ -72,6 +89,7 @@ export default class StoresUtils {
     static intChange(editor, text) {
         if (!isNaN(parseInt(text))) {
             editor = editor.set('text', text);
+            editor = editor.set('hit', true);
             return editor.set('value', parseInt(text));
         }
         return editor;
@@ -83,7 +101,8 @@ export default class StoresUtils {
             label: "",
             text: "",
             value: 0,
-            callback: () => {}
+            callback: () => {
+            }
         });
     }
 
@@ -91,13 +110,16 @@ export default class StoresUtils {
     FLOAT INPUT
      */
 
-    static initFloatInput(initialValue, callback, label) {
+    static initFloatInput(options) {
         return Map({
             visible: true,
-            label: label,
-            text: initialValue ? initialValue.toString() : "",
-            value: initialValue,
-            callback: callback
+            label: options.label,
+            text: options.value ? options.value.toString() : "",
+            value: options.value,
+            callback: options.callback,
+            min: options.min,
+            max: options.max,
+            hit: false
         });
     }
 
@@ -106,10 +128,11 @@ export default class StoresUtils {
         if (char === CANC) {
             return editor.set('text', "");
         }
-        if (oldText === "0") {
+        if (oldText === "0" || !editor.get('hit')) {
             oldText = "";
         }
         let newText = oldText + char;
+        editor = editor.set('hit', true);
         if (!isNaN(parseFloat(newText))) {
             editor = editor.set('text', newText);
             return editor.set('value', parseFloat(newText));
@@ -120,6 +143,7 @@ export default class StoresUtils {
     static floatChange(editor, text) {
         if (!isNaN(parseFloat(text))) {
             editor = editor.set('text', text);
+            editor = editor.set('hit', true);
             return editor.set('value', parseFloat(text));
         }
         return editor;
@@ -131,15 +155,14 @@ export default class StoresUtils {
             label: "",
             text: "",
             value: 0,
-            callback: () => {}
+            callback: () => {
+            }
         });
     }
 
     /*
     PERCENT INPUT
      */
-
-    //TODO
 
     static initPercentInput(initialValue) {
         return Map({
@@ -165,21 +188,24 @@ export default class StoresUtils {
         return editor;
     }
 
-    static initTextInput(initialValue) {
-        initialValue = initialValue || "";
+    static initTextInput(options) {
         return Map({
-            text: initialValue ? initialValue : "",
-            caret: initialValue.length
+            visible: true,
+            label: options.label,
+            value: options.value || "",
+            caret: options.value ? options.value.length : 0,
+            callback: options.callback,
+            checker: options.checker
         });
     }
 
     static textChar(editor, char) {
-        let oldText = editor.get('text');
+        let oldText = editor.get('value');
         let caret = editor.get('caret');
         switch (char.toUpperCase()) {
             case BACKSPACE:
                 if (oldText.length > 0 && caret > 0) {
-                    editor = editor.set('text', oldText.slice(0, caret - 1) + oldText.slice(caret, oldText.length));
+                    editor = editor.set('value', oldText.slice(0, caret - 1) + oldText.slice(caret, oldText.length));
                     editor = editor.set('caret', editor.get('caret') - 1);
                 }
                 break;
@@ -194,11 +220,27 @@ export default class StoresUtils {
                 }
                 break;
             default:
-                editor = editor.set('text', oldText.slice(0, caret) + char + oldText.slice(caret, oldText.length));
-                editor = editor.set('caret', caret + 1);
+                if(char.length === 1) {
+                    editor = editor.set('value', oldText.slice(0, caret) + char + oldText.slice(caret, oldText.length));
+                    editor = editor.set('caret', caret + 1);
+                }
                 break;
         }
         return editor;
+    }
+
+    static textCaret(editor, position) {
+        return editor.set('caret', position);
+    }
+
+    static resetTextInput() {
+        return Map({
+            visible: false,
+            label: "",
+            value: "",
+            callback: () => {
+            }
+        });
     }
 
     static isInteger(text) {
@@ -213,6 +255,9 @@ export default class StoresUtils {
         return !isNaN(parseFloat(text));
     }
 
+    static settings(data, prop, def){
+        return iGet(data, "settings." + prop) || def;
+    }
 }
 
 export class EditorStatus {

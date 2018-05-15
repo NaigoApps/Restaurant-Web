@@ -7,6 +7,14 @@ import {
     ACT_SELECT_WAITER,
     ACT_UPDATE_WAITER, ACT_UPDATE_WAITER_CF, ACT_UPDATE_WAITER_NAME, ACT_UPDATE_WAITER_STATUS, ACT_UPDATE_WAITER_SURNAME
 } from "../../actions/ActionTypes";
+import {EditorStatus} from "../StoresUtils";
+import locationsStore from "../../stores/LocationsStore";
+import {findByUuid} from "../../utils/Utils";
+import {WaitersCreatorActionTypes} from "./WaitersCreatorActions";
+import {WaitersEditorActions, WaitersEditorActionTypes} from "./WaitersEditorActions";
+import {EntitiesUtils} from "../../utils/EntitiesUtils";
+import {ApplicationActionTypes} from "../../actions/ApplicationActions";
+import applicationStore from "../../stores/ApplicationStore";
 
 const {Map} = require('immutable');
 
@@ -16,8 +24,9 @@ class WaitersPageStore extends AbstractStore{
 
     constructor(){
         super(EVT_WAITERS_PAGE_STORE_CHANGED);
-        this.selectedWaiter = null;
-        this.inCreationWaiter = null;
+        this.waiter = null;
+        this.editorStatus = EditorStatus.SURFING;
+        this.page = 0;
     }
 
     setName(value){
@@ -38,43 +47,46 @@ class WaitersPageStore extends AbstractStore{
 
     handleCompletedAction(action){
         let changed = true;
-        dispatcher.waitFor([waitersStore.getToken()]);
+        dispatcher.waitFor([waitersStore.getToken(), applicationStore.getToken()]);
         switch (action.type) {
+            case ApplicationActionTypes.LOAD_SETTINGS:
+            case ApplicationActionTypes.STORE_SETTINGS:
             case ACT_RETRIEVE_WAITERS:
                 break;
-            case ACT_CREATE_WAITER:
-                this.selectedWaiter = action.body.get('uuid');
-                this.inCreationWaiter = null;
+            case WaitersCreatorActionTypes.CREATE_WAITER:
+            case WaitersEditorActionTypes.UPDATE_EDITING_WAITER:
+                this.waiter = action.body.get('uuid');
+                this.editorStatus = EditorStatus.EDITING;
                 break;
-            case ACT_UPDATE_WAITER:
-                this.selectedWaiter = action.body.get('uuid');
+            case WaitersEditorActionTypes.DESELECT_EDITING_WAITER:
+            case WaitersEditorActionTypes.DELETE_EDITING_WAITER:
+            case WaitersCreatorActionTypes.ABORT_WAITER_CREATION:
+            case ApplicationActionTypes.GO_TO_PAGE:
+                this.waiter = null;
+                this.editorStatus = EditorStatus.SURFING;
                 break;
-            case ACT_DELETE_WAITER:
-                this.selectedWaiter = null;
+            case WaitersCreatorActionTypes.BEGIN_WAITER_CREATION:
+                this.waiter = EntitiesUtils.newWaiter();
+                this.editorStatus = EditorStatus.CREATING;
                 break;
-            case ACT_BEGIN_CREATE_WAITER:
-                this.selectedWaiter = null;
-                this.inCreationWaiter = this.buildWaiter();
+            case WaitersEditorActionTypes.SELECT_EDITING_WAITER:
+                this.waiter = action.body;
+                this.editorStatus = EditorStatus.EDITING;
                 break;
-            case ACT_SELECT_WAITER:
-                this.selectedWaiter = action.body;
-                this.inCreationWaiter = null;
+            case WaitersEditorActionTypes.SELECT_EDITING_WAITER_PAGE:
+                this.page = action.body;
                 break;
-            case ACT_DESELECT_WAITER:
-                this.selectedWaiter = null;
-                this.inCreationWaiter = null;
+            case WaitersCreatorActionTypes.SET_CREATING_WAITER_NAME:
+                this.waiter = this.waiter.set('name', action.body);
                 break;
-            case ACT_UPDATE_WAITER_NAME:
-                this.setName(action.body);
+            case WaitersCreatorActionTypes.SET_CREATING_WAITER_SURNAME:
+                this.waiter = this.waiter.set('surname', action.body);
                 break;
-            case ACT_UPDATE_WAITER_SURNAME:
-                this.setSurname(action.body);
+            case WaitersCreatorActionTypes.SET_CREATING_WAITER_CF:
+                this.waiter = this.waiter.set('cf', action.body);
                 break;
-            case ACT_UPDATE_WAITER_CF:
-                this.setCf(action.body);
-                break;
-            case ACT_UPDATE_WAITER_STATUS:
-                this.setStatus(action.body);
+            case WaitersCreatorActionTypes.SET_CREATING_WAITER_STATUS:
+                this.waiter = this.waiter.set('status', action.body);
                 break;
             default:
                 changed = false;
@@ -83,26 +95,28 @@ class WaitersPageStore extends AbstractStore{
         return changed;
     }
 
-    buildWaiter(){
-        return Map({
-            name: "",
-            surname: "",
-            cf: "",
-            status: ""
-        });
-    }
-
     getState(){
-        let value = Map({
+        let data = Map({
+            settings: applicationStore.getSettings(),
             waiters: waitersStore.getWaiters().getPayload(),
             waiterStatuses: waiterStatusesStore.getWaiterStatuses().getPayload(),
 
-            selectedWaiter: this.selectedWaiter,
-            createdWaiter: this.inCreationWaiter
+            editorStatus: this.editorStatus,
+            page: this.page,
+            waiter: this.getSelectedWaiter()
         });
         return {
-            data: value
+            data: data
         }
+    }
+
+    getSelectedWaiter(){
+        if (this.editorStatus === EditorStatus.EDITING) {
+            return findByUuid(waitersStore.getWaiters().getPayload(), this.waiter);
+        } else if (this.editorStatus === EditorStatus.CREATING) {
+            return this.waiter;
+        }
+        return null;
     }
 
 }

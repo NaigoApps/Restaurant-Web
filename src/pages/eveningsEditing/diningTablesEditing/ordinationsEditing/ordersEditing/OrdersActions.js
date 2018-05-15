@@ -11,16 +11,15 @@ export const OrdersActionTypes = {
     SELECT_DISH: "SELECT_DISH",
     SELECT_DISH_PAGE: "SELECT_DISH_PAGE",
     SELECT_PHASE: "SELECT_PHASE",
-    QUANTITY_CHAR: "QUANTITY_CHAR",
-    QUANTITY_CHANGE: "QUANTITY_CHANGE",
+    QUANTITY_CONFIRM: "QUANTITY_CONFIRM",
     SELECT_GROUP: "SELECT_GROUP",
     TOGGLE_GROUP_EDITING: "TOGGLE_GROUP_EDITING",
     REMOVE_GROUP: "REMOVE_GROUP",
-    SELECT_ADDITION_TYPE_PAGE: "SELECT_ADDITION_TYPE_PAGE",
     SELECT_ADDITION_PAGE: "SELECT_ADDITION_PAGE",
     TOGGLE_ADDITION: "TOGGLE_ADDITION",
-    FREE_ADDITION_CHAR: "FREE_ADDITION_CHAR",
-    PRICE_CHAR: "PRICE_CHAR",
+    SET_FREE_ADDITION: "SET_FREE_ADDITION",
+    SET_PRICE: "SET_PRICE",
+    SET_QUANTITY: "SET_QUANTITY",
     ORDER_PHASE: "ORDER_PHASE",
 };
 
@@ -37,19 +36,17 @@ export const OrdersActions = {
 
     selectPhase: (phase) => dispatcher.fireEnd(OrdersActionTypes.SELECT_PHASE, phase),
 
-    quantityChar: (char) => dispatcher.fireEnd(OrdersActionTypes.QUANTITY_CHAR, char),
-    quantityChange: (text) => dispatcher.fireEnd(OrdersActionTypes.QUANTITY_CHANGE, text),
+    quantityConfirm: (value) => dispatcher.fireEnd(OrdersActionTypes.QUANTITY_CONFIRM, value),
 
     selectGroup: (grp) => dispatcher.fireEnd(OrdersActionTypes.SELECT_GROUP, grp),
     toggleGroupEditing: grp => dispatcher.fireEnd(OrdersActionTypes.TOGGLE_GROUP_EDITING, grp),
     removeGroup: (grp) => dispatcher.fireEnd(OrdersActionTypes.REMOVE_GROUP, grp),
 
-    selectAdditionTypePage: (page) => dispatcher.fireEnd(OrdersActionTypes.SELECT_ADDITION_TYPE_PAGE, page),
-
     selectAdditionPage: (page) => dispatcher.fireEnd(OrdersActionTypes.SELECT_ADDITION_PAGE, page),
     toggleAddition: (addition) => dispatcher.fireEnd(OrdersActionTypes.TOGGLE_ADDITION, addition),
 
-    freeAdditionChar: char => dispatcher.fireEnd(OrdersActionTypes.FREE_ADDITION_CHAR, char),
-    priceChar: char => dispatcher.fireEnd(OrdersActionTypes.PRICE_CHAR, char),
+    setFreeAddition: text => dispatcher.fireEnd(OrdersActionTypes.SET_FREE_ADDITION, text),
+    setPrice: value => dispatcher.fireEnd(OrdersActionTypes.SET_PRICE, value),
+    setQuantity: value => dispatcher.fireEnd(OrdersActionTypes.SET_QUANTITY, value),
     editOrderPhase: phase => dispatcher.fireEnd(OrdersActionTypes.ORDER_PHASE, phase),
 };

@@ -12,31 +12,12 @@ import {OrdersActions} from "./ordersEditing/OrdersActions";
 export default class OrdinationEditor extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-
-        }
-    }
-
-
-    showDeleteOrdinationModal() {
-        this.setState({
-            deletingOrdination: true
-        });
     }
 
     doDeleteOrdination() {
-        this.setState({
-            deletingOrdination: false
-        });
         let tableUuid = iGet(this.props.data, "diningTablesEditing.diningTable.uuid");
         let ordUuid = iGet(this.props.data, "ordinationEditing.ordination.uuid");
         OrdinationsEditorActions.deleteOrdination(tableUuid, ordUuid);
-    }
-
-    hideDeleteOrdinationModal() {
-        this.setState({
-            deletingOrdination: false
-        });
     }
 
     render() {

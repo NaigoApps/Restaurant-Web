@@ -1,11 +1,12 @@
 import React from 'react';
-import additionsEditorActions from "./AdditionsEditorActions";
 import EntityEditor from "../../components/editors/EntityEditor";
 import Column from "../../widgets/Column";
 import Row from "../../widgets/Row";
+import {EditorStatus} from "../StoresUtils";
+import {iGet} from "../../utils/Utils";
 import TextEditor from "../../components/widgets/inputs/TextEditor";
+import BooleanEditor from "../../components/widgets/inputs/boolean/BooleanEditor";
 import FloatEditor from "../../components/widgets/inputs/float/FloatEditor";
-import BooleanEditor from "../../components/widgets/inputs/boolean/BooleanInput";
 
 export default class AdditionEditor extends React.Component {
     constructor(props) {
@@ -13,36 +14,84 @@ export default class AdditionEditor extends React.Component {
     }
 
     render() {
-        let props = this.props.data;
-        let addition = props.get('addition');
-        let uuid = addition.get('uuid');
+        const props = this.props.data;
+        const actionsProvider = this.props.actionsProvider;
 
+        const addition = props.get('addition');
+        const editorStatus = props.get('editorStatus');
 
-        return <Row topSpaced>
+        const actions = AdditionEditor.buildActions(props, actionsProvider);
+
+        return <Row topSpaced grow>
             <Column>
-                <EntityEditor
-                    valid={addition.get('name')}
-                    entity={addition}
-                    deleteMethod={additionsEditorActions.deleteAddition}
-                    render={addition => addition.get('name')}>
-                    <TextEditor
-                        label="Nome"
-                        value={addition.get('name')}
-                        commitAction={result => additionsEditorActions.updateAdditionName(uuid, result)}
-                    />
-                    <BooleanEditor
-                        label="Generica"
-                        value={addition.get('generic')}
-                        commitAction={result => additionsEditorActions.updateAdditionGeneric(uuid, result)}
-                    />
-                    <FloatEditor
-                        label="Prezzo"
-                        value={addition.get('price')}
-                        commitAction={result => additionsEditorActions.updateAdditionPrice(uuid, result)}
-                    />
-                </EntityEditor>
+                <Row>
+                    <Column>
+                        <h3 className="text-center">{editorStatus === EditorStatus.CREATING ?
+                            "Creazione variante" : "Modifica variante"}</h3>
+                    </Column>
+                </Row>
+                <Row grow>
+                    <Column>
+                        <EntityEditor
+                            valid={!!addition.get('name')}
+                            entity={addition}
+                            confirmMethod={actionsProvider.onConfirm}
+                            abortMethod={actionsProvider.onAbort}
+                            deleteMessage="Eliminazione variante"
+                            deleteMethod={actionsProvider.onDelete}>
+                            {actions}
+                        </EntityEditor>
+                    </Column>
+                </Row>
             </Column>
         </Row>;
     }
 
+    static buildActions(data, actionsProvider) {
+        let actions = [];
+        if (actionsProvider.confirmName) {
+            actions.push(AdditionEditor.buildNameEditor(data, actionsProvider));
+        }
+        if (actionsProvider.confirmGeneric) {
+            actions.push(AdditionEditor.buildGenericEditor(data, actionsProvider));
+        }
+        if (actionsProvider.confirmPrice) {
+            actions.push(AdditionEditor.buildPriceEditor(data, actionsProvider));
+        }
+
+        return actions.map((action, index) => {
+            return <Row key={index} ofList={index > 0}>
+                <Column>
+                    {action}
+                </Column>
+            </Row>
+        })
+    }
+
+    static buildNameEditor(data, actionsProvider) {
+        return <TextEditor options={{
+            label: "Nome",
+            value: iGet(data, 'addition.name'),
+            callback: result => actionsProvider.confirmName(iGet(data, 'addition.uuid'), result)
+        }}/>;
+    }
+
+    static buildGenericEditor(data, actionsProvider) {
+        return <BooleanEditor
+            label="Generica"
+            value={iGet(data, 'addition.generic')}
+            onConfirm={result => actionsProvider.confirmGeneric(iGet(data, "addition.uuid"), result)}
+        />;
+    }
+
+    static buildPriceEditor(data, actionsProvider) {
+        return <FloatEditor
+            options={{
+                label: "Prezzo",
+                value: iGet(data, 'addition.price'),
+                min: 0,
+                callback: result => actionsProvider.confirmPrice(iGet(data, 'addition.uuid'), result)
+            }}
+        />;
+    }
 }

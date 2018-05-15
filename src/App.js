@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import HomePage from "./pages/HomePage";
-import SettingsPage from "./pages/SettingsPage";
+import ConfigurationPage from "./pages/ConfigurationPage";
 import PrintersPage from "./pages/printers/PrintersPage";
 import LocationsPage from "./pages/locations/LocationsPage";
 import TablesPage from "./pages/tables/TablesPage";
@@ -16,10 +16,12 @@ import ordinationEditingStore from "./pages/eveningsEditing/diningTablesEditing/
 import ordersEditingStore from "./pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
 import diningTableClosingStore
     from "./pages/eveningsEditing/diningTablesEditing/diningTableClosing/DiningTableClosingStore";
+import SettingsPage from "./pages/SettingsPage";
 
 const {Map} = require('immutable');
 
 export const HOME = "HOME";
+export const CONFIGURATION = "CONFIGURATION";
 export const SETTINGS = "SETTINGS";
 export const PRINTERS = "PRINTERS";
 export const LOCATIONS = "LOCATIONS";
@@ -32,6 +34,7 @@ export const EVENINGS = "EVENINGS";
 
 let pages = Map({
     HOME: <HomePage/>,
+    CONFIGURATION: <ConfigurationPage/>,
     SETTINGS: <SettingsPage/>,
     PRINTERS: <PrintersPage/>,
     LOCATIONS: <LocationsPage/>,

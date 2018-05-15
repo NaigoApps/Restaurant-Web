@@ -1,19 +1,20 @@
 import React, {Component} from 'react';
 import menuPageActions from "./MenuPageActions";
 import menuPageStore from "./MenuPageStore";
-import categoriesEditorActions from "./CategoriesEditorActions";
-import dishesEditorActions from "./DishesEditorActions";
 import Page from "../Page";
 import CategoriesNavigator from "./CategoriesNavigator";
-import NavElementLink from "../../widgets/NavElementLink";
-import NavPills from "../../widgets/NavPills";
-import NavElement from "../../widgets/NavElement";
-import {findByUuid} from "../../utils/Utils";
 import CategoryEditor from "./CategoryEditor";
-import CategoryCreator from "./CategoryCreator";
-import DishCreator from "./DishCreator";
+import MenuNav from "./MenuNav";
+import {EditorStatus} from "../StoresUtils";
+import {CategoriesCreatorActions} from "./CategoriesCreatorActions";
+import {CategoriesEditorActions} from "./CategoriesEditorActions";
+import Row from "../../widgets/Row";
+import Column from "../../widgets/Column";
 import DishEditor from "./DishEditor";
-import {SETTINGS} from "../../App";
+import {DishesCreatorActions} from "./DishesCreatorActions";
+import {DishesEditorActions} from "./DishesEditorActions";
+import DishesNavigator from "./DishesNavigator";
+import {iGet} from "../../utils/Utils";
 
 const {Map} = require('immutable');
 
@@ -40,104 +41,49 @@ export default class MenuPage extends Component {
     }
 
     render() {
-        let navContent = MenuPage.makeNavContent(this.state.data);
         let pageContent = MenuPage.makePageContent(this.state.data);
         return (
             <Page title="Menu">
-                {navContent}
+                <MenuNav data={this.state.data}/>
                 {pageContent}
             </Page>
         )
     }
 
-    static makePageContent(state) {
-        if (state.get('selectedDish')) {
-            return <DishEditor data={MenuPage.makeDishEditorDescriptor(state)}/>;
-        } else if (state.get('createdDish')) {
-            return <DishCreator data={MenuPage.makeDishCreatorDescriptor(state)}/>;
-        } else if (state.get('selectedCategory')) {
-            return <CategoryEditor data={MenuPage.makeCategoryEditorDescriptor(state)}/>
-        } else if (state.get('createdCategory')) {
-            return <CategoryCreator data={MenuPage.makeCategoryCreatorDescriptor(state)}/>
+    static makePageContent(data) {
+        const catEditorStatus = data.get('categoriesEditorStatus');
+        const dishEditorStatus = data.get('dishesEditorStatus');
+
+        if (catEditorStatus === EditorStatus.CREATING) {
+            return <CategoryEditor data={data} actionsProvider={CategoriesCreatorActions}/>;
+        } else if (catEditorStatus === EditorStatus.EDITING) {
+            return <Row grow>
+                <Column>
+                    <Row grow>
+                        <Column>
+                            <CategoryEditor data={data} actionsProvider={CategoriesEditorActions}/>
+                        </Column>
+                    </Row>
+                    <Row grow>
+                        <Column>
+                            {MenuPage.makeDishContent(data)}
+                        </Column>
+                    </Row>
+                </Column>
+            </Row>
         } else {
-            return <CategoriesNavigator data={state}/>
+            return <CategoriesNavigator data={data}/>;
         }
     }
 
-    static makeCategoryEditorDescriptor(data) {
-        return Map({
-            category: findByUuid(data.get('categories'), data.get('selectedCategory')),
-            dishes: data.get('dishes'),
-            dishesStatuses: data.get('dishesStatuses'),
-            locations: data.get('locations'),
-            additions: data.get('additions')
-        })
-    }
-
-    static makeCategoryCreatorDescriptor(data) {
-        return Map({
-            category: data.get('createdCategory'),
-            locations: data.get('locations')
-        })
-    }
-
-    static makeDishCreatorDescriptor(data) {
-        return Map({
-            dish: data.get('createdDish')
-        })
-    }
-
-    static makeDishEditorDescriptor(data) {
-        return Map({
-            dish: findByUuid(data.get('dishes'), data.get('selectedDish')),
-            categories: data.get('categories'),
-            dishStatuses: data.get('dishStatuses')
-        })
-    }
-
-    static makeNavContent(state) {
-        let elements = [];
-        elements.push(<NavElementLink
-            key="settings"
-            text="Impostazioni"
-            page={SETTINGS}
-        />);
-        elements.push(<NavElement
-            key="categories"
-            text="Categorie"
-            active={!state.get('selectedCategory') && !state.get('createdCategory') &&
-            !state.get('selectedDish ') && !state.get('createdDish')}
-            commitAction={categoriesEditorActions.deselectCategory}
-        />);
-        if (state.get('selectedCategory')) {
-            elements.push(<NavElement
-                key="selected-cat"
-                text={MenuPage.categoryName(findByUuid(state.get('categories'), state.get('selectedCategory')))}
-                commitAction={dishesEditorActions.deselectDish}
-                active={!state.get('selectedDish') && !state.get('createdDish')}
-            />);
+    static makeDishContent(data){
+        const dishEditorStatus = data.get('dishesEditorStatus');
+        if (dishEditorStatus === EditorStatus.CREATING) {
+            return <DishEditor data={data} actionsProvider={DishesCreatorActions}/>;
+        } else if (dishEditorStatus === EditorStatus.EDITING) {
+            return <DishEditor data={data} actionsProvider={DishesEditorActions}/>;
+        } else {
+            return <DishesNavigator data={data}/>;
         }
-        if (state.get('selectedDish')) {
-            elements.push(<NavElement
-                key="selected-dish"
-                text={MenuPage.dishName(findByUuid(state.get('dishes'), state.get('selectedDish')))}
-                active={true}
-            />);
-        } else if (state.get('createdDish')) {
-            elements.push(<NavElement
-                key="created-dish"
-                text={state.get('createdDish').get('name') || "Nuovo piatto"}
-                active={true}
-            />);
-        }
-        return <NavPills>{elements}</NavPills>;
-    }
-
-    static categoryName(cat) {
-        return cat ? cat.get('name') : "?";
-    }
-
-    static dishName(dish) {
-        return dish ? dish.get('name') : "?";
     }
 }

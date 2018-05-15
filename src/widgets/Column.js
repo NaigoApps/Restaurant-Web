@@ -38,9 +38,9 @@ export default class Column extends Component {
         if (this.props.justify) {
             classes.push("justify-content-" + this.props.justify);
         }
-        if (this.props.centered) {
-            classes.push("text-center");
-        }
+        // if (this.props.centered) {
+        //     classes.push("text-center");
+        // }
         if (this.props.right) {
             classes.push("text-right");
         } else if (this.props.left) {
@@ -53,8 +53,6 @@ export default class Column extends Component {
             classes.push("bg-" + this.props.type)
         } else if (this.props.active) {
             classes.push("bg-primary");
-        } else {
-            classes.push("bg-secondary");
         }
         if(this.props.customCss){
             classes.push(this.props.customCss)

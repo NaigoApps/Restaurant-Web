@@ -10,7 +10,7 @@ import Modal from "../widgets/modal/Modal";
 import Button from "../widgets/Button";
 import Row from "../widgets/Row";
 import Column from "../widgets/Column";
-import ApplicationKeyboard from "../components/widgets/ApplicationKeyboard";
+import ApplicationTextInput from "../components/widgets/ApplicationTextInput";
 import ApplicationFloatInput from "../components/widgets/ApplicationFloatInput";
 import ApplicationIntegerInput from "../components/widgets/ApplicationIntegerInput";
 import ApplicationSelectInput from "../components/widgets/ApplicationSelectInput";
@@ -22,6 +22,7 @@ export default class Page extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            textInput: Map(),
             floatInput: Map(),
             integerInput: Map(),
             selectInput: Map(),
@@ -55,7 +56,7 @@ export default class Page extends Component {
             screenfull.exit();
         }
         this.setState({
-            keyboardVisible: status.keyboardVisible,
+            textInput: status.textInput,
             floatInput: status.floatInput,
             integerInput: status.integerInput,
             selectInput: status.selectInput,
@@ -108,7 +109,7 @@ export default class Page extends Component {
                             <Button text="Chiudi" commitAction={this.clearMessages}/>
                         </div>
                     </Modal>
-                    <ApplicationKeyboard visible={this.state.keyboardVisible}/>
+                    <ApplicationTextInput data={this.state.textInput}/>
                     <ApplicationFloatInput data={this.state.floatInput}/>
                     <ApplicationIntegerInput data={this.state.integerInput}/>
                     <ApplicationSelectInput data={this.state.selectInput}/>

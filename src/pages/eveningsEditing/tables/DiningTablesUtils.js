@@ -37,8 +37,8 @@ export default class DiningTablesUtils {
     }
 
     static findTableOrders(table) {
-        let orders = [];
-        table.get('ordinations').forEach(ordination => orders.push(...ordination.get('orders')));
+        let orders = List();
+        table.get('ordinations').forEach(ordination => orders = orders.push(...ordination.get('orders')));
         return orders;
     }
 
@@ -49,20 +49,50 @@ export default class DiningTablesUtils {
         return result;
     }
 
-    static findTableOpenedOrders(table) {
+    static ordersTotal(orders){
+        let sum = 0;
+        orders.forEach(order => sum += order.get('price'));
+        return sum;
+    }
+
+    static tableOrdersTotal(table){
+        let sum = 0;
+        table.get('ordinations').forEach(ordination => {
+            ordination.get('orders').forEach(order => sum += order.get('price'))
+        });
+        return sum;
+    }
+
+    static tableBillsTotal(table){
+        let sum = 0;
+        table.get('bills').forEach(bill => sum += bill.get('total'));
+        return sum;
+    }
+
+    static findTableOpenedOrders(table, editingBill) {
         let orders = List();
         table.get('ordinations').forEach(ordination => orders = orders.push(...ordination.get('orders')));
-        table.get('bills').forEach(invoice => {
-            orders = orders.filter(order => !invoice.get('orders').includes(order.get('uuid')));
+        table.get('bills')
+            .filter(bill => !editingBill || bill.get('uuid') !== editingBill.get('uuid'))
+            .forEach(bill => {
+            orders = orders.filter(order => !bill.get('orders').includes(order.get('uuid')));
         });
+        if(editingBill){
+            orders = orders.filter(order => !editingBill.get('orders').includes(order.get('uuid')))
+        }
         return orders;
     }
 
-    static findTableOpenedCoverCharges(table) {
+    static findTableOpenedCoverCharges(table, editingBill) {
         let ccs = table.get('coverCharges');
-        table.get('bills').forEach(bill => {
+        table.get('bills')
+            .filter(bill => !editingBill || bill.get('uuid') !== editingBill.get('uuid'))
+            .forEach(bill => {
             ccs -= bill.get('coverCharges');
         });
+        if(editingBill){
+            ccs -= editingBill.get('coverCharges');
+        }
         return ccs;
     }
 
@@ -102,7 +132,7 @@ export default class DiningTablesUtils {
     }
 
     static renderDiningTable(diningTable, tables, waiters) {
-        let result = "";
+        let result = "Tavolo ";
         if (diningTable) {
             const table = findByUuid(tables, diningTable.get('table'));
             const waiter = findByUuid(waiters, diningTable.get('waiter'));
@@ -122,9 +152,12 @@ export default class DiningTablesUtils {
     }
 
     static renderBill(bill, customers) {
+        if(!bill.get('progressive')){
+            return "Conto generico";
+        }
         if (bill.get('customer')) {
-            let customer = findByUuid(this.props.data.get('customers'), bill.get('customer'));
-            return "Fattura n°" + bill.get('progressive') + " di " + DiningTablesUtils.renderCustomer(customer)
+            let customer = findByUuid(customers, bill.get('customer'));
+            return "Fattura n°" + bill.get('progressive') + " di " + DiningTablesUtils.renderCustomer(customer);
         } else {
             return "Ricevuta n°" + bill.get('progressive')
         }

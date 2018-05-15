@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import Row from "../../widgets/Row";
-import Button from "../../widgets/Button";
 import Column from "../../widgets/Column";
-import dishesEditorActions from "./DishesEditorActions";
-import dishesCreatorActions from "./DishesCreatorActions";
-import PaginatedList from "../../components/widgets/PaginatedList";
+import SelectInput from "../../components/widgets/inputs/SelectInput";
+import {DishesEditorActions} from "./DishesEditorActions";
+import {DishesCreatorActions} from "./DishesCreatorActions";
+import StoresUtils from "../StoresUtils";
+import RoundButton from "../../widgets/RoundButton";
 
 export default class DishesNavigator extends Component {
 
@@ -13,38 +14,48 @@ export default class DishesNavigator extends Component {
     }
 
     render() {
-        const props = this.props.data;
+        const data = this.props.data;
+        const category = data.get('category');
 
-        return [<Row key="list" topSpaced>
-            <Column>
-                <PaginatedList
-                    id={dish => dish.get('uuid')}
-                    rows={5}
-                    cols={3}
-                    entities={props.get('dishes')}
-                    renderer={dish => dish.get('name')}
-                    colorRenderer={dish => this.color(dish)}
-                    selectMethod={dishesEditorActions.selectDish}
-                    deselectMethod={dishesEditorActions.deselectDish}
-                />
-            </Column>
-        </Row>,
-            <Row key="new" topSpaced>
+        return [
+            <Row key="title">
                 <Column>
-                    <Button
-                        text="Nuovo piatto"
-                        type="info"
-                        commitAction={dishesCreatorActions.beginDishCreation}
+                    <h5>Elenco piatti categoria {category.get('name')}</h5>
+                </Column>
+            </Row>,
+            <Row key="list" topSpaced>
+                <Column>
+                    <SelectInput
+                        bordered
+                        id={dish => dish.get('uuid')}
+                        rows={StoresUtils.settings(data, "dishesRows", 3)}
+                        cols={StoresUtils.settings(data, "dishesColumns", 3)}
+                        options={data.get('dishes')}
+                        page={data.get('dishesPage')}
+                        colorRenderer={dish => DishesNavigator.color(dish)}
+                        renderer={dish => dish.get('name')}
+                        onSelectPage={index => DishesEditorActions.selectDishPage(index)}
+                        onSelect={dish => DishesEditorActions.selectDish(dish)}
+                    />
+                </Column>
+            </Row>,
+            <Row key="new" justify="center" topSpaced grow>
+                <Column justify="center" auto>
+                    <RoundButton key="new"
+                                 icon="plus"
+                                 text="Nuovo piatto"
+                                 type="success"
+                                 commitAction={() => DishesCreatorActions.beginDishCreation()}
                     />
                 </Column>
             </Row>];
     }
 
-    color(dish){
-        if(dish.get('status') === "SOSPESO"){
+    static color(dish) {
+        if (dish.get('status') === "SOSPESO") {
             return "warning";
         }
-        if(dish.get('status') === "RIMOSSO"){
+        if (dish.get('status') === "RIMOSSO") {
             return "danger";
         }
         return "secondary";

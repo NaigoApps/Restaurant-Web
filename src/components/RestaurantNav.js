@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {ApplicationActions} from "../actions/ApplicationActions";
 import Button from "../widgets/Button";
-import {HOME} from "../App";
+import {HOME, SETTINGS} from "../App";
 import NavPills from "../widgets/NavPills";
 import Column from "../widgets/Column";
 import Row from "../widgets/Row";
@@ -33,9 +33,9 @@ class RestaurantNav extends Component {
                             <Row>
                                 <Column auto>
                                     <Button
-                                        text="Home"
                                         icon="home"
                                         commitAction={() => this.goHome()}
+                                        highPadding
                                     />
                                 </Column>
                                 {this.props.children}
@@ -43,8 +43,17 @@ class RestaurantNav extends Component {
                         </Column>
                         <Column auto>
                             <Button
+                                icon="gears"
+                                commitAction={() => ApplicationActions.goToPage(SETTINGS)}
+                                highPadding
+                            />
+                        </Column>
+                        <Column auto>
+                            <Button
                                 icon="window-restore"
-                                commitAction={() => ApplicationActions.toggleFullScreen()}/>
+                                commitAction={() => ApplicationActions.toggleFullScreen()}
+                                highPadding
+                            />
                         </Column>
                     </Row>
                 </Column>

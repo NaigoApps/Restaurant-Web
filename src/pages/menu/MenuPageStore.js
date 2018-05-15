@@ -1,35 +1,28 @@
 import AbstractStore from "../../stores/RootFeatureStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {
-    ACT_BEGIN_CREATE_CATEGORY,
-    ACT_BEGIN_CREATE_DISH,
-    ACT_CREATE_CATEGORY,
-    ACT_CREATE_DISH,
-    ACT_DELETE_CATEGORY,
-    ACT_DELETE_DISH,
-    ACT_DESELECT_CATEGORY,
-    ACT_DESELECT_DISH, ACT_RETRIEVE_ADDITIONS,
+    ACT_RETRIEVE_ADDITIONS,
     ACT_RETRIEVE_CATEGORIES,
     ACT_RETRIEVE_DISH_STATUSES,
     ACT_RETRIEVE_DISHES,
-    ACT_RETRIEVE_LOCATIONS,
-    ACT_SELECT_CATEGORY,
-    ACT_SELECT_DISH,
-    ACT_UPDATE_CATEGORY,
-    ACT_UPDATE_CATEGORY_CREATOR_LOCATION,
-    ACT_UPDATE_CATEGORY_CREATOR_NAME,
-    ACT_UPDATE_DISH,
-    ACT_UPDATE_DISH_CREATOR_DESCRIPTION,
-    ACT_UPDATE_DISH_CREATOR_NAME,
-    ACT_UPDATE_DISH_CREATOR_PRICE
+    ACT_RETRIEVE_LOCATIONS
 } from "../../actions/ActionTypes";
 import categoriesStore from "../../stores/generic/CategoriesStore";
 import dishesStore from "../../stores/generic/DishesStore";
 import dishesStatusesStore from "../../stores/generic/DishesStatusesStore";
 import locationsStore from "../../stores/LocationsStore";
 import additionsStore from "../../stores/generic/AdditionsStore";
+import {EditorStatus} from "../StoresUtils";
+import {findByUuid} from "../../utils/Utils";
+import {CategoriesEditorActionTypes} from "./CategoriesEditorActions";
+import {CategoriesCreatorActionTypes} from "./CategoriesCreatorActions";
+import {DishesCreatorActionTypes} from "./DishesCreatorActions";
+import {DishesEditorActionTypes} from "./DishesEditorActions";
+import {EntitiesUtils} from "../../utils/EntitiesUtils";
+import {ApplicationActionTypes} from "../../actions/ApplicationActions";
+import applicationStore from "../../stores/ApplicationStore";
 
-const {Map} = require('immutable');
+const {Map, List} = require('immutable');
 
 const EVT_MENU_PAGE_STORE_CHANGED = "EVT_MENU_PAGE_STORE_CHANGED";
 
@@ -37,146 +30,139 @@ class MenuPageStore extends AbstractStore {
 
     constructor() {
         super(EVT_MENU_PAGE_STORE_CHANGED);
-        this.selectedCategory = null;
-        this.inCreationCategory = null;
-        this.selectedDish = null;
-        this.inCreationDish = null;
+        this.categoriesEditorStatus = EditorStatus.SURFING;
+        this.dishesEditorStatus = EditorStatus.SURFING;
+        this.categoriesPage = 0;
+        this.dishesPage = 0;
+        this.category = null;
+        this.dish = null;
     }
 
     getState() {
+        const selectedCategory = this.getSelectedCategory();
         let result = Map({
             categories: categoriesStore.getCategories().getPayload(),
-            dishes: dishesStore.getDishesByCategory(this.selectedCategory),
+            dishes: selectedCategory ? dishesStore.getDishesByCategory(selectedCategory.get('uuid')) : List(),
             dishStatuses: dishesStatusesStore.getDishesStatuses().getPayload(),
             locations: locationsStore.getLocations().getPayload(),
             additions: additionsStore.getAdditions().getPayload(),
-            selectedDish: this.selectedDish,
-            createdDish: this.inCreationDish,
-            selectedCategory: this.selectedCategory,
-            createdCategory: this.inCreationCategory
+            dish: this.getSelectedDish(),
+            category: selectedCategory,
+            dishesEditorStatus: this.dishesEditorStatus,
+            categoriesEditorStatus: this.categoriesEditorStatus,
+            dishesPage: this.dishesPage,
+            categoriesPage: this.categoriesPage,
+
+            settings: applicationStore.getSettings()
         });
         return {
             data: result
         };
     }
 
-    setCategoryName(value) {
-        this.inCreationCategory = this.inCreationCategory.set('name', value);
+    getSelectedCategory(){
+        if(this.categoriesEditorStatus === EditorStatus.EDITING){
+            return findByUuid(categoriesStore.getCategories().getPayload(), this.category);
+        }else if(this.categoriesEditorStatus === EditorStatus.CREATING){
+            return this.category;
+        }
+        return null
     }
 
-    setCategoryLocation(value) {
-        this.inCreationCategory = this.inCreationCategory.set('location', value);
-    }
-
-    setDishName(value) {
-        this.inCreationDish = this.inCreationDish.set('name', value);
-    }
-
-    setDishPrice(value) {
-        this.inCreationDish = this.inCreationDish.set('price', value);
-    }
-
-    setDishDescription(value) {
-        this.inCreationDish = this.inCreationDish.set('description', value);
+    getSelectedDish(){
+        if(this.dishesEditorStatus === EditorStatus.EDITING){
+            return findByUuid(dishesStore.getDishesByCategory(this.category), this.dish);
+        }else if(this.dishesEditorStatus === EditorStatus.CREATING){
+            return this.dish;
+        }
+        return null;
     }
 
     handleCompletedAction(action) {
         let changed = true;
         dispatcher.waitFor([categoriesStore.getToken(), dishesStore.getToken(), dishesStatusesStore.getToken(),
-            locationsStore.getToken(), additionsStore.getToken()]);
+            locationsStore.getToken(), additionsStore.getToken(), applicationStore.getToken()]);
         switch (action.type) {
+            case ApplicationActionTypes.LOAD_SETTINGS:
+            case ApplicationActionTypes.STORE_SETTINGS:
             case ACT_RETRIEVE_CATEGORIES:
             case ACT_RETRIEVE_DISHES:
             case ACT_RETRIEVE_DISH_STATUSES:
             case ACT_RETRIEVE_LOCATIONS:
             case ACT_RETRIEVE_ADDITIONS:
                 break;
-            case ACT_CREATE_CATEGORY:
-                this.selectedCategory = action.body.get('uuid');
-                this.inCreationCategory = null;
+            case CategoriesCreatorActionTypes.CREATE_CATEGORY:
+            case CategoriesEditorActionTypes.UPDATE_EDITING_CATEGORY:
+                this.category = action.body.get('uuid');
+                this.categoriesEditorStatus = EditorStatus.EDITING;
+                this.dish = null;
+                this.dishesEditorStatus = EditorStatus.SURFING;
                 break;
-            case ACT_CREATE_DISH:
-                this.selectedDish = action.body.get('uuid');
-                this.inCreationDish = null;
+            case DishesCreatorActionTypes.CREATE_DISH:
+            case DishesEditorActionTypes.UPDATE_EDITING_DISH:
+                this.dish = action.body.get('uuid');
+                this.dishesEditorStatus = EditorStatus.EDITING;
+                this.category = action.body.get('category');
                 break;
-            case ACT_UPDATE_CATEGORY:
-                this.selectedCategory = action.body.get('uuid');
+            case CategoriesEditorActionTypes.DESELECT_EDITING_CATEGORY:
+            case CategoriesEditorActionTypes.DELETE_EDITING_CATEGORY:
+            case ApplicationActionTypes.GO_TO_PAGE:
+                this.category = null;
+                this.categoriesEditorStatus = EditorStatus.SURFING;
+                this.dish = null;
+                this.dishesEditorStatus = EditorStatus.SURFING;
                 break;
-            case ACT_UPDATE_DISH:
-                this.selectedDish = action.body.get('uuid');
-                this.selectedCategory = action.body.get('category');
+            case DishesEditorActionTypes.DESELECT_EDITING_DISH:
+            case DishesEditorActionTypes.DELETE_EDITING_DISH:
+            case DishesCreatorActionTypes.ABORT_DISH_CREATION:
+                this.dish = null;
+                this.dishesEditorStatus = EditorStatus.SURFING;
                 break;
-            case ACT_DELETE_CATEGORY:
-                this.selectedCategory = null;
+            case CategoriesCreatorActionTypes.BEGIN_CATEGORY_CREATION:
+                this.category = EntitiesUtils.newCategory();
+                this.categoriesEditorStatus = EditorStatus.CREATING;
                 break;
-            case ACT_DELETE_DISH:
-                this.selectedDish = null;
+            case DishesCreatorActionTypes.BEGIN_DISH_CREATION:
+                this.dish = EntitiesUtils.newDish();
+                this.dish = this.dish.set('category', this.category);
+                this.dishesEditorStatus = EditorStatus.CREATING;
                 break;
-            case ACT_BEGIN_CREATE_CATEGORY:
-                this.selectedCategory = null;
-                this.inCreationCategory = this.buildCategory();
+            case CategoriesEditorActionTypes.SELECT_EDITING_CATEGORY:
+                this.category = action.body;
+                this.categoriesEditorStatus = EditorStatus.EDITING;
+                this.dish = null;
+                this.dishesEditorStatus = EditorStatus.SURFING;
                 break;
-            case ACT_BEGIN_CREATE_DISH:
-                this.selectedDish = null;
-                this.inCreationDish = this.buildDish();
+            case CategoriesEditorActionTypes.SELECT_EDITING_CATEGORY_PAGE:
+                this.categoriesPage = action.body;
                 break;
-            case ACT_SELECT_CATEGORY:
-                this.selectedCategory = action.body;
-                this.selectedDish = null;
-                this.inCreationCategory = null;
-                this.inCreationDish = null;
+            case DishesEditorActionTypes.SELECT_EDITING_DISH:
+                this.dish = action.body;
+                this.dishesEditorStatus = EditorStatus.EDITING;
                 break;
-            case ACT_SELECT_DISH:
-                this.selectedDish = action.body;
-                this.inCreationDish = null;
+            case DishesEditorActionTypes.SELECT_EDITING_DISH_PAGE:
+                this.dishesPage = action.body;
                 break;
-            case ACT_DESELECT_CATEGORY:
-                this.selectedCategory = null;
-                this.selectedDish = null;
-                this.inCreationDish = null;
-                this.inCreationCategory = null;
+            case CategoriesCreatorActionTypes.SET_CREATING_CATEGORY_NAME:
+                this.category = this.category.set('name', action.body);
                 break;
-            case ACT_DESELECT_DISH:
-                this.selectedDish = null;
-                this.inCreationDish = null;
+            case CategoriesCreatorActionTypes.SET_CREATING_CATEGORY_LOCATION:
+                this.category = this.category.set('location', action.body);
                 break;
-            case ACT_UPDATE_CATEGORY_CREATOR_NAME:
-                this.setCategoryName(action.body);
+            case DishesCreatorActionTypes.SET_CREATING_DISH_NAME:
+                this.dish = this.dish.set('name', action.body);
                 break;
-            case ACT_UPDATE_CATEGORY_CREATOR_LOCATION:
-                this.setCategoryLocation(action.body);
+            case DishesCreatorActionTypes.SET_CREATING_DISH_DESCRIPTION:
+                this.dish = this.dish.set('description', action.body);
                 break;
-            case ACT_UPDATE_DISH_CREATOR_NAME:
-                this.setDishName(action.body);
-                break;
-            case ACT_UPDATE_DISH_CREATOR_PRICE:
-                this.setDishPrice(action.body);
-                break;
-            case ACT_UPDATE_DISH_CREATOR_DESCRIPTION:
-                this.setDishDescription(action.body);
+            case DishesCreatorActionTypes.SET_CREATING_DISH_PRICE:
+                this.dish = this.dish.set('price', action.body);
                 break;
             default:
                 changed = false;
                 break;
         }
         return changed;
-    }
-
-    buildCategory() {
-        return Map({
-            name: "",
-            location: null,
-            dishes: []
-        });
-    }
-
-    buildDish() {
-        return Map({
-            name: "",
-            price: 0.0,
-            description: "",
-            category: this.selectedCategory
-        });
     }
 
 }

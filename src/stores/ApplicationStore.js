@@ -12,10 +12,11 @@ class ApplicationStore extends AbstractStore {
         super(EVT_APPLICATION_STORE_CHANGED);
         this.isFullScreen = false;
         this.currentPage = null;
-        this.keyboardVisible = false;
         this.floatInput = Map();
         this.integerInput = Map();
         this.selectInput = Map();
+        this.textInput = Map();
+        this.settings = Map();
     }
 
     handleCompletedAction(action) {
@@ -33,12 +34,22 @@ class ApplicationStore extends AbstractStore {
             case ApplicationActionTypes.GO_TO_PAGE:
                 this.currentPage = action.body;
                 break;
-            case ApplicationActionTypes.SET_KEYBOARD_VISIBLE:
-                this.keyboardVisible = action.body;
+
+            case ApplicationActionTypes.SHOW_TEXT_INPUT:
+                this.textInput = StoresUtils.initTextInput(action.body);
+                break;
+            case ApplicationActionTypes.TEXT_INPUT_CHAR:
+                this.textInput = StoresUtils.textChar(this.textInput, action.body);
+                break;
+            case ApplicationActionTypes.TEXT_INPUT_CARET:
+                this.textInput = StoresUtils.textCaret(this.textInput, action.body);
+                break;
+            case ApplicationActionTypes.HIDE_TEXT_INPUT:
+                this.textInput = StoresUtils.resetTextInput();
                 break;
 
             case ApplicationActionTypes.SHOW_FLOAT_INPUT:
-                this.floatInput = StoresUtils.initFloatInput(action.body.value, action.body.callback, action.body.label);
+                this.floatInput = StoresUtils.initFloatInput(action.body);
                 break;
             case ApplicationActionTypes.FLOAT_INPUT_CHAR:
                 this.floatInput = StoresUtils.floatChar(this.floatInput, action.body);
@@ -62,12 +73,14 @@ class ApplicationStore extends AbstractStore {
             case ApplicationActionTypes.HIDE_INTEGER_INPUT:
                 this.integerInput = StoresUtils.resetIntInput();
                 break;
-
             case ApplicationActionTypes.SHOW_SELECT_INPUT:
                 this.selectInput = StoresUtils.initSelectInput(action.body);
                 break;
-            case ApplicationActionTypes.SELECT_INPUT_CHANGE:
-                this.selectInput = StoresUtils.selectChange(this.selectInput, action.body);
+            case ApplicationActionTypes.SELECT_INPUT_SELECT:
+                this.selectInput = StoresUtils.selectInputSelect(this.selectInput, action.body);
+                break;
+            case ApplicationActionTypes.SELECT_INPUT_DESELECT:
+                this.selectInput = StoresUtils.selectInputDeselect(this.selectInput, action.body);
                 break;
             case ApplicationActionTypes.SELECT_INPUT_PAGE_CHANGE:
                 this.selectInput = StoresUtils.selectPageChange(this.selectInput, action.body);
@@ -75,6 +88,12 @@ class ApplicationStore extends AbstractStore {
             case ApplicationActionTypes.HIDE_SELECT_INPUT:
                 this.selectInput = StoresUtils.resetSelectInput(this.selectInput);
                 break;
+
+            case ApplicationActionTypes.LOAD_SETTINGS:
+            case ApplicationActionTypes.STORE_SETTINGS:
+                this.settings = action.body || Map();
+                break;
+
             default:
                 changed = false;
                 break;
@@ -88,9 +107,15 @@ class ApplicationStore extends AbstractStore {
             currentPage: this.currentPage,
             keyboardVisible: this.keyboardVisible,
             floatInput: this.floatInput,
+            textInput: this.textInput,
             integerInput: this.integerInput,
             selectInput: this.selectInput,
+            settings: this.settings
         };
+    }
+
+    getSettings(){
+        return this.settings;
     }
 
 }

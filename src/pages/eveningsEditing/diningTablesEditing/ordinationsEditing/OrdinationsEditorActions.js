@@ -28,7 +28,7 @@ export const OrdinationsEditorActions = {
 
     onConfirmOrders: (tableUuid, ordinationUuid, orders) => asyncActionBuilder.put(
         OrdinationEditorActionTypes.UPDATE_ORDERS,
-        'ordinations/' + ordinationUuid + '/orders', orders),
+        'dining-tables/' + ordinationUuid + '/orders', orders),
 
     onAbortOrders: () => dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDERS_EDITING),
 

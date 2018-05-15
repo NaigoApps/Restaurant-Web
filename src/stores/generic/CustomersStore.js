@@ -7,6 +7,8 @@ import {
 } from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
+import {CustomersCreatorActionTypes} from "../../pages/customers/CustomerCreatorActions";
+import {CustomersEditorActionTypes} from "../../pages/customers/CustomersEditorActions";
 
 export const EVT_CUSTOMER_STORE_CHANGED = "EVT_CUSTOMER_STORE_CHANGED";
 
@@ -44,17 +46,17 @@ class CustomersStore extends AbstractEntityStore {
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_CREATE_CUSTOMER:
+            case CustomersCreatorActionTypes.CREATE_CUSTOMER:
                 this.createData(action.body);
                 break;
             case ACT_RETRIEVE_CUSTOMERS:
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;
-            case ACT_UPDATE_CUSTOMER:
+            case CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER:
                 this.updateData(action.body);
                 break;
-            case ACT_DELETE_CUSTOMER:
+            case CustomersEditorActionTypes.DELETE_EDITING_CUSTOMER:
                 this.deleteData(action.body);
                 break;
             default:

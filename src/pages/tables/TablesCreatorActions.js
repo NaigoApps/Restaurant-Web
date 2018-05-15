@@ -1,30 +1,34 @@
-import {
-    ACT_BEGIN_CREATE_RESTAURANT_TABLE, ACT_CREATE_RESTAURANT_TABLE,
-    ACT_DESELECT_RESTAURANT_TABLE,
-    ACT_SELECT_RESTAURANT_TABLE,
-    ACT_UPDATE_RESTAURANT_TABLE_CREATOR_NAME
-} from "../../actions/ActionTypes"
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
-class TablesCreatorActions {
+export const TablesCreatorActionTypes = {
+    SET_CREATING_R_TABLE_NAME: "SET_CREATING_R_TABLE_NAME",
+    BEGIN_R_TABLE_CREATION: "BEGIN_R_TABLE_CREATION",
+    CREATE_R_TABLE: "CREATE_R_TABLE",
+    ABORT_R_TABLE_CREATION: "ABORT_R_TABLE_CREATION",
+};
 
-    updateTableName(name) {
-        dispatcher.fireEnd(ACT_UPDATE_RESTAURANT_TABLE_CREATOR_NAME, name);
-    }
+export const TablesCreatorActions = {
 
-    beginTableCreation() {
-        dispatcher.fireEnd(ACT_BEGIN_CREATE_RESTAURANT_TABLE);
-    }
+    confirmName: (uuid, name) =>
+        dispatcher.fireEnd(
+            TablesCreatorActionTypes.SET_CREATING_R_TABLE_NAME,
+            name
+        ),
 
-    createTable(table) {
-        asyncActionBuilder.post(ACT_CREATE_RESTAURANT_TABLE, 'restaurant-tables', table);
-    }
+    beginTableCreation: () =>
+        dispatcher.fireEnd(
+            TablesCreatorActionTypes.BEGIN_R_TABLE_CREATION,
+        ),
 
-    deselectTable(){
-        dispatcher.fireEnd(ACT_DESELECT_RESTAURANT_TABLE);
-    }
-}
+    onConfirm: (table) =>
+        asyncActionBuilder.post(
+            TablesCreatorActionTypes.CREATE_R_TABLE,
+            'restaurant-tables',
+            table),
 
-const tablesCreatorActions = new TablesCreatorActions();
-export default tablesCreatorActions;
+    onAbort: () =>
+        dispatcher.fireEnd(
+            TablesCreatorActionTypes.ABORT_R_TABLE_CREATION,
+        ),
+};

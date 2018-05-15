@@ -1,9 +1,11 @@
 import tablesActions from "../../generic/TablesActions";
+import {ApplicationActions} from "../../actions/ApplicationActions";
 
 class TablesPageActions {
 
     initTablesPage(){
-        tablesActions.retrieveTables()
+        tablesActions.retrieveTables();
+        ApplicationActions.loadSettings();
     }
 
 }

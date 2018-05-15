@@ -2,23 +2,16 @@ import React, {Component} from 'react';
 import GraphWizardPage from "../../../../components/widgets/wizard/graph-wizard/GraphWizardPage";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
-import {INVOICE, RECEIPT} from "./DiningTableClosingView";
+import {INVOICE, RECEIPT} from "./DiningTableClosingWizard";
 import SwitchInput from "../../../../components/widgets/SwitchInput";
 import {DiningTablesClosingActions} from "./DiningTablesClosingActions";
 import {iGet} from "../../../../utils/Utils";
 import IntegerInput from "../../../../components/widgets/inputs/IntegerInput";
+import IntegerEditor from "../../../../components/widgets/inputs/IntegerEditor";
 
 export default class DiningTableClosingModePage extends Component {
     constructor(props) {
         super(props);
-    }
-
-    setType(value) {
-        if (!value) {
-            DiningTablesClosingActions.setBillType(RECEIPT);
-        } else {
-            DiningTablesClosingActions.setBillType(INVOICE);
-        }
     }
 
     setQuick(quick) {
@@ -33,9 +26,8 @@ export default class DiningTableClosingModePage extends Component {
     }
 
     render() {
-        let type = iGet(this.props.data, "diningTableClosing.type");
         let quick = iGet(this.props.data, "diningTableClosing.quick");
-        let splitText = iGet(this.props.data, "diningTableClosing.splitInput.text");
+        let split = iGet(this.props.data, "diningTableClosing.split");
         return (
             <GraphWizardPage
                 abortAction={this.props.abortAction}
@@ -43,18 +35,6 @@ export default class DiningTableClosingModePage extends Component {
                 <Row>
                     <Column>
                         <Row>
-                            <Column>
-                                <SwitchInput
-                                    value={type === INVOICE}
-                                    leftText="Scontrino"
-                                    rightText="Fattura"
-                                    leftBg="info"
-                                    rightBg="info"
-                                    onToggle={(value) => this.setType(value)}
-                                />
-                            </Column>
-                        </Row>
-                        <Row topSpaced>
                             <Column>
                                 <SwitchInput
                                     value={!quick}
@@ -68,15 +48,14 @@ export default class DiningTableClosingModePage extends Component {
                         </Row>
                         <Row topSpaced>
                             <Column>
-                                <h5>Numero di parti</h5>
-                            </Column>
-                        </Row>
-                        <Row>
-                            <Column>
-                                <IntegerInput
-                                    onChar={char => DiningTablesClosingActions.splitChar(char)}
-                                    onChange={text => DiningTablesClosingActions.splitChange(text)}
-                                    text={splitText}
+                                <IntegerEditor
+                                    type="info"
+                                    options={{
+                                        label: "Numero di parti",
+                                        value: split,
+                                        callback: result => DiningTablesClosingActions.setSplit(result),
+                                        min: 1
+                                    }}
                                 />
                             </Column>
                         </Row>

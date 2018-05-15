@@ -2,7 +2,7 @@ import SubFeatureStore from "../../../../stores/SubFeatureStore";
 import eveningPageStore from "../../EveningPageStore";
 import {EditorStatus} from "../../../StoresUtils";
 import eveningStore from "../../../../stores/EveningStore";
-import diningTablesEditingStore from "../DiningTableEditorStore";
+import diningTablesEditingStore, {DiningTableEditorMode} from "../DiningTableEditorStore";
 import {findByUuid} from "../../../../utils/Utils";
 import {EntitiesUtils} from "../../../../utils/EntitiesUtils";
 import {OrdinationCreatorActionTypes} from "./OrdinationsCreatorActions";
@@ -47,6 +47,12 @@ class OrdinationEditingStore extends SubFeatureStore {
             case DiningTablesEditorActionTypes.SELECT_DINING_TABLE:
                 this.init();
                 break;
+            case DiningTablesEditorActionTypes.BEGIN_ORDINATIONS_EDITING:
+            case DiningTablesEditorActionTypes.BEGIN_DATA_EDITING:
+            case DiningTablesEditorActionTypes.BEGIN_BILLS_EDITING:
+                this.status = EditorStatus.SURFING;
+                this.ordination = null;
+                break;
             case OrdinationEditorActionTypes.SELECT_ORDINATION_PAGE:
                 this.page = action.body;
                 break;
@@ -59,9 +65,11 @@ class OrdinationEditingStore extends SubFeatureStore {
                 this.ordinationEditor = this.initOrdinationEditor(this.getSelectedOrdination());
                 break;
             case OrdinationCreatorActionTypes.CREATE_ORDINATION:
-            case OrdinationEditorActionTypes.UPDATE_ORDERS:
                 this.status = EditorStatus.EDITING;
                 this.ordination = action.body.get('uuid');
+                this.ordinationEditor = this.resetOrdinationEditor();
+                break;
+            case OrdinationEditorActionTypes.UPDATE_ORDERS:
                 this.ordinationEditor = this.resetOrdinationEditor();
                 break;
             case OrdinationEditorActionTypes.BEGIN_ORDINATION_EDITING:

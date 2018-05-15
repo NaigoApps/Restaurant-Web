@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {TYPES} from "../../components/editors/EntityEditor";
 import Row from "../../widgets/Row";
-import Button from "../../widgets/Button";
 import Column from "../../widgets/Column";
-import locationsEditorActions from "./LocationsEditorActions";
-import locationsCreatorActions from "./LocationsCreatorActions";
-import PaginatedList from "../../components/widgets/PaginatedList";
+import SelectInput from "../../components/widgets/inputs/SelectInput";
+import {LocationsEditorActions} from "./LocationsEditorActions";
+import {LocationsCreatorActions} from "./LocationsCreatorActions";
+import StoresUtils from "../StoresUtils";
+import RoundButton from "../../widgets/RoundButton";
 
 export default class LocationsNavigator extends Component {
 
@@ -14,25 +14,31 @@ export default class LocationsNavigator extends Component {
     }
 
     render() {
-        const props = this.props.data;
+        const data = this.props.data;
 
-        return [<Row key="list" topSpaced>
-            <Column>
-                <PaginatedList
-                    id={location => location.get('uuid')}
-                    entities={props.get('locations')}
-                    renderer={location => location.get('name')}
-                    selectMethod={locationsEditorActions.selectLocation}
-                    deselectMethod={locationsEditorActions.deselectLocation}
-                />
-            </Column>
-        </Row>,
-            <Row key="new" topSpaced>
+        return [
+            <Row key="list" topSpaced>
                 <Column>
-                    <Button
-                        text="Nuova postazione"
-                        type="info"
-                        commitAction={locationsCreatorActions.beginLocationCreation}
+                    <SelectInput
+                        bordered
+                        rows={StoresUtils.settings(data, "locationsRows", 3)}
+                        cols={StoresUtils.settings(data, "locationsColumns", 3)}
+                        id={location => location.get('uuid')}
+                        options={data.get('locations')}
+                        page={data.get('page')}
+                        renderer={location => location.get('name')}
+                        onSelectPage={index => LocationsEditorActions.selectLocationsPage(index)}
+                        onSelect={location => LocationsEditorActions.selectLocation(location)}
+                    />
+                </Column>
+            </Row>,
+            <Row key="new" justify="center" topSpaced grow>
+                <Column justify="center" auto>
+                    <RoundButton key="new"
+                                 icon="plus"
+                                 text="Nuova postazione"
+                                 type="success"
+                                 commitAction={() => LocationsCreatorActions.beginLocationCreation()}
                     />
                 </Column>
             </Row>];

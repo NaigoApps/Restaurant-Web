@@ -32,10 +32,9 @@ export default class OrdersEditor extends Component {
     render() {
         let data = this.props.data;
         let orders = iGet(data, "ordersEditing.orders");
-        let ordination = iGet(data, "ordinationEditing.ordination");
 
         return <GraphWizard
-            isValid={data => orders.size > 0}
+            isValid={data => orders === null || orders.size > 0}
             page={iGet(data, "ordersEditing.wizardPage")}
             hideForm={true}
             visible={this.props.visible}
@@ -44,14 +43,16 @@ export default class OrdersEditor extends Component {
             renderer={(data) => this.renderWizardData.bind(this)(data)}
             onMovePage={page => OrdersActions.selectWizardPage(page)}
             commitAction={this.onWizardOk.bind(this)}
-            abortAction={this.onWizardAbort.bind(this)}>
+            abortAction={this.onWizardAbort.bind(this)}
+            abortText="Annulla comanda"
+            confirmText="Conferma comanda"
+        >
 
             <OrderDishWizardPage
                 identifier={OrdersWizardPages.DISHES_PAGE}
                 name="Piatti"
                 label={dish => dish.get('name')}
                 data={this.props.data}
-                final
             />
 
             <OrderAdditionsWizardPage

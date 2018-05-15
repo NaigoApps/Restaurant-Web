@@ -5,7 +5,6 @@ import Scrollable from "../../../../components/widgets/Scrollable";
 import Column from "../../../../widgets/Column";
 import Row from "../../../../widgets/Row";
 import Button from "../../../../widgets/Button";
-import GroupEditor from "./GroupEditor";
 
 export default class OrdinationOrdersCrudList extends React.Component {
     constructor(props) {
@@ -25,13 +24,6 @@ export default class OrdinationOrdersCrudList extends React.Component {
                     text={result + " " + price}
                     size="lg"
                     commitAction={() => this.props.commitAction(ordersGroup)}/>
-            </Column>
-            <Column auto>
-                <GroupEditor
-                    data={data}
-                    group={ordersGroup}
-                    trashAction={this.props.trashAction}
-                />
             </Column>
         </Row>
     }

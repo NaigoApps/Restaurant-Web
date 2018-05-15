@@ -16,6 +16,9 @@ export default class Icon extends Component {
         if(this.props.size){
             classes.push("icon-size-" + this.props.size);
         }
+        if(this.props.type){
+            classes.push("text-" + this.props.type);
+        }
         return classes.join(" ");
     }
 

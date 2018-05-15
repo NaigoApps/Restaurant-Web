@@ -22,7 +22,10 @@ export default class ApplicationFloatInput extends Component {
 
     render() {
         let data = this.props.data;
-        return <PopupContainer visible={data.get('visible')}>
+        return <PopupContainer
+            id="app-float-input"
+            blurCallback={() => ApplicationActions.hideFloatInput()}
+            visible={data.get('visible')}>
             <Row>
                 <Column>
                     {data.get('label')}

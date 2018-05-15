@@ -1,40 +1,49 @@
-import {
-    ACT_BEGIN_CREATE_ADDITION,
-    ACT_CREATE_ADDITION,
-    ACT_DELETE_ADDITION,
-    ACT_DESELECT_ADDITION,
-    ACT_RETRIEVE_ADDITIONS,
-    ACT_SELECT_ADDITION,
-    ACT_UPDATE_ADDITION,
-    ACT_UPDATE_ADDITION_GENERIC,
-    ACT_UPDATE_ADDITION_NAME,
-    ACT_UPDATE_ADDITION_PRICE
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
-class AdditionsCreatorActions {
+export const AdditionsCreatorActionTypes = {
+    BEGIN_ADDITION_CREATION: "BEGIN_ADDITION_CREATION",
+    CREATE_ADDITION: "CREATE_ADDITION",
+    ABORT_ADDITION_CREATION: "ABORT_ADDITION_CREATION",
+    SET_CREATING_ADDITION_NAME: "SET_CREATING_ADDITION_NAME",
+    SET_CREATING_ADDITION_PRICE: "SET_CREATING_ADDITION_PRICE",
+    SET_CREATING_ADDITION_GENERIC: "SET_CREATING_ADDITION_GENERIC",
+};
 
-    beginAdditionCreation() {
-        dispatcher.fireEnd(ACT_BEGIN_CREATE_ADDITION);
-    }
+export const AdditionsCreatorActions = {
 
-    createAddition(addition) {
-        asyncActionBuilder.post(ACT_CREATE_ADDITION, "additions", addition)
-    }
+    beginAdditionCreation: () =>
+        dispatcher.fireEnd(
+            AdditionsCreatorActionTypes.BEGIN_ADDITION_CREATION
+        ),
 
-    updateAdditionName(name) {
-        dispatcher.fireEnd(ACT_UPDATE_ADDITION_NAME, name)
-    }
+    onConfirm: (addition) =>
+        asyncActionBuilder.post(
+            AdditionsCreatorActionTypes.CREATE_ADDITION,
+            "additions",
+            addition
+        ),
 
-    updateAdditionPrice(price) {
-        dispatcher.fireEnd(ACT_UPDATE_ADDITION_PRICE, price)
-    }
+    onAbort: () =>
+        dispatcher.fireEnd(
+            AdditionsCreatorActionTypes.ABORT_ADDITION_CREATION
+        ),
 
-    updateAdditionGeneric(generic) {
-        dispatcher.fireEnd(ACT_UPDATE_ADDITION_GENERIC, generic)
-    }
-}
+    confirmName: (uuid, name) =>
+        dispatcher.fireEnd(
+            AdditionsCreatorActionTypes.SET_CREATING_ADDITION_NAME,
+            name
+        ),
 
-const additionsCreatorActions = new AdditionsCreatorActions();
-export default additionsCreatorActions;
+    confirmPrice: (uuid, price) =>
+        dispatcher.fireEnd(
+            AdditionsCreatorActionTypes.SET_CREATING_ADDITION_PRICE,
+            price
+        ),
+
+    confirmGeneric: (uuid, generic) =>
+        dispatcher.fireEnd(
+            AdditionsCreatorActionTypes.SET_CREATING_ADDITION_GENERIC,
+            generic
+        ),
+};

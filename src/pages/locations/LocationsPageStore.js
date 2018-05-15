@@ -13,6 +13,13 @@ import {
 } from "../../actions/ActionTypes";
 import locationsStore from "../../stores/LocationsStore";
 import printersStore from "../../stores/generic/PrintersStore";
+import {LocationsCreatorActions, LocationsCreatorActionTypes} from "./LocationsCreatorActions";
+import {EditorStatus} from "../StoresUtils";
+import {findByUuid} from "../../utils/Utils";
+import {LocationsEditorActions, LocationsEditorActionTypes} from "./LocationsEditorActions";
+import {EntitiesUtils} from "../../utils/EntitiesUtils";
+import {ApplicationActionTypes} from "../../actions/ApplicationActions";
+import applicationStore from "../../stores/ApplicationStore";
 
 const {fromJS, Map} = require('immutable');
 
@@ -22,51 +29,51 @@ class LocationsPageStore extends AbstractStore {
 
     constructor() {
         super(EVT_LOCATIONS_PAGE_STORE_CHANGED);
-        this.selectedLocation = null;
-        this.createdLocation = null;
-    }
-
-    setName(value) {
-        this.createdLocation = this.createdLocation.set('name', value);
-    }
-
-    setPrinter(value) {
-        this.createdLocation = this.createdLocation.set('printer', value);
+        this.location = null;
+        this.editorStatus = EditorStatus.SURFING;
+        this.page = 0;
     }
 
     handleCompletedAction(action) {
         let changed = true;
-        dispatcher.waitFor([locationsStore.getToken(), printersStore.getToken()]);
+        dispatcher.waitFor([locationsStore.getToken(), printersStore.getToken(), applicationStore.getToken()]);
         switch (action.type) {
+            case ApplicationActionTypes.LOAD_SETTINGS:
+            case ApplicationActionTypes.STORE_SETTINGS:
             case ACT_RETRIEVE_LOCATIONS:
                 break;
-            case ACT_CREATE_LOCATION:
-                this.selectedLocation = action.body.get('uuid');
-                this.createdLocation = null;
+            case LocationsCreatorActionTypes.CREATE_LOCATION:
+                this.editorStatus = EditorStatus.EDITING;
+                this.location = action.body.get('uuid');
                 break;
-            case ACT_UPDATE_LOCATION:
-                this.selectedLocation = action.body.get('uuid');
+                //FIXME Anche no...
+            case LocationsEditorActionTypes.UPDATE_EDITING_LOCATION:
+                this.editorStatus = EditorStatus.EDITING;
+                this.location = action.body.get('uuid');
                 break;
-            case ACT_DELETE_LOCATION:
-                this.selectedLocation = null;
+            case LocationsCreatorActionTypes.BEGIN_LOCATION_CREATION:
+                this.editorStatus = EditorStatus.CREATING;
+                this.location = EntitiesUtils.newLocation();
                 break;
-            case ACT_BEGIN_CREATE_LOCATION:
-                this.selectedLocation = null;
-                this.createdLocation = this.buildLocation();
+            case LocationsEditorActionTypes.SELECT_EDITING_LOCATION:
+                this.editorStatus = EditorStatus.EDITING;
+                this.location = action.body;
                 break;
-            case ACT_SELECT_LOCATION:
-                this.selectedLocation = action.body;
-                this.createdLocation = null;
+            case LocationsEditorActionTypes.SELECT_LOCATIONS_EDITOR_PAGE:
+                this.page = action.body;
                 break;
-            case ACT_DESELECT_LOCATION:
-                this.selectedLocation = null;
-                this.createdLocation = null;
+            case LocationsEditorActionTypes.DELETE_EDITING_LOCATION:
+            case LocationsEditorActionTypes.DESELECT_EDITING_LOCATION:
+            case LocationsCreatorActionTypes.ABORT_LOCATION_CREATION:
+            case ApplicationActionTypes.GO_TO_PAGE:
+                this.editorStatus = EditorStatus.SURFING;
+                this.location = null;
                 break;
-            case ACT_UPDATE_LOCATION_NAME:
-                this.setName(action.body);
+            case LocationsCreatorActionTypes.SET_CREATING_LOCATION_NAME:
+                this.location = this.location.set('name', action.body);
                 break;
-            case ACT_UPDATE_LOCATION_PRINTER:
-                this.setPrinter(action.body);
+            case LocationsCreatorActionTypes.SET_CREATING_LOCATION_PRINTER:
+                this.location = this.location.set('printer', action.body);
                 break;
             default:
                 changed = false;
@@ -75,26 +82,30 @@ class LocationsPageStore extends AbstractStore {
         return changed;
     }
 
-    buildLocation() {
-        return fromJS({
-            name: "",
-            printer: ""
-        });
-    }
-
     getState() {
         let result = Map({
             locations: locationsStore.getLocations().getPayload(),
             printers: printersStore.getPrinters().getPayload(),
 
-            selectedLocation: this.selectedLocation,
-            createdLocation: this.createdLocation
+            page: this.page,
+            editorStatus: this.editorStatus,
+            location: this.getSelectedLocation(),
+
+            settings: applicationStore.getSettings()
         });
         return {
             data : result
         }
     }
 
+    getSelectedLocation() {
+        if (this.editorStatus === EditorStatus.EDITING) {
+            return findByUuid(locationsStore.getLocations().getPayload(), this.location);
+        } else if (this.editorStatus === EditorStatus.CREATING) {
+            return this.location;
+        }
+        return null;
+    }
 }
 
 const locationsPageStore = new LocationsPageStore();

@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
-import SelectInput from "./SelectInput";
-import Column from "../../../widgets/Column";
 import Button from "../../../widgets/Button";
-import OkCancelModal from "../../../widgets/OkCancelModal";
-import Row from "../../../widgets/Row";
 import {ApplicationActions} from "../../../actions/ApplicationActions";
+import Column from "../../../widgets/Column";
+import Row from "../../../widgets/Row";
 
 /**
  * Events:
@@ -24,8 +22,8 @@ export default class SelectEditor extends Component {
 
     renderValue(value) {
         const options = this.props.options;
-        if (!options.renderer) {
-            return value;
+        if (!options.renderer || !value) {
+            return value || "";
         }
         return options.renderer(value);
     }
@@ -41,19 +39,29 @@ export default class SelectEditor extends Component {
 
     render() {
         const options = this.props.options;
+        let value;
+        if (!options.multiSelect) {
+            value = this.renderValue(this.findValue(options.value));
+        } else {
+            value = options.value
+                .map(v => this.renderValue(this.findValue(v)))
+                .sort((s1, s2) => s1.trim().localeCompare(s2.trim()))
+                .reduce((v1, v2) => v1 + ", " + v2)
+        }
+        let text = <Row>
+            <Column auto justify="center">
+                <span><b>{options.label}</b>:</span>
+            </Column>
+            <Column><span className="text-left">{value}</span></Column>
+        </Row>;
 
-        return <Row align="center" topSpaced>
-            <Column sm="2" right>
-                {options.label}
-            </Column>
-            <Column auto>
-                <Button
-                    highPadding
-                    text={this.renderValue(this.findValue(options.value))}
-                    commitAction={() => ApplicationActions.showSelectInput(options)}
-                />
-            </Column>
-        </Row>
+        return <Button
+            highPadding
+            textRows={this.props.textRows}
+            type={this.props.type}
+            text={text}
+            commitAction={() => ApplicationActions.showSelectInput(options)}
+        />;
     }
 
 }

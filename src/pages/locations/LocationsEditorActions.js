@@ -1,43 +1,52 @@
-import {
-    ACT_DELETE_LOCATION,
-    ACT_DESELECT_LOCATION,
-    ACT_SELECT_LOCATION,
-    ACT_UPDATE_LOCATION
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
-class LocationsEditorActions {
+export const LocationsEditorActionTypes = {
+    SELECT_EDITING_LOCATION: "SELECT_EDITING_LOCATION",
+    DESELECT_EDITING_LOCATION: "DESELECT_EDITING_LOCATION",
+    UPDATE_EDITING_LOCATION: "UPDATE_EDITING_LOCATION",
+    DELETE_EDITING_LOCATION: "DELETE_EDITING_LOCATION",
+    SELECT_LOCATIONS_EDITOR_PAGE: "SELECT_LOCATIONS_EDITOR_PAGE"
+};
 
-    selectLocation(location) {
-        dispatcher.fireEnd(ACT_SELECT_LOCATION, location);
-    }
+export const LocationsEditorActions = {
 
-    deselectLocation(){
-        dispatcher.fireEnd(ACT_DESELECT_LOCATION);
-    }
+    selectLocationsPage: (page) =>
+        dispatcher.fireEnd(
+            LocationsEditorActionTypes.SELECT_LOCATIONS_EDITOR_PAGE,
+            page
+        ),
 
-    updateLocationName(uuid, value) {
+    selectLocation: (location) =>
+        dispatcher.fireEnd(
+            LocationsEditorActionTypes.SELECT_EDITING_LOCATION,
+            location
+        ),
+
+    deselectLocation: () =>
+        dispatcher.fireEnd(
+            LocationsEditorActionTypes.DESELECT_EDITING_LOCATION
+        ),
+
+    confirmName: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_LOCATION,
+            LocationsEditorActionTypes.UPDATE_EDITING_LOCATION,
             'locations/' + uuid + '/name',
             value
-        );
-    }
+        ),
 
-    updateLocationPrinter(uuid, value) {
+    confirmPrinter: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_LOCATION,
+            LocationsEditorActionTypes.UPDATE_EDITING_LOCATION,
             'locations/' + uuid + '/printer',
             value
-        );
-    }
+        ),
 
-    deleteLocation(uuid) {
-        asyncActionBuilder.remove(ACT_DELETE_LOCATION, 'locations', uuid);
-    }
+    deleteLocation: (uuid) =>
+        asyncActionBuilder.remove(
+            LocationsEditorActionTypes.DELETE_EDITING_LOCATION,
+            'locations',
+            uuid
+        )
 
-}
-
-const locationsEditorActions = new LocationsEditorActions();
-export default locationsEditorActions;
+};

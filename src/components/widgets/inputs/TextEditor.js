@@ -1,64 +1,27 @@
 import React, {Component} from 'react';
-import TextInput from "./text/TextInput";
 import Button from "../../../widgets/Button";
 import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
-import OkCancelModal from "../../../widgets/OkCancelModal";
+import {ApplicationActions} from "../../../actions/ApplicationActions";
 
 export default class TextEditor extends Component {
     constructor(props) {
         super(props);
     }
 
-    onWizardConfirm(wData) {
-        if(this.props.onConfirm) {
-            this.props.onConfirm(this.props.text);
-        }
-    }
-
-    onWizardAbort(){
-        if(this.props.onAbort) {
-            this.props.onAbort();
-        }
-    }
-
-    onShowModal(){
-        if(this.props.onShowModal){
-            this.props.onShowModal();
-        }
-    }
-
-    onInputChar(char){
-        if(this.props.onChar){
-            this.props.onChar(char);
-        }
-    }
-
-    onSetInputCaret(pos){
-        if(this.props.onSetCaret){
-            this.props.onSetCaret(pos);
-        }
-    }
-
     render() {
-        return <Row>
-            <Column>
-                <Button
-                    text={this.props.text}
-                    commitAction={() => this.onShowModal()}
-                />
-            </Column>
-            <OkCancelModal
-                visible={this.props.visible}
-                confirmAction={() => this.onWizardConfirm()}
-                abortAction={() => this.onWizardAbort()}>
-                <TextInput
-                    uuid={this.props.uuid}
-                    text={this.props.text}
-                    onSetCaret={(pos) => this.onSetInputCaret(pos)}
-                    onChar={(char) => this.onInputChar(char)}
-                />
-            </OkCancelModal>
-        </Row>
+        let options = this.props.options;
+        let value = options.value ? options.value.toString() : "";
+        let text = <Row>
+            <Column auto justify="center"><span><b>{options.label}</b>:</span></Column>
+            <Column><span className="text-left">{value}</span></Column>
+        </Row>;
+        return <Button
+            disabled={this.props.disabled}
+            type={this.props.type || "secondary"}
+            highPadding
+            text={text}
+            commitAction={() => ApplicationActions.showTextInput(options)}
+        />;
     }
 }

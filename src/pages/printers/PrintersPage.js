@@ -6,8 +6,8 @@ import PrinterEditor from "./PrinterEditor";
 import PrintersNavigator from "./PrintersNavigator";
 import PrintersNav from "./PrintersNav";
 import {EditorStatus} from "../StoresUtils";
-import printersCreatorActions from "./PrintersCreatorActions";
-import printersEditorActions from "./PrintersEditorActions";
+import {PrintersCreatorActions} from "./PrintersCreatorActions";
+import {PrintersEditorActions} from "./PrintersEditorActions";
 
 const {fromJS, Map} = require('immutable');
 
@@ -50,12 +50,12 @@ export default class PrintersPage extends Component {
             case EditorStatus.EDITING:
                 return <PrinterEditor
                     data={state}
-                    actionsProvider={printersEditorActions}
+                    actionsProvider={PrintersEditorActions}
                 />;
             case EditorStatus.CREATING:
                 return <PrinterEditor
                     data={state}
-                    actionsProvider={printersCreatorActions}
+                    actionsProvider={PrintersCreatorActions}
                 />;
             default:
                 return <PrintersNavigator data={state}/>

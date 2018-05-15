@@ -1,46 +1,57 @@
-import {
-    ACT_BEGIN_CREATE_WAITER,
-    ACT_CREATE_WAITER,
-    ACT_DESELECT_WAITER,
-    ACT_UPDATE_WAITER_CF,
-    ACT_UPDATE_WAITER_NAME,
-    ACT_UPDATE_WAITER_STATUS,
-    ACT_UPDATE_WAITER_SURNAME
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
-class WaitersCreatorActions {
+export const WaitersCreatorActionTypes = {
+    BEGIN_WAITER_CREATION: "BEGIN_WAITER_CREATION",
+    SET_CREATING_WAITER_NAME: "SET_CREATING_WAITER_NAME",
+    SET_CREATING_WAITER_SURNAME: "SET_CREATING_WAITER_SURNAME",
+    SET_CREATING_WAITER_CF: "SET_CREATING_WAITER_CF",
+    SET_CREATING_WAITER_STATUS: "SET_CREATING_WAITER_STATUS",
+    CREATE_WAITER: "CREATE_WAITER",
+    ABORT_WAITER_CREATION: "ABORT_WAITER_CREATION",
+};
 
-    beginWaiterCreation() {
-        dispatcher.fireEnd(ACT_BEGIN_CREATE_WAITER);
-    }
+export const WaitersCreatorActions = {
 
-    updateWaiterName(name) {
-        dispatcher.fireEnd(ACT_UPDATE_WAITER_NAME, name);
-    }
+    beginWaiterCreation: () =>
+        dispatcher.fireEnd(
+            WaitersCreatorActionTypes.BEGIN_WAITER_CREATION
+        ),
 
-    updateWaiterSurname(surname) {
-        dispatcher.fireEnd(ACT_UPDATE_WAITER_SURNAME, surname);
-    }
+    confirmName: (uuid, name) =>
+        dispatcher.fireEnd(
+            WaitersCreatorActionTypes.SET_CREATING_WAITER_NAME,
+            name
+        ),
 
-    updateWaiterCf(cf) {
-        dispatcher.fireEnd(ACT_UPDATE_WAITER_CF, cf);
-    }
+    confirmSurname: (uuid, surname) =>
+        dispatcher.fireEnd(
+            WaitersCreatorActionTypes.SET_CREATING_WAITER_SURNAME,
+            surname
+        ),
 
-    updateWaiterStatus(status) {
-        dispatcher.fireEnd(ACT_UPDATE_WAITER_STATUS, status);
-    }
+    confirmCf: (uuid, cf) =>
+        dispatcher.fireEnd(
+            WaitersCreatorActionTypes.SET_CREATING_WAITER_CF,
+            cf
+        ),
 
-    createWaiter(waiter) {
-        asyncActionBuilder.post(ACT_CREATE_WAITER, 'waiters', waiter);
-    }
+    confirmStatus: (uuid, status) =>
+        dispatcher.fireEnd(
+            WaitersCreatorActionTypes.SET_CREATING_WAITER_STATUS,
+            status
+        ),
 
-    deselectWaiter(){
-        dispatcher.fireEnd(ACT_DESELECT_WAITER);
-    }
+    onConfirm: (waiter) =>
+        asyncActionBuilder.post(
+            WaitersCreatorActionTypes.CREATE_WAITER,
+            'waiters',
+            waiter
+        ),
 
-}
+    onAbort: () =>
+        dispatcher.fireEnd(
+            WaitersCreatorActionTypes.ABORT_WAITER_CREATION
+        ),
 
-const waitersCreatorActions = new WaitersCreatorActions();
-export default waitersCreatorActions;
+};

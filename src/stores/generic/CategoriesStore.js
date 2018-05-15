@@ -6,6 +6,8 @@ import {
 } from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
+import {CategoriesEditorActionTypes} from "../../pages/menu/CategoriesEditorActions";
+import {CategoriesCreatorActionTypes} from "../../pages/menu/CategoriesCreatorActions";
 
 export const EVT_CATEGORIES_STORE_CHANGED = "EVT_CATEGORIES_STORE_CHANGED";
 
@@ -43,13 +45,13 @@ class CategoriesStore extends AbstractEntityStore {
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;
-            case ACT_CREATE_CATEGORY:
+            case CategoriesCreatorActionTypes.CREATE_CATEGORY:
                 this.createData(action.body);
                 break;
-            case ACT_UPDATE_CATEGORY:
+            case CategoriesEditorActionTypes.UPDATE_EDITING_CATEGORY:
                 this.updateData(action.body);
                 break;
-            case ACT_DELETE_CATEGORY:
+            case CategoriesEditorActionTypes.DELETE_EDITING_CATEGORY:
                 this.deleteData(action.body);
                 break;
             default:

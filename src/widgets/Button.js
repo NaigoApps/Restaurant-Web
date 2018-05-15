@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import Icon from "./Icon";
+import Row from "./Row";
+import Column from "./Column";
 
 /**
  * Expects:
@@ -29,7 +31,7 @@ export default class Button extends Component {
         }
         if (this.props.size) {
             classes.push("btn-" + this.props.size)
-        }else{
+        } else {
             classes.push("btn-lg")
         }
         if (this.props.fill) {
@@ -38,11 +40,14 @@ export default class Button extends Component {
         if (this.props.fullSize) {
             classes.push("col-sm-12");
         }
-        if (this.props.customClass){
+        if (this.props.customClass) {
             classes.push(this.props.customClass);
         }
-        if(this.props.highPadding){
+        if (this.props.highPadding) {
             classes.push("high-padding");
+        }
+        if (this.props.textRows) {
+            classes.push("text-rows-" + this.props.textRows)
         }
         return classes.join(" ");
     }
@@ -54,7 +59,31 @@ export default class Button extends Component {
 
         let content;
         if (text && icon) {
-            content = <span><div>{text}</div><Icon name={icon}/></span>;
+            if (this.props.vertical) {
+                content = <Row>
+                    <Column>
+                        <Row>
+                            <Column>
+                                {text}
+                            </Column>
+                        </Row>
+                        <Row ofList>
+                            <Column>
+                                <Icon name={icon}/>
+                            </Column>
+                        </Row>
+                    </Column>
+                </Row>;
+            } else {
+                content = <Row justify="center">
+                    <Column auto>
+                        {text}
+                    </Column>
+                    <Column auto>
+                        <Icon name={icon}/>
+                    </Column>
+                </Row>;
+            }
         } else if (text) {
             content = text;
         } else if (icon) {

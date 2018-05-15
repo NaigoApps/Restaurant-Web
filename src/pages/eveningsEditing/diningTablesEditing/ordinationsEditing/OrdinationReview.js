@@ -29,9 +29,11 @@ export default class OrdinationReview extends React.Component {
         let ordersEditor = phaseOrders.forEach((orders, phase) => {
             orders = OrdinationsUtils.implode(orders);
             orders = OrdinationsUtils.sortByDish(orders, this.props.data.get('dishes'), this.props.data.get('additions'));
-            phasesComponents.push(<div key={"phase_" + phase}>
-                <p><b>{findByUuid(this.props.data.get('phases'), phase).get('name')}</b></p>
-            </div>);
+            phasesComponents.push(<Row key={"phase_" + phase}>
+                <Column>
+                    <b>{findByUuid(this.props.data.get('phases'), phase).get('name')}</b>
+                </Column>
+            </Row>);
 
             let ordersRenderer = orders.map(o => this.renderOrder(o));
 
@@ -51,7 +53,16 @@ export default class OrdinationReview extends React.Component {
         let ordination = iGet(data, "ordinationEditing.ordination");
         let orders = ordination.get("orders");
         return <Row grow>
-            {this.renderOrders(orders)}
+            <Column>
+                <Row>
+                    <Column>
+                        <h5>Riepilogo {OrdinationsUtils.renderOrdination(ordination)}</h5>
+                    </Column>
+                </Row>
+                <Row grow>
+                    {this.renderOrders(orders)}
+                </Row>
+            </Column>
         </Row>;
     }
 

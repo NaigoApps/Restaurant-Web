@@ -1,16 +1,13 @@
 import React, {Component} from 'react';
 import Page from "../Page";
-import NavElementLink from "../../widgets/NavElementLink";
-import NavElement from "../../widgets/NavElement";
-import NavPills from "../../widgets/NavPills";
 import customersPageStore from "./CustomersPageStore";
 import customersPageActions from "./CustomersPageActions";
-import {NEW_CUSTOMER_UUID} from "../../utils/EntitiesUtils";
-import CustomerCreator from "./CustomerCreator";
 import CustomerEditor from "./CustomerEditor";
 import CustomersNavigator from "./CustomersNavigator";
-import customersEditorActions from "./CustomersEditorActions";
-import {SETTINGS} from "../../App";
+import {EditorStatus} from "../StoresUtils";
+import CustomersNav from "./CustomersNav";
+import {CustomersEditorActions} from "./CustomersEditorActions";
+import {CustomersCreatorActions} from "./CustomerCreatorActions";
 
 const {Map} = require('immutable');
 
@@ -38,49 +35,23 @@ export default class CustomersPage extends Component {
     }
 
     render() {
-        let navContent = CustomersPage.makeNavContent(this.state.data);
         let pageContent = CustomersPage.makePageContent(this.state.data);
         return (
             <Page title="Clienti">
-                {navContent}
+                <CustomersNav data={this.state.data}/>
                 {pageContent}
             </Page>
         )
     }
 
-    static makePageContent(props) {
-        let editorContent = <CustomersNavigator data={props}/>;
-
-        if (props.get('editingCustomer')) {
-            if (props.get('editingCustomer').get('uuid') === NEW_CUSTOMER_UUID) {
-                editorContent = <CustomerCreator data={props}/>;
-            } else {
-                editorContent = <CustomerEditor data={props}/>;
-            }
+    static makePageContent(state) {
+        const editorStatus = state.get('editorStatus');
+        if (editorStatus === EditorStatus.EDITING) {
+            return <CustomerEditor data={state} actionsProvider={CustomersEditorActions}/>
+        } else if (editorStatus === EditorStatus.CREATING) {
+            return <CustomerEditor data={state} actionsProvider={CustomersCreatorActions}/>
+        } else {
+            return <CustomersNavigator data={state}/>
         }
-        return editorContent;
-    }
-
-    static makeNavContent(state) {
-        let elements = [];
-        elements.push(<NavElementLink
-            key="settings"
-            text="Impostazioni"
-            page={SETTINGS}
-        />);
-        elements.push(<NavElement
-            key="customers"
-            text="Clienti"
-            active={!state.get('editingCustomer')}
-            commitAction={customersEditorActions.deselectCustomer}
-        />);
-        if (state.get('editingCustomer')) {
-            elements.push(<NavElement
-                key="selected"
-                text={state.get('editingCustomer').get('surname') + " " + state.get('editingCustomer').get('name')}
-                active={true}
-            />);
-        }
-        return <NavPills>{elements}</NavPills>;
     }
 }

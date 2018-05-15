@@ -3,11 +3,9 @@ import EntityEditor from "../../components/editors/EntityEditor";
 import Column from "../../widgets/Column";
 import Row from "../../widgets/Row";
 import TextEditor from "../../components/widgets/inputs/TextEditor";
-import EntitySelectEditor from "../../components/widgets/inputs/EntitySelectEditor";
-import DishesNavigator from "./DishesNavigator";
-import dishesEditorActions from "./DishesEditorActions";
 import FloatEditor from "../../components/widgets/inputs/float/FloatEditor";
 import SelectEditor from "../../components/widgets/inputs/SelectEditor";
+import {iGet} from "../../utils/Utils";
 
 export default class DishEditor extends React.Component {
     constructor(props) {
@@ -15,51 +13,102 @@ export default class DishEditor extends React.Component {
     }
 
     render() {
-        let props = this.props.data;
-        let dish = props.get('dish');
-        if(dish) {
+        const props = this.props.data;
+        const actionsProvider = this.props.actionsProvider;
 
-            let uuid = dish.get('uuid');
-            return <Row topSpaced>
-                <Column>
-                    <EntityEditor
-                        entity={dish}
-                        deleteMethod={dishesEditorActions.deleteDish}
-                        valid={props.get('dish').get('name') && props.get('dish').get('status') && props.get('dish').get('category')}
-                        render={dish => dish.get('name')}>
-                        <TextEditor
-                            label="Nome"
-                            value={dish.get('name')}
-                            commitAction={result => dishesEditorActions.updateDishName(uuid, result)}
-                        />
-                        <TextEditor
-                            label="Descrizione"
-                            value={dish.get('description')}
-                            commitAction={result => dishesEditorActions.updateDishDescription(uuid, result)}
-                        />
-                        <FloatEditor
-                            label="Prezzo"
-                            value={dish.get('price')}
-                            commitAction={result => dishesEditorActions.updateDishPrice(uuid, result)}
-                        />
-                        <SelectEditor
-                            label="Stato"
-                            value={dish.get('status')}
-                            options={props.get('dishStatuses')}
-                            commitAction={result => dishesEditorActions.updateDishStatus(uuid, result)}
-                        />
-                        <EntitySelectEditor
-                            label="Categoria"
-                            options={props.get('categories')}
-                            renderer={cat => cat.get('name')}
-                            value={dish.get('category')}
-                            commitAction={result => dishesEditorActions.updateDishCategory(uuid, result)}
-                        />
-                    </EntityEditor>
-                </Column>
-            </Row>;
-        }
-        return <div/>;
+        const dish = props.get('dish');
+        const uuid = dish.get('uuid');
+
+        const actions = DishEditor.buildActions(props, actionsProvider);
+
+        return <Row topSpaced>
+            <Column>
+                <EntityEditor
+                    entity={dish}
+                    valid={dish.get('name')}
+                    confirmMethod={actionsProvider.onConfirm}
+                    abortMethod={actionsProvider.onAbort}
+                    deleteMessage="Eliminazione piatto"
+                    deleteMethod={actionsProvider.onDelete}>
+                    {actions}
+                </EntityEditor>
+            </Column>
+        </Row>;
     }
 
+    static buildActions(data, actionsProvider) {
+        const actions = [];
+        if (actionsProvider.confirmName) {
+            actions.push(DishEditor.buildNameEditor(data, actionsProvider));
+        }
+        if (actionsProvider.confirmDescription) {
+            actions.push(DishEditor.buildDescriptionEditor(data, actionsProvider));
+        }
+        if (actionsProvider.confirmPrice) {
+            actions.push(DishEditor.buildPriceEditor(data, actionsProvider));
+        }
+        if (actionsProvider.confirmStatus) {
+            actions.push(DishEditor.buildStatusEditor(data, actionsProvider));
+        }
+        if (actionsProvider.confirmCategory) {
+            actions.push(DishEditor.buildCategoryEditor(data, actionsProvider));
+        }
+
+        return actions.map((action, index) => {
+            return <Row key={index} ofList={index > 0}>
+                <Column>
+                    {action}
+                </Column>
+            </Row>
+        });
+    }
+
+    static buildNameEditor(data, actionsProvider) {
+        return <TextEditor options={{
+            label: "Nome",
+            value: iGet(data, 'dish.name'),
+            callback: result => actionsProvider.confirmName(iGet(data, 'dish.uuid'), result)
+        }}/>;
+    }
+
+    static buildDescriptionEditor(data, actionsProvider) {
+        return <TextEditor options={{
+            label: "Descrizione",
+            value: iGet(data, 'dish.description'),
+            callback: result => actionsProvider.confirmDescription(iGet(data, 'dish.uuid'), result)
+        }}/>;
+    }
+
+    static buildPriceEditor(data, actionsProvider) {
+        return <FloatEditor
+            options={{
+                label: "Prezzo",
+                value: iGet(data, 'dish.price'),
+                min: 0,
+                callback: result => actionsProvider.confirmPrice(iGet(data, 'dish.uuid'), result)
+            }}
+        />;
+    }
+
+    static buildStatusEditor(data, actionsProvider) {
+        return <SelectEditor options={{
+            label: "Stato",
+            value: iGet(data, 'dish.status'),
+            values: data.get('dishStatuses'),
+            isValid: status => !!status,
+            callback: status => actionsProvider.confirmStatus(iGet(data, 'dish.uuid'), status)
+        }}/>;
+    }
+
+    static buildCategoryEditor(data, actionsProvider) {
+        return <SelectEditor options={{
+            label: "Categoria",
+            value: iGet(data, 'dish.category'),
+            values: data.get('categories'),
+            id: category => category.get('uuid'),
+            isValid: category => !!category,
+            renderer: category => category.get('name'),
+            callback: category => actionsProvider.confirmCategory(iGet(data, 'dish.uuid'), category)
+        }}/>
+    }
 }

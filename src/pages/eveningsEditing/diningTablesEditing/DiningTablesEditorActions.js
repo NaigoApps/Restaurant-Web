@@ -1,8 +1,5 @@
 import requestBuilder from "../../../actions/RequestBuilder";
 import dispatcher from "../../../dispatcher/SimpleDispatcher";
-import {OrdinationEditorActionTypes} from "./ordinationsEditing/OrdinationsEditorActions";
-
-const {fromJS} = require('immutable');
 
 export const DiningTablesEditorActionTypes = {
     BEGIN_DINING_TABLE_CREATION: "BEGIN_DINING_TABLE_CREATION",
@@ -38,7 +35,7 @@ export const DiningTablesEditorActionTypes = {
 export const DiningTablesEditorActions = {
 
     select: (table) => dispatcher.fireEnd(DiningTablesEditorActionTypes.SELECT_DINING_TABLE, table),
-    selectPage: (page) => dispatcher.fireEnd(DiningTablesEditorActionTypes.SELECT_DINING_TABLE_PAGE),
+    selectPage: (page) => dispatcher.fireEnd(DiningTablesEditorActionTypes.SELECT_DINING_TABLE_PAGE, page),
     deselect: () => dispatcher.fireEnd(DiningTablesEditorActionTypes.DESELECT_DINING_TABLE),
 
 

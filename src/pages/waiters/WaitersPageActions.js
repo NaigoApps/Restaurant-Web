@@ -1,10 +1,12 @@
 import waitersActions from "../../generic/WaitersActions";
+import {ApplicationActions} from "../../actions/ApplicationActions";
 
 class WaitersPageActions {
 
     initWaitersPage(){
         waitersActions.retrieveWaiters();
         waitersActions.retrieveWaiterStatuses();
+        ApplicationActions.loadSettings();
     }
 
     registerSocket() {

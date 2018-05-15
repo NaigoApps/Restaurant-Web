@@ -1,6 +1,8 @@
 import {ACT_CREATE_DISH, ACT_DELETE_DISH, ACT_RETRIEVE_DISHES, ACT_UPDATE_DISH} from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
+import {DishesCreatorActionTypes} from "../../pages/menu/DishesCreatorActions";
+import {DishesEditorActionTypes} from "../../pages/menu/DishesEditorActions";
 
 export const EVT_DISHES_STORE_CHANGED = "EVT_DISHES_STORE_CHANGED";
 
@@ -43,13 +45,13 @@ class DishesStore extends AbstractEntityStore {
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;
-            case ACT_CREATE_DISH:
+            case DishesCreatorActionTypes.CREATE_DISH:
                 this.createData(action.body);
                 break;
-            case ACT_UPDATE_DISH:
+            case DishesEditorActionTypes.UPDATE_EDITING_DISH:
                 this.updateData(action.body);
                 break;
-            case ACT_DELETE_DISH:
+            case DishesEditorActionTypes.DELETE_EDITING_DISH:
                 this.deleteData(action.body);
                 break;
             default:

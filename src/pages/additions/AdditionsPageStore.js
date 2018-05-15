@@ -1,79 +1,67 @@
 import AbstractStore from "../../stores/RootFeatureStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
-import {
-    ACT_BEGIN_CREATE_ADDITION,
-    ACT_CREATE_ADDITION,
-    ACT_DELETE_ADDITION,
-    ACT_DESELECT_ADDITION,
-    ACT_RETRIEVE_ADDITIONS,
-    ACT_SELECT_ADDITION,
-    ACT_UPDATE_ADDITION,
-    ACT_UPDATE_ADDITION_GENERIC,
-    ACT_UPDATE_ADDITION_NAME,
-    ACT_UPDATE_ADDITION_PRICE
-} from "../../actions/ActionTypes";
+import {ACT_RETRIEVE_ADDITIONS} from "../../actions/ActionTypes";
 import additionsStore from "../../stores/generic/AdditionsStore";
+import {EditorStatus} from "../StoresUtils";
+import {AdditionsCreatorActionTypes} from "./AdditionsCreatorActions";
+import {AdditionsEditorActionTypes} from "./AdditionsEditorActions";
+import {EntitiesUtils} from "../../utils/EntitiesUtils";
+import {findByUuid} from "../../utils/Utils";
+import {ApplicationActionTypes} from "../../actions/ApplicationActions";
+import applicationStore from "../../stores/ApplicationStore";
 
 const {Map} = require('immutable');
 
 const EVT_ADDITIONS_PAGE_STORE_CHANGED = "EVT_ADDITIONS_PAGE_STORE_CHANGED";
 
-class AdditionsPageStore extends AbstractStore{
+class AdditionsPageStore extends AbstractStore {
 
-    constructor(){
+    constructor() {
         super(EVT_ADDITIONS_PAGE_STORE_CHANGED);
-        this.selectedAddition = null;
-        this.inCreationAddition = null;
+        this.addition = null;
+        this.editorStatus = EditorStatus.SURFING;
+        this.page = 0;
     }
 
-    setName(value){
-        this.inCreationAddition = this.inCreationAddition.set('name', value);
-    }
-
-    setPrice(value){
-        this.inCreationAddition = this.inCreationAddition.set('price', value);
-    }
-
-    setGeneric(value){
-        this.inCreationAddition = this.inCreationAddition.set('generic', value);
-    }
-
-    handleCompletedAction(action){
+    handleCompletedAction(action) {
         let changed = true;
-        dispatcher.waitFor([additionsStore.getToken()]);
+        dispatcher.waitFor([additionsStore.getToken(), applicationStore.getToken()]);
         switch (action.type) {
+            case ApplicationActionTypes.LOAD_SETTINGS:
+            case ApplicationActionTypes.STORE_SETTINGS:
             case ACT_RETRIEVE_ADDITIONS:
                 break;
-            case ACT_CREATE_ADDITION:
-                this.selectedAddition = action.body.get('uuid');
-                this.inCreationAddition = null;
+            case AdditionsCreatorActionTypes.CREATE_ADDITION:
+            case AdditionsEditorActionTypes.UPDATE_EDITING_ADDITION:
+                this.addition = action.body.get('uuid');
+                this.editorStatus = EditorStatus.EDITING;
                 break;
-            case ACT_UPDATE_ADDITION:
-                this.selectedAddition = action.body.get('uuid');
+            case AdditionsCreatorActionTypes.ABORT_ADDITION_CREATION:
+            case AdditionsEditorActionTypes.DELETE_EDITING_ADDITION:
+            case AdditionsEditorActionTypes.DESELECT_EDITING_ADDITION:
+            case ApplicationActionTypes.GO_TO_PAGE:
+                this.addition = null;
+                this.editorStatus = EditorStatus.SURFING;
                 break;
-            case ACT_DELETE_ADDITION:
-                this.selectedAddition = null;
+            case AdditionsCreatorActionTypes.BEGIN_ADDITION_CREATION:
+                this.addition = EntitiesUtils.newAddition();
+                this.editorStatus = EditorStatus.CREATING;
                 break;
-            case ACT_BEGIN_CREATE_ADDITION:
-                this.selectedAddition = null;
-                this.inCreationAddition = this.buildAddition();
+            case AdditionsEditorActionTypes.SELECT_EDITING_ADDITION:
+                this.addition = action.body;
+                this.editorStatus = EditorStatus.EDITING;
                 break;
-            case ACT_SELECT_ADDITION:
-                this.selectedAddition = action.body;
-                this.inCreationAddition = null;
+            case AdditionsEditorActionTypes.SELECT_EDITING_ADDITION_PAGE:
+                this.page = action.body;
                 break;
-            case ACT_DESELECT_ADDITION:
-                this.selectedAddition = null;
-                this.inCreationAddition = null;
+            case AdditionsCreatorActionTypes.SET_CREATING_ADDITION_NAME:
+                this.addition = this.addition.set('name', action.body);
                 break;
-            case ACT_UPDATE_ADDITION_NAME:
-                this.setName(action.body);
+            case AdditionsCreatorActionTypes.SET_CREATING_ADDITION_GENERIC:
+                this.addition = this.addition.set('generic', action.body);
                 break;
-            case ACT_UPDATE_ADDITION_PRICE:
-                this.setPrice(action.body);
-                break;
-            case ACT_UPDATE_ADDITION_GENERIC:
-                this.setGeneric(action.body);
+            case AdditionsCreatorActionTypes.SET_CREATING_ADDITION_PRICE:
+                this.addition = this.addition.set('price', action.body);
                 break;
             default:
                 changed = false;
@@ -82,24 +70,29 @@ class AdditionsPageStore extends AbstractStore{
         return changed;
     }
 
-    buildAddition(){
-        return Map({
-            name: "",
-            price: 0,
-            generic: false
-        });
-    }
-
-    getState(){
+    getState() {
         let value = Map({
             additions: additionsStore.getAdditions().getPayload(),
 
-            selectedAddition: this.selectedAddition,
-            createdAddition: this.inCreationAddition
+            addition: this.getSelectedAddition(),
+            page: this.page,
+            editorStatus: this.editorStatus,
+
+            settings: applicationStore.getSettings()
         });
+
         return {
             data: value
         };
+    }
+
+    getSelectedAddition() {
+        if (this.editorStatus === EditorStatus.EDITING) {
+            return findByUuid(additionsStore.getAdditions().getPayload(), this.addition);
+        } else if (this.editorStatus === EditorStatus.CREATING) {
+            return this.addition;
+        }
+        return null;
     }
 
 }

@@ -1,51 +1,78 @@
-import {
-    ACT_ABORT_ENTITY_EDITING,
-    ACT_BEGIN_ENTITY_EDITING,
-    ACT_CREATE_CUSTOMER,
-    ACT_SET_ENTITY_PROPERTY
-} from "../../actions/ActionTypes"
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
-import {EntitiesUtils} from "../../utils/EntitiesUtils";
 
 const {fromJS} = require('immutable');
 
-class CustomerCreatorActions {
+export const CustomersCreatorActionTypes = {
+    BEGIN_CUSTOMER_CREATION: "BEGIN_CUSTOMER_CREATION",
+    SET_CREATING_CUSTOMER_NAME: "SET_CREATING_CUSTOMER_NAME",
+    SET_CREATING_CUSTOMER_SURNAME: "SET_CREATING_CUSTOMER_SURNAME",
+    SET_CREATING_CUSTOMER_CF: "SET_CREATING_CUSTOMER_CF",
+    SET_CREATING_CUSTOMER_PIVA: "SET_CREATING_CUSTOMER_PIVA",
+    SET_CREATING_CUSTOMER_ADDRESS: "SET_CREATING_CUSTOMER_ADDRESS",
+    SET_CREATING_CUSTOMER_CAP: "SET_CREATING_CUSTOMER_CAP",
+    SET_CREATING_CUSTOMER_CITY: "SET_CREATING_CUSTOMER_CITY",
+    SET_CREATING_CUSTOMER_DISTRICT: "SET_CREATING_CUSTOMER_DISTRICT",
+    CREATE_CUSTOMER: "CREATE_CUSTOMER",
+    ABORT_CUSTOMER_CREATION: "ABORT_CUSTOMER_CREATION",
+};
 
-    updateCustomerProperty(property, value) {
-        //FIXME
-        // dispatcher.fireEnd(ACT_SET_ENTITY_PROPERTY, fromJS({
-        //     type: CUSTOMER_TYPE,
-        //     property: property,
-        //     value: value
-        // }));
-    }
+export const CustomersCreatorActions = {
 
-    beginCustomerCreation() {
-        //FIXME
-        // dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
-        //     type: CUSTOMER_TYPE,
-        //     entity: EntitiesUtils.newCustomer(),
-        //     mode: CREATING_MODE
-        // }));
-    }
+    beginCustomerCreation: () =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.BEGIN_CUSTOMER_CREATION
+        ),
 
-    createCustomer(customer) {
-        //FIXME
-        // asyncActionBuilder.post(ACT_CREATE_CUSTOMER, 'customers', customer)
-        //     .then(result => {
-        //         dispatcher.fireEnd(ACT_BEGIN_ENTITY_EDITING, fromJS({
-        //             type: CUSTOMER_TYPE,
-        //             entity: result
-        //         }));
-        //     });
-    }
+    confirmName: (uuid, value) =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_NAME,
+            value
+        ),
+    confirmSurname: (uuid, value) =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_SURNAME,
+            value
+        ),
+    confirmCf: (uuid, value) =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_CF,
+            value
+        ),
+    confirmPiva: (uuid, value) =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_PIVA,
+            value
+        ),
+    confirmAddress: (uuid, value) =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_ADDRESS,
+            value
+        ),
+    confirmCap: (uuid, value) =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_CAP,
+            value
+        ),
+    confirmCity: (uuid, value) =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_CITY,
+            value
+        ),
+    confirmDistrict: (uuid, value) =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_DISTRICT,
+            value
+        ),
 
-    deselectCustomer(){
-        //FIXME
-        // dispatcher.fireEnd(ACT_ABORT_ENTITY_EDITING, CUSTOMER_TYPE);
-    }
-}
+    onConfirm: (customer) =>
+        asyncActionBuilder.post(CustomersCreatorActionTypes.CREATE_CUSTOMER,
+            'customers',
+            customer
+        ),
 
-const customersCreatorActions = new CustomerCreatorActions();
-export default customersCreatorActions;
+    onAbort: () =>
+        dispatcher.fireEnd(
+            CustomersCreatorActionTypes.ABORT_CUSTOMER_CREATION
+        ),
+};

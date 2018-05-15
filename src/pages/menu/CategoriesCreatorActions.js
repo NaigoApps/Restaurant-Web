@@ -1,35 +1,42 @@
 import requestBuilder from "../../actions/RequestBuilder";
-import {
-    ACT_BEGIN_CREATE_CATEGORY,
-    ACT_CREATE_CATEGORY, ACT_DESELECT_CATEGORY, ACT_UPDATE_CATEGORY_CREATOR_LOCATION,
-    ACT_UPDATE_CATEGORY_CREATOR_NAME
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 
+export const CategoriesCreatorActionTypes = {
+    BEGIN_CATEGORY_CREATION: "BEGIN_CATEGORY_CREATION",
+    SET_CREATING_CATEGORY_NAME: "SET_CREATING_CATEGORY_NAME",
+    SET_CREATING_CATEGORY_LOCATION: "SET_CREATING_CATEGORY_LOCATION",
+    CREATE_CATEGORY: "CREATE_CATEGORY",
+    ABORT_CATEGORY_CREATION: "ABORT_CATEGORY_CREATION",
+};
 
-class CategoriesCreatorActions {
+export const CategoriesCreatorActions = {
 
-    beginCategoryCreation() {
-        dispatcher.fireEnd(ACT_BEGIN_CREATE_CATEGORY);
-    }
+    beginCreation: () =>
+        dispatcher.fireEnd(
+            CategoriesCreatorActionTypes.BEGIN_CATEGORY_CREATION
+        ),
 
-    createCategory(category) {
-        requestBuilder.post(ACT_CREATE_CATEGORY, 'categories', category);
-    }
+    confirmName: (uuid, name) =>
+        dispatcher.fireEnd(
+            CategoriesCreatorActionTypes.SET_CREATING_CATEGORY_NAME,
+            name
+        ),
 
-    updateCategoryName(name){
-        dispatcher.fireEnd(ACT_UPDATE_CATEGORY_CREATOR_NAME, name);
-    }
+    confirmLocation: (uuid, value) =>
+        dispatcher.fireEnd(
+            CategoriesCreatorActionTypes.SET_CREATING_CATEGORY_LOCATION,
+            value
+        ),
 
-    updateCategoryLocation(value){
-        dispatcher.fireEnd(ACT_UPDATE_CATEGORY_CREATOR_LOCATION, value);
-    }
+    onConfirm: (category) =>
+        requestBuilder.post(
+            CategoriesCreatorActionTypes.CREATE_CATEGORY,
+            'categories',
+            category),
 
-    deselectCategory(){
-        dispatcher.fireEnd(ACT_DESELECT_CATEGORY);
-    }
+    onAbort: () =>
+        dispatcher.fireEnd(
+            CategoriesCreatorActionTypes.ABORT_CATEGORY_CREATION
+        ),
 
-}
-
-const categoriesCreatorActions = new CategoriesCreatorActions();
-export default categoriesCreatorActions;
+};

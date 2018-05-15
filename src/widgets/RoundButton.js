@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import Icon from "./Icon";
 import {uuid} from "../utils/Utils";
+import Row from "./Row";
+import Column from "./Column";
 
 /**
  * Expects:
@@ -23,8 +25,8 @@ export default class RoundButton extends Component {
     }
 
     componentDidMount() {
-        let btn = global.$('#' + this.state.uuid);
-        btn.height(btn.width());
+        // let btn = global.$('#' + this.state.uuid);
+        // btn.height(btn.width());
     }
 
     getClassName() {
@@ -41,17 +43,8 @@ export default class RoundButton extends Component {
         } else {
             classes.push("btn-lg")
         }
-        if (this.props.fill) {
-            classes.push("fill");
-        }
-        if (this.props.fullSize) {
-            classes.push("col-sm-12");
-        }
         if (this.props.customClass) {
             classes.push(this.props.customClass);
-        }
-        if (this.props.highPadding) {
-            classes.push("high-padding");
         }
         classes.push("round");
         return classes.join(" ");
@@ -64,7 +57,16 @@ export default class RoundButton extends Component {
 
         let content;
         if (text && icon) {
-            content = <span><div>{text}</div><Icon name={icon}/></span>;
+            content = <Row>
+                <Column>
+                    <Row>
+                        <Column>{text}</Column>
+                    </Row>
+                    <Row>
+                        <Column><Icon name={icon}/></Column>
+                    </Row>
+                </Column>
+            </Row>;
         } else if (text) {
             content = text;
         } else if (icon) {

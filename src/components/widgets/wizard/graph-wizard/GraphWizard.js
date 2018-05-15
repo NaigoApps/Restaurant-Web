@@ -32,8 +32,6 @@ export default class GraphWizard extends Component {
     }
 
     componentDidMount() {
-        //FIXME
-        // graphWizardStore.addChangeListener(this.updateWizard);
         if (this.props.visible) {
             this.openWizard();
         }
@@ -48,11 +46,6 @@ export default class GraphWizard extends Component {
         if (!prevProps.visible && this.props.visible) {
             this.openWizard();
         }
-    }
-
-    componentWillUnmount() {
-        //FIXME
-        // graphWizardStore.removeChangeListener(this.updateWizard);
     }
 
     initialWizardData() {
@@ -84,53 +77,6 @@ export default class GraphWizard extends Component {
     }
 
     render() {
-        if (!this.props.auto) {
-            if (this.props.hideForm) {
-                return <div className="form-horizontal">
-                    {this.buildModal()}
-                </div>;
-            }
-            return <Row align="center" topSpaced>
-                <Column sm={this.props.labelSize || "4"} right>
-                    <label><b>{this.props.label}</b></label>
-                </Column>
-                <Column auto={!this.props.buttonSize} sm={this.props.buttonSize || ""}>
-                    <Button
-                        commitAction={this.openWizard.bind(this)}
-                        text={this.renderData()}
-                        icon="pencil"
-                    />
-                </Column>
-                {this.buildModal()}
-            </Row>;
-        }
-        return this.buildModal();
-    }
-
-    renderData() {
-        if (this.props.renderer) {
-            return this.props.renderer(this.initialWizardData());
-        }
-        return "";
-    }
-
-    buildAbortButton() {
-        return <Button
-            text="Annulla"
-            type="danger"
-            commitAction={this.abortAction.bind(this)}/>;
-    }
-
-    buildConfirmButton() {
-        return <Button
-            text="Conferma"
-            type="success"
-            disabled={this.props.isValid && !this.props.isValid(this.state.data)}
-            commitAction={this.confirmAction.bind(this)}/>;
-    }
-
-    buildModal() {
-
         const pageName = this.props.page;
 
         let pages = React.Children.map(this.props.children, (child) => React.cloneElement(child, {
@@ -140,8 +86,6 @@ export default class GraphWizard extends Component {
         }));
 
         const currentPage = React.Children.toArray(pages).find(page => page.props.identifier === pageName);
-
-        const final = currentPage && currentPage.props.final;
 
         let nav = React.Children.map(this.props.children, (child) => {
             return <NavElement
@@ -161,12 +105,14 @@ export default class GraphWizard extends Component {
             </div>;
         }
 
-        let buttons;
-        if (final) {
-            buttons = <Row justify="center">
-                {this.buildAbortButton()}{this.buildConfirmButton()}
-            </Row>;
-        }
+        let buttons = <Row justify="center">
+            <Column>
+                {this.buildAbortButton()}
+            </Column>
+            <Column>
+                {this.buildConfirmButton()}
+            </Column>
+        </Row>;
 
         return <Modal visible={this.props.visible || this.state.open} lg={this.props.size === "lg"}
                       onModalShown={() => this.cssUpdate()}
@@ -184,4 +130,27 @@ export default class GraphWizard extends Component {
             </div>
         </Modal>
     }
+
+    renderData() {
+        if (this.props.renderer) {
+            return this.props.renderer(this.initialWizardData());
+        }
+        return "";
+    }
+
+    buildAbortButton() {
+        return <Button
+            text={this.props.abortText || "Annulla"}
+            type="danger"
+            commitAction={this.abortAction.bind(this)}/>;
+    }
+
+    buildConfirmButton() {
+        return <Button
+            text={this.props.confirmText || "Conferma"}
+            type="success"
+            disabled={this.props.isValid && !this.props.isValid(this.state.data)}
+            commitAction={this.confirmAction.bind(this)}/>;
+    }
+
 }

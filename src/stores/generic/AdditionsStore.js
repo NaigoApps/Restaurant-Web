@@ -12,6 +12,8 @@ import {
 } from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
+import {AdditionsCreatorActions, AdditionsCreatorActionTypes} from "../../pages/additions/AdditionsCreatorActions";
+import {AdditionsEditorActionTypes} from "../../pages/additions/AdditionsEditorActions";
 
 const EVT_ADDITIONS_STORE_CHANGE = "EVT_ADDITIONS_STORE_CHANGE";
 
@@ -21,7 +23,7 @@ class AdditionsStore extends AbstractEntityStore {
     }
 
     comparator(a1, a2){
-        return a1.get('name').toLowerCase().localeCompare(a2.get('name').toLowerCase());
+        return a1.get('name').toLowerCase().trim().localeCompare(a2.get('name').toLowerCase().trim());
     }
 
     handleStartedAction(action) {
@@ -44,13 +46,13 @@ class AdditionsStore extends AbstractEntityStore {
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;
-            case ACT_CREATE_ADDITION:
+            case AdditionsCreatorActionTypes.CREATE_ADDITION:
                 this.createData(action.body);
                 break;
-            case ACT_UPDATE_ADDITION:
+            case AdditionsEditorActionTypes.UPDATE_EDITING_ADDITION:
                 this.updateData(action.body);
                 break;
-            case ACT_DELETE_ADDITION:
+            case AdditionsEditorActionTypes.DELETE_EDITING_ADDITION:
                 this.deleteData(action.body);
                 break;
             default:

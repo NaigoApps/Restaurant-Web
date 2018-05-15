@@ -30,7 +30,10 @@ export default class ApplicationIntegerInput extends Component {
 
     render() {
         let data = this.props.data;
-        return <PopupContainer visible={data.get('visible')}>
+        return <PopupContainer
+            id="app-int-input"
+            visible={data.get('visible')}
+            blurCallback={() => ApplicationActions.hideIntegerInput()}>
             <Row>
                 <Column>
                     {data.get('label')}

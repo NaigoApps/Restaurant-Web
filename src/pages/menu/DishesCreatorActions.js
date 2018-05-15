@@ -1,47 +1,49 @@
-import {
-    ACT_BEGIN_CREATE_DISH,
-    ACT_CREATE_DISH, ACT_DESELECT_DISH,
-    ACT_UPDATE_DISH_CREATOR_DESCRIPTION,
-    ACT_UPDATE_DISH_CREATOR_NAME,
-    ACT_UPDATE_DISH_CREATOR_PRICE
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
+export const DishesCreatorActionTypes = {
+    BEGIN_DISH_CREATION: "BEGIN_DISH_CREATION",
+    CREATE_DISH: "CREATE_DISH",
+    SET_CREATING_DISH_NAME: "SET_CREATING_DISH_NAME",
+    SET_CREATING_DISH_DESCRIPTION: "SET_CREATING_DISH_DESCRIPTION",
+    SET_CREATING_DISH_PRICE: "SET_CREATING_DISH_PRICE",
+    ABORT_DISH_CREATION: "ABORT_DISH_CREATION",
+};
 
-class DishesCreatorActions {
+export const DishesCreatorActions = {
 
-    beginDishCreation(){
-        dispatcher.fireEnd(ACT_BEGIN_CREATE_DISH);
-    }
+    beginDishCreation: () =>
+        dispatcher.fireEnd(
+            DishesCreatorActionTypes.BEGIN_DISH_CREATION
+        ),
 
-    createDish(dish) {
+    onConfirm: (dish) =>
         asyncActionBuilder.post(
-            ACT_CREATE_DISH,
+            DishesCreatorActionTypes.CREATE_DISH,
             'dishes',
             dish
-        );
-    }
+        ),
 
-    updateDishName(name){
-        dispatcher.fireEnd(ACT_UPDATE_DISH_CREATOR_NAME, name);
-    }
+    confirmName: (uuid, name) =>
+        dispatcher.fireEnd(
+            DishesCreatorActionTypes.SET_CREATING_DISH_NAME,
+            name
+        ),
 
-    updateDishDescription(desc){
-        dispatcher.fireEnd(ACT_UPDATE_DISH_CREATOR_DESCRIPTION, desc);
-    }
+    confirmDescription: (uuid, desc) =>
+        dispatcher.fireEnd(
+            DishesCreatorActionTypes.SET_CREATING_DISH_DESCRIPTION,
+            desc
+        ),
 
-    updateDishPrice(price){
-        dispatcher.fireEnd(ACT_UPDATE_DISH_CREATOR_PRICE, price);
-    }
+    confirmPrice: (uuid, price) =>
+        dispatcher.fireEnd(
+            DishesCreatorActionTypes.SET_CREATING_DISH_PRICE,
+            price
+        ),
 
-    createDish(dish) {
-        asyncActionBuilder.post(ACT_CREATE_DISH, 'dishes', dish);
-    }
-    deselectDish(){
-        dispatcher.fireEnd(ACT_DESELECT_DISH);
-    }
-}
-
-const dishesCreatorActions = new DishesCreatorActions();
-export default dishesCreatorActions;
+    onAbort: () =>
+        dispatcher.fireEnd(
+            DishesCreatorActionTypes.ABORT_DISH_CREATION,
+        ),
+};

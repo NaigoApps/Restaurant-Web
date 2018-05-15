@@ -1,39 +1,61 @@
 import requestBuilder from "../../actions/RequestBuilder";
-import {
-    ACT_DELETE_CATEGORY, ACT_DESELECT_CATEGORY, ACT_SELECT_CATEGORY,
-    ACT_UPDATE_CATEGORY
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
-import dishesActions from "./DishesActions";
 
 
-class CategoriesEditorActions {
+export const CategoriesEditorActionTypes={
+    DELETE_EDITING_CATEGORY: "DELETE_EDITING_CATEGORY",
+    UPDATE_EDITING_CATEGORY: "UPDATE_EDITING_CATEGORY",
+    SELECT_EDITING_CATEGORY: "SELECT_EDITING_CATEGORY",
+    DESELECT_EDITING_CATEGORY: "DESELECT_EDITING_CATEGORY",
+    SELECT_EDITING_CATEGORY_PAGE: "SELECT_EDITING_CATEGORY_PAGE",
+};
 
-    deleteCategory(category) {
-        requestBuilder.remove(ACT_DELETE_CATEGORY, 'categories', category)
-    }
+export const CategoriesEditorActions = {
 
-    updateCategoryName(uuid, value) {
-        requestBuilder.put(ACT_UPDATE_CATEGORY, 'categories/' + uuid + '/name', value);
-    }
+    selectCategoryPage : (page) =>
+        dispatcher.fireEnd(
+            CategoriesEditorActionTypes.SELECT_EDITING_CATEGORY_PAGE,
+            page
+        ),
 
-    updateCategoryLocation(uuid, value) {
-        requestBuilder.put(ACT_UPDATE_CATEGORY, 'categories/' + uuid + '/location', value);
-    }
+    selectCategory : (category) =>
+        dispatcher.fireEnd(
+            CategoriesEditorActionTypes.SELECT_EDITING_CATEGORY,
+            category
+        ),
 
-    updateCategoryAdditions(uuid, values) {
-        requestBuilder.put(ACT_UPDATE_CATEGORY, 'categories/' + uuid + '/additions', values);
-    }
+    deselectCategory : () =>
+        dispatcher.fireEnd(
+            CategoriesEditorActionTypes.DESELECT_EDITING_CATEGORY
+        ),
 
-    selectCategory(category) {
-        dispatcher.fireEnd(ACT_SELECT_CATEGORY, category);
-    }
 
-    deselectCategory() {
-        dispatcher.fireEnd(ACT_DESELECT_CATEGORY);
-    }
+    onDelete : (category) =>
+        requestBuilder.remove(
+            CategoriesEditorActionTypes.DELETE_EDITING_CATEGORY,
+            'categories',
+            category
+        ),
 
-}
+    confirmName : (uuid, value) =>
+        requestBuilder.put(
+            CategoriesEditorActionTypes.UPDATE_EDITING_CATEGORY,
+            'categories/' + uuid + '/name',
+            value
+        ),
 
-const categoriesEditorActions = new CategoriesEditorActions();
-export default categoriesEditorActions;
+    confirmLocation : (uuid, value) =>
+        requestBuilder.put(
+            CategoriesEditorActionTypes.UPDATE_EDITING_CATEGORY,
+            'categories/' + uuid + '/location',
+            value
+        ),
+
+    confirmAdditions : (uuid, values) =>
+        requestBuilder.put(
+            CategoriesEditorActionTypes.UPDATE_EDITING_CATEGORY,
+            'categories/' + uuid + '/additions',
+            values
+        ),
+
+};

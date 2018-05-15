@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import KeyPad from "../../KeyPad";
 import Column from "../../../../widgets/Column";
 import Row from "../../../../widgets/Row";
-import Keyboard from "../Keyboard";
+import Keyboard, {BACKSPACE, DELETE, LEFT, RIGHT} from "../Keyboard";
+import {CANC} from "../../../../utils/Characters";
 
 const {Map} = require('immutable');
 
@@ -11,15 +11,41 @@ export default class TextInput extends Component {
         super(props);
     }
 
-    onChar(char) {
+    onKeyDown(data){
         if(this.props.onChar) {
-            this.props.onChar(char);
+            if (data.key === "ArrowLeft") {
+                this.props.onChar(LEFT);
+            } else if (data.key === "ArrowRight") {
+                this.props.onChar(RIGHT);
+            }
+        }
+    }
+
+    onChar(char, evt) {
+        if(this.props.onChar) {
+            if(char && !evt){
+                this.props.onChar(char);
+            }else {
+                switch (evt.inputType) {
+                    case "deleteContentBackward":
+                        this.props.onChar(BACKSPACE);
+                        break;
+                    case "deleteContentForward":
+                        this.props.onChar(DELETE);
+                        break;
+                    default:
+                        if (char) {
+                            this.props.onChar(char);
+                        }
+                        break;
+                }
+            }
         }
     }
 
     updateCaret() {
         if(this.props.onSetCaret) {
-            let input = global.$("#" + this.props.uuid)[0];
+            let input = global.$("#" + this.props.id)[0];
             this.props.onSetCaret(input.selectionStart);
         }
     }
@@ -35,14 +61,15 @@ export default class TextInput extends Component {
                     <Row>
                         <Column>
                             <input
-                                id={this.props.uuid}
+                                id={this.props.id}
                                 className="form-control"
                                 placeholder={placeholder}
                                 type="text"
                                 disabled={disabled}
                                 value={text || ""}
                                 onMouseUp={() => this.updateCaret()}
-                                onKeyDown={data => this.onChar(data.key, data)}/>
+                                onKeyDown={data => this.onKeyDown(data)}
+                                onChange={data => this.onChar(data.nativeEvent.data, data.nativeEvent)}/>
                         </Column>
                     </Row>
                     <Row topSpaced>

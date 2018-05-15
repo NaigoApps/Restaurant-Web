@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import Row from "../../widgets/Row";
-import Button from "../../widgets/Button";
 import Column from "../../widgets/Column";
-import categoriesEditorActions from "./CategoriesEditorActions";
-import categoriesCreatorActions from "./CategoriesCreatorActions";
-import PaginatedList from "../../components/widgets/PaginatedList";
+import {CategoriesEditorActions} from "./CategoriesEditorActions";
+import {CategoriesCreatorActions} from "./CategoriesCreatorActions";
+import SelectInput from "../../components/widgets/inputs/SelectInput";
+import StoresUtils from "../StoresUtils";
+import RoundButton from "../../widgets/RoundButton";
 
 export default class CategoriesNavigator extends Component {
 
@@ -13,27 +14,31 @@ export default class CategoriesNavigator extends Component {
     }
 
     render() {
-        const props = this.props.data;
+        const data = this.props.data;
 
-        return [<Row key="list" topSpaced>
-            <Column>
-                <PaginatedList
-                    id={cat => cat.get('uuid')}
-                    rows={9}
-                    cols={3}
-                    entities={props.get('categories')}
-                    renderer={cat => cat.get('name')}
-                    selectMethod={categoriesEditorActions.selectCategory}
-                    deselectMethod={categoriesEditorActions.deselectCategory}
-                />
-            </Column>
-        </Row>,
-            <Row key="new" topSpaced>
+        return [
+            <Row key="list" topSpaced>
                 <Column>
-                    <Button
-                        text="Nuova categoria"
-                        type="info"
-                        commitAction={categoriesCreatorActions.beginCategoryCreation}
+                    <SelectInput
+                        bordered
+                        id={category => category.get('uuid')}
+                        rows={StoresUtils.settings(data, "categoriesRows", 3)}
+                        cols={StoresUtils.settings(data, "categoriesColumns", 3)}
+                        options={data.get('categories')}
+                        page={data.get('categoriesPage')}
+                        renderer={category => category.get('name')}
+                        onSelectPage={index => CategoriesEditorActions.selectCategoryPage(index)}
+                        onSelect={category => CategoriesEditorActions.selectCategory(category)}
+                    />
+                </Column>
+            </Row>,
+            <Row key="new" justify="center" topSpaced grow>
+                <Column justify="center" auto>
+                    <RoundButton key="new"
+                                 icon="plus"
+                                 text="Nuova categoria"
+                                 type="success"
+                                 commitAction={() => CategoriesCreatorActions.beginCreation()}
                     />
                 </Column>
             </Row>];

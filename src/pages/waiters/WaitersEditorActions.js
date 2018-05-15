@@ -1,61 +1,65 @@
-import {
-    ACT_BEGIN_CREATE_WAITER, ACT_DELETE_WAITER,
-    ACT_DESELECT_WAITER,
-    ACT_SELECT_WAITER, ACT_UPDATE_WAITER,
-    ACT_UPDATE_WAITER_CF,
-    ACT_UPDATE_WAITER_NAME,
-    ACT_UPDATE_WAITER_SURNAME
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
-class WaitersEditorActions {
+export const WaitersEditorActionTypes = {
+    SELECT_EDITING_WAITER: "SELECT_EDITING_WAITER",
+    SELECT_EDITING_WAITER_PAGE: "SELECT_EDITING_WAITER_PAGE",
+    DESELECT_EDITING_WAITER: "DESELECT_EDITING_WAITER",
+    UPDATE_EDITING_WAITER: "UPDATE_EDITING_WAITER",
+    DELETE_EDITING_WAITER: "DELETE_EDITING_WAITER",
+};
 
-    selectWaiter(waiter) {
-        dispatcher.fireEnd(ACT_SELECT_WAITER, waiter);
-    }
+export const WaitersEditorActions = {
 
-    deselectWaiter(){
-        dispatcher.fireEnd(ACT_DESELECT_WAITER);
-    }
+    selectWaiter: (waiter) =>
+        dispatcher.fireEnd(
+            WaitersEditorActionTypes.SELECT_EDITING_WAITER,
+            waiter
+        ),
 
-    updateWaiterName(uuid, value) {
+    selectWaiterPage: (page) =>
+        dispatcher.fireEnd(
+            WaitersEditorActionTypes.SELECT_EDITING_WAITER_PAGE,
+            page
+        ),
+
+    deselectWaiter: () =>
+        dispatcher.fireEnd(
+            WaitersEditorActionTypes.DESELECT_EDITING_WAITER
+        ),
+
+    confirmName: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_WAITER,
+            WaitersEditorActionTypes.UPDATE_EDITING_WAITER,
             'waiters/' + uuid + '/name',
             value
-        );
-    }
+        ),
 
-    updateWaiterSurname(uuid, value) {
+    confirmSurname: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_WAITER,
+            WaitersEditorActionTypes.UPDATE_EDITING_WAITER,
             'waiters/' + uuid + '/surname',
             value
-        );
-    }
+        ),
 
-    updateWaiterCf(uuid, value) {
+    confirmCf: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_WAITER,
+            WaitersEditorActionTypes.UPDATE_EDITING_WAITER,
             'waiters/' + uuid + '/cf',
             value
-        );
-    }
+        ),
 
-    updateWaiterStatus(uuid, value) {
+    confirmStatus: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_WAITER,
+            WaitersEditorActionTypes.UPDATE_EDITING_WAITER,
             'waiters/' + uuid + '/status',
             value
-        );
-    }
+        ),
 
-    deleteWaiter(uuid) {
-        asyncActionBuilder.remove(ACT_DELETE_WAITER, 'waiters', uuid);
-    }
-
-}
-
-const waitersEditorActions = new WaitersEditorActions();
-export default waitersEditorActions;
+    onDelete: (uuid) =>
+        asyncActionBuilder.remove(
+            WaitersEditorActionTypes.DELETE_EDITING_WAITER,
+            'waiters',
+            uuid
+        )
+};

@@ -11,6 +11,8 @@ import PercentInput from "../../../../components/widgets/inputs/PercentInput";
 import FloatInput from "../../../../components/widgets/inputs/float/FloatInput";
 import {DiningTablesClosingActions} from "./DiningTablesClosingActions";
 import {iGet} from "../../../../utils/Utils";
+import FloatEditor from "../../../../components/widgets/inputs/float/FloatEditor";
+import IntegerEditor from "../../../../components/widgets/inputs/IntegerEditor";
 
 export default class DiningTableClosingReviewPage extends Component {
     constructor(props) {
@@ -22,15 +24,15 @@ export default class DiningTableClosingReviewPage extends Component {
         let table = iGet(data, "diningTablesEditing.diningTable");
         let dishes = data.get('dishes');
         let additions = data.get('additions');
-        let wizardData = iGet(data, 'diningTableClosing');
-        if (wizardData) {
-            let invoiceOrders = wizardData.get('orders');
+        let closingData = iGet(data, 'diningTableClosing');
+        if (closingData) {
+            let invoiceOrders = iGet(closingData, 'selectedBill.orders');
             let orders = DiningTablesUtils.findTableOrders(table);
             orders = orders.filter(order => invoiceOrders.includes(order.get('uuid')));
             let total = OrdinationsUtils.total(orders);
             orders = DiningTablesUtils.implode(orders);
             orders = OrdinationsUtils.sortByDish(orders, dishes, additions);
-            let coverCharges = wizardData.get('coverCharges');
+            let coverCharges = iGet(closingData, 'selectedBill.coverCharges');
             let coverChargesPrice = coverCharges * iGet(data, "evening.coverCharge");
             total += coverChargesPrice;
 
@@ -49,10 +51,6 @@ export default class DiningTableClosingReviewPage extends Component {
                                     </Row>
                                     {
                                         orders.map(grp => {
-                                            let singleButton = <Button icon="angle-left"
-                                                                       commitAction={() => this.openOrder(grp)}/>;
-                                            let allButton = <Button icon="angle-double-left"
-                                                                    commitAction={() => this.openOrders(grp)}/>;
                                             let left = OrdinationsUtils.renderImplodedOrder(grp, data.get('dishes'), this.props.data.get('additions'));
                                             return (
                                                 <Row key={grp.get('groupId')} align="center">
@@ -103,15 +101,14 @@ export default class DiningTableClosingReviewPage extends Component {
 
     buildRefinedTotalView() {
         let wizardData = this.props.data.get('diningTableClosing');
-        let discount = iGet(wizardData, 'percentInput.value');
-        let billsNumber = iGet(wizardData, 'splitInput.value');
-        let total = this.calculateRealTotal();
+        let discount = iGet(wizardData, 'percent');
+        let billsNumber = iGet(wizardData, 'split');
 
         let discountedTotal = OrdinationsUtils.formatPrice(this.calculateDiscountedTotal());
-        let totalPrice = OrdinationsUtils.formatPrice(iGet(wizardData, 'finalTotalInput.value'));
+        let totalSplittedPrice = OrdinationsUtils.formatPrice(iGet(wizardData, 'selectedBill.total') / billsNumber);
         if (billsNumber > 1) {
-            totalPrice = totalPrice + " x " + billsNumber + " = " +
-                OrdinationsUtils.formatPrice(iGet(wizardData, 'finalTotalInput.value') * billsNumber);
+            totalSplittedPrice = totalSplittedPrice + " x " + billsNumber + " = " +
+                OrdinationsUtils.formatPrice(iGet(wizardData, 'selectedBill.total'));
         }
         return [
             <Row key="discount">
@@ -122,7 +119,7 @@ export default class DiningTableClosingReviewPage extends Component {
             <Row key="total">
                 <Column>
                     <FormattedParagraph leftText="TOTALE DEFINITIVO:"
-                                        rightText={totalPrice}
+                                        rightText={totalSplittedPrice}
                                         leftBold/>
                 </Column>
             </Row>
@@ -133,29 +130,16 @@ export default class DiningTableClosingReviewPage extends Component {
         const data = this.props.data;
         let table = iGet(data, "diningTablesEditing.diningTable");
         let wizardData = data.get('diningTableClosing');
-        let dishes = data.get('dishes');
-        let additions = data.get('additions');
 
-        let discount = iGet(wizardData, 'percentInput.value');
-        let billsNumber = iGet(wizardData, 'splitInput.value');
+        let discount = wizardData.get('percent');
 
-        let invoiceOrders = wizardData.get('orders');
+        let invoiceOrders = iGet(wizardData, 'selectedBill.orders');
         let orders = DiningTablesUtils.findTableOrders(table);
 
         orders = orders.filter(order => invoiceOrders.includes(order.get('uuid')));
         let total = OrdinationsUtils.total(orders);
-        total += wizardData.get('coverCharges') * iGet(data, 'evening.coverCharge');
+        total += iGet(wizardData,'selectedBill.coverCharges') * iGet(data, 'evening.coverCharge');
         return total - discount * total / 100;
-    }
-
-    calculateRealTotal() {
-        let discountedTotal = this.calculateDiscountedTotal();
-        const data = this.props.data;
-        let wizardData = data.get('diningTableClosing');
-        let billsNumber = iGet(wizardData, 'splitInput.value');
-
-        let total = billsNumber > 0 ? discountedTotal / billsNumber : discountedTotal;
-        return total.toFixed(2);
     }
 
     setRefiningComponent(value) {
@@ -166,6 +150,7 @@ export default class DiningTableClosingReviewPage extends Component {
 
     buildRefiningComponent() {
         let wizardData = this.props.data.get('diningTableClosing');
+        let billsNumber = wizardData.get('split');
         return <Row>
             <Column>
                 <Row>
@@ -175,24 +160,29 @@ export default class DiningTableClosingReviewPage extends Component {
                 </Row>
                 <Row>
                     <Column>
-                        <PercentInput
-                            text={iGet(wizardData, "percentInput.text")}
-                            onChar={(char) => DiningTablesClosingActions.percentChar(char)}
-                            onChange={(text) => DiningTablesClosingActions.percentChange(text)}
+                        <IntegerEditor
+                            type="info"
+                            options={{
+                                label: "Sconto percentuale",
+                                value: wizardData.get('percent'),
+                                callback: result => DiningTablesClosingActions.setPercent(result),
+                                min: 0,
+                                max: 99
+                            }}
+                            percent
                         />
                     </Column>
                 </Row>
                 <Row topSpaced>
                     <Column>
-                        <h5>Totale</h5>
-                    </Column>
-                </Row>
-                <Row>
-                    <Column>
-                        <FloatInput
-                            text={iGet(wizardData, 'finalTotalInput.text')}
-                            onChar={(char) => DiningTablesClosingActions.finalTotalChar(char)}
-                            onChange={(text) => DiningTablesClosingActions.finalTotalChange(text)}
+                        <FloatEditor
+                            type="info"
+                            options={{
+                                label: "Totale definitivo",
+                                value: iGet(wizardData, 'selectedBill.total'),
+                                callback: value => DiningTablesClosingActions.setFinalTotal(value * billsNumber)
+                            }}
+                            currency
                         />
                     </Column>
                 </Row>

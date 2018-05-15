@@ -2,17 +2,16 @@ import React, {Component} from 'react';
 import tablesPageStore from "./TablesPageStore";
 import tablesPageActions from "./TablesPageActions";
 import Page from "../Page";
-import {findByUuid} from "../../utils/Utils";
-import tablesEditorActions from "./TablesEditorActions";
-import TableEditor from "../locations/TableEditor";
-import TableCreator from "../locations/TableCreator";
-import TablesNavigator from "../locations/TablesNavigator";
-import NavElementLink from "../../widgets/NavElementLink";
-import NavElement from "../../widgets/NavElement";
-import NavPills from "../../widgets/NavPills";
-import {SETTINGS} from "../../App";
+import TableEditor from "./TableEditor";
+import TablesNavigator from "./TablesNavigator";
+import {EditorStatus} from "../StoresUtils";
+import TablesNav from "./TablesNav";
+import {TablesCreatorActions} from "./TablesCreatorActions";
+import {TablesEditorActions} from "./TablesEditorActions";
 
 const {Map} = require('immutable');
+
+const {fromJS} = require('immutable');
 
 export default class TablesPage extends Component {
 
@@ -38,64 +37,29 @@ export default class TablesPage extends Component {
     }
 
     render() {
-        let navContent = TablesPage.makeNavContent(this.state.data);
         let pageContent = TablesPage.makePageContent(this.state.data);
         return (
             <Page title="Tavoli">
-                {navContent}
+                <TablesNav data={this.state.data}/>
                 {pageContent}
             </Page>
         )
     }
 
     static makePageContent(state) {
-        if (state.get('selectedTable')) {
-            return <TableEditor data={TablesPage.makeTableEditorDescriptor(state)}/>
-        } else if (state.get('createdTable')) {
-            return <TableCreator data={TablesPage.makeTableCreatorDescriptor(state)}/>
+        let editorStatus = state.get('editorStatus');
+        if (editorStatus === EditorStatus.EDITING) {
+            return <TableEditor
+                data={state}
+                actionsProvider={TablesEditorActions}
+            />
+        } else if (editorStatus === EditorStatus.CREATING) {
+            return <TableEditor
+                data={state}
+                actionsProvider={TablesCreatorActions}
+            />
         } else {
             return <TablesNavigator data={state}/>
         }
-    }
-
-    static makeTableEditorDescriptor(data) {
-        return Map({
-            table: findByUuid(data.get('tables'), data.get('selectedTable'))
-        })
-    }
-
-    static makeTableCreatorDescriptor(data) {
-        return Map({
-            table: data.get('createdTable')
-        })
-    }
-
-    static makeNavContent(state) {
-        let elements = [];
-        elements.push(<NavElementLink
-            key="settings"
-            text="Impostazioni"
-            page={SETTINGS}
-        />);
-        elements.push(<NavElement
-            key="tables"
-            text="Tavoli"
-            active={!state.get('selectedTable') && !state.get('createdTable')}
-            commitAction={tablesEditorActions.deselectTable}
-        />);
-        if (state.get('selectedTable')) {
-            elements.push(<NavElement
-                key="selected"
-                text={findByUuid(state.get('tables'), state.get('selectedTable')).get('name')}
-                active={true}
-            />);
-        } else if (state.get('createdTable')) {
-            elements.push(<NavElement
-                key="selected"
-                text={state.get('createdTable').get('name') || "Nuovo tavolo"}
-                active={true}
-            />);
-        }
-        return <NavPills>{elements}</NavPills>;
     }
 }

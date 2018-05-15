@@ -4,13 +4,13 @@ import GraphWizardPage from "./GraphWizardPage";
 import {findByUuid, iGet} from "../../../../utils/Utils";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
-import IntegerInput from "../../inputs/IntegerInput";
-import NavPills from "../../../../widgets/NavPills";
 import NavElement from "../../../../widgets/NavElement";
 import SelectInput from "../../inputs/SelectInput";
 import {OrdersActions} from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersActions";
 import OrdinationOrdersReview
     from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationOrdersReview";
+import IntegerEditor from "../../inputs/IntegerEditor";
+import SelectEditor from "../../inputs/SelectEditor";
 
 const {List, fromJS} = require('immutable');
 
@@ -39,7 +39,6 @@ export default class OrderDishWizardPage extends Component {
         let orders = iGet(data, "ordersEditing.orders");
         let selectedCategory = iGet(data, "ordersEditing.selectedCategory");
 
-        let phasesContent = this.buildPhasesContent();
         let nav = this.buildNav();
         let content = null;
         if (selectedCategory) {
@@ -48,16 +47,19 @@ export default class OrderDishWizardPage extends Component {
             content = this.buildCategoriesContent();
         }
 
-        let quantityText = iGet(data, "ordersEditing.quantityInput.text")
+        let quantity = iGet(data, "ordersEditing.quantity");
 
         let sampleOrder = this.props.wizardData["editing"];
+
+        let availablePhases = data.get('phases');
+        let selectedPhase = iGet(data, 'ordersEditing.selectedPhase');
 
         return (
             <GraphWizardPage
                 abortAction={this.props.abortAction}
                 confirmAction={this.props.confirmAction}>
                 <Row grow>
-                    <Column lg="6" justify="between">
+                    <Column lg="6">
                         <Row grow>
                             <Column>
                                 <OrdinationOrdersReview
@@ -66,28 +68,34 @@ export default class OrderDishWizardPage extends Component {
                                 />
                             </Column>
                         </Row>
-                        <Row ofList>
-                            <Column>
-                                {phasesContent}
-                            </Column>
-                        </Row>
                     </Column>
-                    <Column lg="6" justify="between">
+                    <Column lg="6">
                         <Row>
                             <Column>
-                                <Column auto centered>
-                                    <h5>Quantità</h5>
-                                </Column>
-                                <Row>
-                                    <Column>
-                                        <IntegerInput
-                                            uuid={"dishQuantity"}
-                                            text={quantityText}
-                                            onChar={char => OrdersActions.quantityChar(char)}
-                                            onChange={text => OrdersActions.quantityChange(text)}
-                                        />
-                                    </Column>
-                                </Row>
+                                <IntegerEditor
+                                    type="info"
+                                    options={{
+                                    label: "Quantità",
+                                    value: quantity,
+                                    callback: result => OrdersActions.quantityConfirm(result),
+                                    min: 1
+                                }}
+                                />
+                            </Column>
+                            <Column>
+                                <SelectEditor
+                                    type="info"
+                                    options={{
+                                        rows: 2,
+                                        cols: 2,
+                                        label: "Portata",
+                                        values: availablePhases,
+                                        id: p => p.get('uuid'),
+                                        renderer: p => p ? p.get('name') : "",
+                                        value: selectedPhase,
+                                        callback: result => OrdersActions.selectPhase(result)
+                                    }}
+                                />
                             </Column>
                         </Row>
                         <Row topSpaced>
@@ -108,21 +116,6 @@ export default class OrderDishWizardPage extends Component {
                 </Row>
             </GraphWizardPage>
         )
-    }
-
-    buildPhasesContent() {
-        let data = this.props.data;
-        let availablePhases = data.get('phases');
-        let selectedPhase = iGet(data, 'ordersEditing.selectedPhase');
-        return <SelectInput
-            rows={1}
-            cols={4}
-            id={phase => phase.get('uuid')}
-            options={availablePhases}
-            renderer={phase => phase.get('name')}
-            selected={selectedPhase}
-            page={0}
-            onSelect={phase => OrdersActions.selectPhase(phase)}/>;
     }
 
     buildNav() {

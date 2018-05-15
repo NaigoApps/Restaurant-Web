@@ -1,5 +1,5 @@
 import React from 'react';
-import {findByUuid} from "../../../../utils/Utils";
+import {findByUuid, uuid} from "../../../../utils/Utils";
 import OrdinationsUtils from "../../OrdinationsUtils";
 import Scrollable from "../../../../components/widgets/Scrollable";
 import Column from "../../../../widgets/Column";
@@ -16,7 +16,7 @@ export default class OrdinationOrdersReview extends React.Component {
         let additions = this.props.data.get('additions');
         let result = OrdinationsUtils.renderImplodedOrder(group, dishes, additions);
 
-        return <Row key={group.get('groupId')}>
+        return <Row key={"order-" + uuid()}>
             <Column>
                 <FormattedParagraph leftText={result} rightText={OrdinationsUtils.formatPrice(group.get('price'))}/>
             </Column>

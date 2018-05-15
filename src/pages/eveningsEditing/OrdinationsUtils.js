@@ -92,17 +92,14 @@ export default class OrdinationsUtils {
         return groupsList;
     }
 
-    static sameGroup(g1, g2) {
-        if (!g1 || !g2) {
-            return false;
-        }
-        return g1.quantity === g2.quantity &&
-            g1.price === g2.price &&
-            OrdinationsUtils.sameOrder(g1.order, g2.order);
-    }
-
     static sameOrder(o1, o2) {
         return DiningTablesUtils.sameOrder(o1, o2) && o1.get('phase') === o2.get('phase')
+    }
+
+    static countOrders(orders, order){
+        let result = 0;
+        orders.forEach(o => result += OrdinationsUtils.sameOrder(o, order) ? 1 : 0);
+        return result;
     }
 
     static buildOrder(dish, phase, price, ordination) {
@@ -167,7 +164,7 @@ export default class OrdinationsUtils {
     }
 
     static renderOrdination(ordination){
-        return beautifyTime(ordination.get('creationTime'));
+        return "Comanda delle " + beautifyTime(ordination.get('creationTime'));
     }
 
     static ordinationDateSorter(o1, o2){

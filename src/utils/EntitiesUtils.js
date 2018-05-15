@@ -25,6 +25,14 @@ export class EntitiesUtils {
         });
     }
 
+    static newBill() {
+        return fromJS({
+            orders: [],
+            total: 0,
+            coverCharges: 0
+        });
+    }
+
     static newOrder(dish, phase) {
         return fromJS({
             uuid: uuid(),
@@ -35,7 +43,11 @@ export class EntitiesUtils {
         });
     }
 
-    static newCustomer(){
+    static duplicateOrder(order) {
+        return order.set('uuid', uuid());
+    }
+
+    static newCustomer() {
         return fromJS({
             uuid: NEW_CUSTOMER_UUID,
             name: "",
@@ -49,7 +61,7 @@ export class EntitiesUtils {
         });
     }
 
-    static newPrinter(){
+    static newPrinter() {
         return fromJS({
             name: "",
             main: false,
@@ -57,8 +69,55 @@ export class EntitiesUtils {
         });
     }
 
-    static renderCustomer(customer){
-        if(customer) {
+    static newLocation() {
+        return fromJS({
+            name: "",
+            printer: ""
+        });
+    }
+
+    static newRestaurantTable() {
+        return fromJS({
+            name: ""
+        });
+    }
+
+    static newWaiter(){
+        return fromJS({
+            name: "",
+            surname: "",
+            cf: "",
+            status: ""
+        });
+    }
+
+    static newCategory() {
+        return fromJS({
+            name: "",
+            location: null,
+            dishes: []
+        });
+    }
+
+    static newDish() {
+        return fromJS({
+            name: "",
+            price: 0.0,
+            description: "",
+            category: ""
+        });
+    }
+
+    static newAddition() {
+        return fromJS({
+            name: "",
+            price: 0,
+            generic: false
+        });
+    }
+
+    static renderCustomer(customer) {
+        if (customer) {
             return customer.get('surname') + " " + customer.get('name');
         }
         return "?";

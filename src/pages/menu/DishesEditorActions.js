@@ -1,68 +1,71 @@
-import {
-    ACT_BEGIN_CREATE_DISH,
-    ACT_CREATE_DISH, ACT_DELETE_DISH, ACT_DESELECT_DISH,
-    ACT_RETRIEVE_DISH_STATUSES,
-    ACT_RETRIEVE_DISHES,
-    ACT_SELECT_DISH,
-    ACT_UPDATE_DISH, ACT_UPDATE_DISH_CREATOR_DESCRIPTION, ACT_UPDATE_DISH_CREATOR_NAME, ACT_UPDATE_DISH_CREATOR_PRICE
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
-import categoriesActions from "./CategoriesActions";
 import asyncActionBuilder from "../../actions/RequestBuilder";
-import categoriesEditorActions from "./CategoriesEditorActions";
 
+export const DishesEditorActionTypes = {
+    SELECT_EDITING_DISH: "SELECT_EDITING_DISH",
+    DESELECT_EDITING_DISH: "DESELECT_EDITING_DISH",
+    SELECT_EDITING_DISH_PAGE: "SELECT_EDITING_DISH_PAGE",
+    UPDATE_EDITING_DISH: "UPDATE_EDITING_DISH",
+    DELETE_EDITING_DISH: "DELETE_EDITING_DISH",
+};
 
-class DishesEditorActions {
+export const DishesEditorActions = {
 
-    updateDishName(uuid, value) {
+    selectDish: (dish) =>
+        dispatcher.fireEnd(
+            DishesEditorActionTypes.SELECT_EDITING_DISH,
+            dish
+        ),
+
+    deselectDish: () =>
+        dispatcher.fireEnd(
+            DishesEditorActionTypes.DESELECT_EDITING_DISH
+        ),
+
+    selectDishPage: (page) =>
+        dispatcher.fireEnd(
+            DishesEditorActionTypes.SELECT_EDITING_DISH_PAGE,
+            page
+        ),
+
+    confirmName: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_DISH,
+            DishesEditorActionTypes.UPDATE_EDITING_DISH,
             'dishes/' + uuid + '/name',
             value
-        );
-    }
+        ),
 
-    updateDishDescription(uuid, value) {
+    confirmDescription: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_DISH,
+            DishesEditorActionTypes.UPDATE_EDITING_DISH,
             'dishes/' + uuid + '/description',
             value
-        );
-    }
+        ),
 
-    updateDishPrice(uuid, value) {
+    confirmPrice: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_DISH,
+            DishesEditorActionTypes.UPDATE_EDITING_DISH,
             'dishes/' + uuid + '/price',
             value
-        );
-    }
+        ),
 
-    updateDishStatus(uuid, value) {
+    confirmStatus: (uuid, value) =>
         asyncActionBuilder.put(
-            ACT_UPDATE_DISH,
+            DishesEditorActionTypes.UPDATE_EDITING_DISH,
             'dishes/' + uuid + '/status',
             value
-        );
-    }
+        ),
 
-    updateDishCategory(uuid, value) {
-        asyncActionBuilder.put(ACT_UPDATE_DISH, 'dishes/' + uuid + '/category', value);
-    }
+    confirmCategory: (uuid, value) =>
+        asyncActionBuilder.put(
+            DishesEditorActionTypes.UPDATE_EDITING_DISH,
+            'dishes/' + uuid + '/category',
+            value),
 
-    deleteDish(dish) {
-        asyncActionBuilder.remove(ACT_DELETE_DISH, 'dishes', dish)
-    }
-
-    selectDish(dish) {
-        dispatcher.fireEnd(ACT_SELECT_DISH, dish);
-    }
-
-    deselectDish() {
-        dispatcher.fireEnd(ACT_DESELECT_DISH);
-    }
-
-}
-
-const dishesEditorActions = new DishesEditorActions();
-export default dishesEditorActions;
+    onDelete: (dish) =>
+        asyncActionBuilder.remove(
+            DishesEditorActionTypes.DELETE_EDITING_DISH,
+            'dishes',
+            dish
+        ),
+};

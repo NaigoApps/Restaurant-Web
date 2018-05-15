@@ -47,15 +47,6 @@ export default class EveningNav extends Component {
                 commitAction={() => DiningTablesEditorActions.deselect()}
             />);
 
-            pills.push(<NavElement
-                key="cc_editor"
-                type="info"
-                text={"Coperto: " + OrdinationsUtils.formatPrice(evening.get('coverCharge'))}
-                active={!!data.get('editingOrdination')}
-                commitAction={() => ApplicationActions.showFloatInput(evening.get('coverCharge'),
-                    (result) => EveningEditorActions.confirmCoverCharge(iGet(data, "evening.uuid"), result))}
-            />);
-
             if (iGet(data, 'diningTablesEditing.diningTable')) {
                 let table = iGet(data, 'diningTablesEditing.diningTable');
 

@@ -1,38 +1,58 @@
-import {
-    ACT_DELETE_ADDITION,
-    ACT_DESELECT_ADDITION,
-    ACT_SELECT_ADDITION,
-    ACT_UPDATE_ADDITION
-} from "../../actions/ActionTypes";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 
-class AdditionsEditorActions {
+export const AdditionsEditorActionTypes = {
+    DELETE_EDITING_ADDITION: "DELETE_EDITING_ADDITION",
+    UPDATE_EDITING_ADDITION: "UPDATE_EDITING_ADDITION",
+    SELECT_EDITING_ADDITION: "SELECT_EDITING_ADDITION",
+    SELECT_EDITING_ADDITION_PAGE: "SELECT_EDITING_ADDITION_PAGE",
+    DESELECT_EDITING_ADDITION: "DESELECT_EDITING_ADDITION",
+};
 
-    deleteAddition(addition){
-        asyncActionBuilder.remove(ACT_DELETE_ADDITION, "additions", addition);
-    }
+export const AdditionsEditorActions = {
 
-    updateAdditionName(uuid, name) {
-        asyncActionBuilder.put(ACT_UPDATE_ADDITION, "additions/" + uuid + "/name", name)
-    }
+    onDelete: (addition) =>
+        asyncActionBuilder.remove(
+            AdditionsEditorActionTypes.DELETE_EDITING_ADDITION,
+            "additions",
+            addition
+        ),
 
-    updateAdditionPrice(uuid, price) {
-        asyncActionBuilder.put(ACT_UPDATE_ADDITION, "additions/" + uuid + "/price", price)
-    }
+    confirmName: (uuid, name) =>
+        asyncActionBuilder.put(
+            AdditionsEditorActionTypes.UPDATE_EDITING_ADDITION,
+            "additions/" + uuid + "/name",
+            name
+        ),
 
-    updateAdditionGeneric(uuid, generic) {
-        asyncActionBuilder.put(ACT_UPDATE_ADDITION, "additions/" + uuid + "/generic", generic.toString())
-    }
+    confirmPrice: (uuid, price) =>
+        asyncActionBuilder.put(
+            AdditionsEditorActionTypes.UPDATE_EDITING_ADDITION,
+            "additions/" + uuid + "/price",
+            price
+        ),
 
-    selectAddition(addition){
-        dispatcher.fireEnd(ACT_SELECT_ADDITION, addition);
-    }
+    confirmGeneric: (uuid, generic) =>
+        asyncActionBuilder.put(
+            AdditionsEditorActionTypes.UPDATE_EDITING_ADDITION,
+            "additions/" + uuid + "/generic",
+            generic.toString()
+        ),
 
-    deselectAddition(){
-        dispatcher.fireEnd(ACT_DESELECT_ADDITION);
-    }
+    selectAddition: (addition) =>
+        dispatcher.fireEnd(
+            AdditionsEditorActionTypes.SELECT_EDITING_ADDITION,
+            addition
+        ),
+
+    selectAdditionsPage: (page) =>
+        dispatcher.fireEnd(
+            AdditionsEditorActionTypes.SELECT_EDITING_ADDITION_PAGE,
+            page
+        ),
+
+    deselectAddition: () =>
+        dispatcher.fireEnd(
+            AdditionsEditorActionTypes.DESELECT_EDITING_ADDITION
+        )
 }
-
-const additionsEditorActions = new AdditionsEditorActions();
-export default additionsEditorActions;

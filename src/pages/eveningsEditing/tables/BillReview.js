@@ -1,12 +1,8 @@
 import React, {Component} from 'react';
-import EntityEditor from "../../../components/editors/EntityEditor";
 import DiningTablesUtils from "./DiningTablesUtils";
-import PaginatedList from "../../../components/widgets/PaginatedList";
-import {findByUuid, iGet} from "../../../utils/Utils";
+import {iGet} from "../../../utils/Utils";
 import Row from "../../../widgets/Row";
 import Column from "../../../widgets/Column";
-import {DiningTablesEditorActions} from "../diningTablesEditing/DiningTablesEditorActions";
-import {DiningTablesClosingActions} from "../diningTablesEditing/diningTableClosing/DiningTablesClosingActions";
 import OrdinationsUtils from "../OrdinationsUtils";
 import FormattedParagraph from "../../../widgets/FormattedParagraph";
 import Scrollable from "../../../components/widgets/Scrollable";
@@ -15,12 +11,13 @@ export default class BillReview extends Component {
     constructor(props) {
         super(props);
     }
+
     render() {
         let props = this.props.data;
         let orders = [];
         let evening = props.get('evening');
         let table = iGet(props, "diningTablesEditing.diningTable");
-        let bill = iGet(props, "diningTableClosing.selectedBill")
+        let bill = iGet(props, "diningTableClosing.selectedBill");
 
         table.get('ordinations').forEach(ordination => {
             ordination.get('orders').forEach(order => {
@@ -53,17 +50,24 @@ export default class BillReview extends Component {
         let total = bill.get('total');
         return <Row grow>
             <Column>
-                <Scrollable>
-                    <Row>
-                        <Column>
-                            <FormattedParagraph leftText={leftCoverCharges} rightText={rightCoverCharges}/>
-                        </Column>
-                    </Row>
-                    {ordersComponents}
-                </Scrollable>
                 <Row>
+                    <Column><h5>Riepilogo {DiningTablesUtils.renderBill(bill, props.get('customers'))}</h5></Column>
+                </Row>
+                <Row grow>
                     <Column>
-                        <b>TOTALE: <span>{OrdinationsUtils.formatPrice(total)}</span></b>
+                        <Scrollable>
+                            <Row>
+                                <Column>
+                                    <FormattedParagraph leftText={leftCoverCharges} rightText={rightCoverCharges}/>
+                                </Column>
+                            </Row>
+                            {ordersComponents}
+                        </Scrollable>
+                        <Row>
+                            <Column>
+                                <h5><b>TOTALE: <span>{OrdinationsUtils.formatPrice(total)}</span></b></h5>
+                            </Column>
+                        </Row>
                     </Column>
                 </Row>
             </Column>

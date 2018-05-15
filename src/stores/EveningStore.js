@@ -100,6 +100,7 @@ class EveningStore extends AbstractEntityStore {
             case DiningTablesEditorActionTypes.CONFIRM_WAITER:
             case DiningTablesEditorActionTypes.CONFIRM_TABLE:
             case DiningTablesEditorActionTypes.PRINT_PARTIAL_BILL:
+            case OrdinationEditorActionTypes.UPDATE_ORDERS:
             case ACT_DELETE_ORDINATION: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {
@@ -111,7 +112,6 @@ class EveningStore extends AbstractEntityStore {
                 break;
             }
             case OrdinationEditorActionTypes.PRINT_ORDINATION:
-            case OrdinationEditorActionTypes.UPDATE_ORDERS:
             case ACT_UPDATE_ORDINATION: {
                 let evening = this.getSingleData();
                 if (evening.isLoaded()) {

@@ -1,36 +1,42 @@
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
-import {
-    ACT_BEGIN_CREATE_LOCATION,
-    ACT_CREATE_LOCATION,
-    ACT_DESELECT_LOCATION,
-    ACT_UPDATE_LOCATION_NAME,
-    ACT_UPDATE_LOCATION_PRINTER
-} from "../../actions/ActionTypes";
 
-class LocationsCreatorActions {
+export const LocationsCreatorActionTypes = {
+    BEGIN_LOCATION_CREATION: "BEGIN_LOCATION_CREATION",
+    SET_CREATING_LOCATION_NAME: "SET_CREATING_LOCATION_NAME",
+    SET_CREATING_LOCATION_PRINTER: "SET_CREATING_LOCATION_PRINTER",
+    CREATE_LOCATION: "CREATE_LOCATION",
+    ABORT_LOCATION_CREATION: "ABORT_LOCATION_CREATION",
+};
 
-    beginLocationCreation() {
-        dispatcher.fireEnd(ACT_BEGIN_CREATE_LOCATION);
-    }
+export const LocationsCreatorActions = {
 
-    updateLocationName(name) {
-        dispatcher.fireEnd(ACT_UPDATE_LOCATION_NAME, name);
-    }
+    beginLocationCreation: () =>
+        dispatcher.fireEnd(
+            LocationsCreatorActionTypes.BEGIN_LOCATION_CREATION
+        ),
 
-    updateLocationPrinter(printer) {
-        dispatcher.fireEnd(ACT_UPDATE_LOCATION_PRINTER, printer);
-    }
+    confirmName: (uuid, name) =>
+        dispatcher.fireEnd(
+            LocationsCreatorActionTypes.SET_CREATING_LOCATION_NAME,
+            name
+        ),
 
-    createLocation(location) {
-        asyncActionBuilder.post(ACT_CREATE_LOCATION, 'locations', location);
-    }
+    confirmPrinter: (uuid, printer) =>
+        dispatcher.fireEnd(
+            LocationsCreatorActionTypes.SET_CREATING_LOCATION_PRINTER,
+            printer
+        ),
 
-    deselectLocation(){
-        dispatcher.fireEnd(ACT_DESELECT_LOCATION);
-    }
+    onConfirm: (location) =>
+        asyncActionBuilder.post(
+            LocationsCreatorActionTypes.CREATE_LOCATION,
+            'locations',
+            location
+        ),
 
-}
-
-const locationsCreatorActions = new LocationsCreatorActions();
-export default locationsCreatorActions;
+    onAbort: () =>
+        dispatcher.fireEnd(
+            LocationsCreatorActionTypes.ABORT_LOCATION_CREATION
+        ),
+};

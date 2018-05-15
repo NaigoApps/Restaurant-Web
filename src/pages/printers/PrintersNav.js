@@ -1,11 +1,9 @@
 import React, {Component} from 'react';
-import {findByUuid, iGet} from "../../utils/Utils";
 import NavElement from "../../widgets/NavElement";
-import printersEditorActions from "./PrintersEditorActions";
-import NavPills from "../../widgets/NavPills";
-import NavElementLink from "../../widgets/NavElementLink";
-import {SETTINGS} from "../../App";
 import {EditorStatus} from "../StoresUtils";
+import RestaurantNav from "../../components/RestaurantNav";
+import {PrintersEditorActions} from "./PrintersEditorActions";
+import NavConfigurationButton from "../../widgets/NavConfigurationButton";
 
 export default class PrintersNav extends Component {
 
@@ -14,36 +12,34 @@ export default class PrintersNav extends Component {
     }
 
     render() {
-        let navContent = this.makeNavContent();
-        return <NavPills>{navContent}</NavPills>;
+        let navContent = PrintersNav.makeNavContent(this.props.data);
+        return <RestaurantNav>{navContent}</RestaurantNav>;
     }
 
-    makeNavContent() {
-        let data = this.props.data;
+    static makeNavContent(data) {
         let elements = [];
-        let status = data.get('status');
+
         let printer = data.get('printer');
-        elements.push(<NavElementLink
-            key="settings"
-            text="Impostazioni"
-            page={SETTINGS}
-        />);
+        let status = data.get('status');
+
+        elements.push(<NavConfigurationButton key="home"/>);
+
         elements.push(<NavElement
             key="printers"
             text="Stampanti"
             active={status === EditorStatus.SURFING}
-            commitAction={() => printersEditorActions.deselectPrinter()}
+            commitAction={() => PrintersEditorActions.deselectPrinter()}
         />);
         if (status === EditorStatus.EDITING) {
             elements.push(<NavElement
                 key="selected"
-                text={iGet(data, "editor.name.value")}
+                text={printer.get('name')}
                 active={true}
             />);
-        } else if (status === EditorStatus.CREATING) {
+        }else if (status === EditorStatus.CREATING) {
             elements.push(<NavElement
                 key="selected"
-                text={iGet(data, "editor.name.value")}
+                text="Creazione stampante"
                 active={true}
             />);
         }

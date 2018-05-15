@@ -31,6 +31,8 @@ import customersStore from "../../stores/generic/CustomersStore";
 import StoresUtils from "../StoresUtils";
 import RootFeatureStore from "../../stores/RootFeatureStore";
 import {EveningEditingActionTypes} from "./EveningEditorActions";
+import {ApplicationActionTypes} from "../../actions/ApplicationActions";
+import applicationStore from "../../stores/ApplicationStore";
 
 const {Map, fromJS} = require('immutable');
 
@@ -54,7 +56,8 @@ class EveningPageStore extends RootFeatureStore {
             dishesStore.getToken(),
             phasesStore.getToken(),
             additionsStore.getToken(),
-            customersStore.getToken()
+            customersStore.getToken(),
+            applicationStore.getToken()
         ]);
 
         let changed = true;
@@ -64,6 +67,8 @@ class EveningPageStore extends RootFeatureStore {
         let state = this.state;
 
         switch (action.type) {
+            case ApplicationActionTypes.LOAD_SETTINGS:
+            case ApplicationActionTypes.STORE_SETTINGS:
             case ACT_RETRIEVE_WAITERS:
             case ACT_RETRIEVE_RESTAURANT_TABLES:
             case ACT_RETRIEVE_CATEGORIES:
@@ -141,6 +146,8 @@ class EveningPageStore extends RootFeatureStore {
         result = iSet(result, "phases", phasesStore.getPhases().getPayload());
         result = iSet(result, "additions", additionsStore.getAdditions().getPayload());
         result = iSet(result, "customers", customersStore.getCustomers().getPayload());
+
+        result = iSet(result, 'settings', applicationStore.getSettings());
 
         return result;
     }

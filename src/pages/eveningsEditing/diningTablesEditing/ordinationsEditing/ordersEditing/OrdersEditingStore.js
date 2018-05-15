@@ -5,10 +5,9 @@ import phasesStore from "../../../../../stores/generic/PhasesStore";
 import {EntitiesUtils} from "../../../../../utils/EntitiesUtils";
 import {findByUuid, findIndexByUuid} from "../../../../../utils/Utils";
 import dishesStore from "../../../../../stores/generic/DishesStore";
-import StoresUtils from "../../../../StoresUtils";
 import {OrdinationCreatorActionTypes} from "../OrdinationsCreatorActions";
 import {AdditionPages} from "../../../../../components/widgets/wizard/graph-wizard/OrderAdditionsWizardPage";
-import ordinationEditingStore from "../OrdinationEditingStore";
+import OrdinationsUtils from "../../../OrdinationsUtils";
 
 const {Map, List, fromJS} = require('immutable');
 
@@ -30,11 +29,9 @@ class OrdersEditingStore extends SubFeatureStore {
 
         this.selectedOrder = null;
 
-        this.additionsPage = null;
-        this.additionTypePage = null;
+        this.quantity = 1;
 
-        this.freeAdditionInput = StoresUtils.initTextInput();
-        this.priceInput = StoresUtils.initFloatInput();
+        this.additionsPage = null;
     }
 
     getState() {
@@ -44,14 +41,11 @@ class OrdersEditingStore extends SubFeatureStore {
             selectedCategory: this.selectedCategory,
             categoryPage: this.categoryPage,
             dishPage: this.dishPage,
-            quantityInput: this.quantityInput,
+            quantity: this.quantity,
             selectedPhase: this.selectedPhase,
             selectedOrder: this.selectedOrder,
             editingGroup: this.editingGroup,
             additionsPage: this.additionsPage,
-            additionTypePage: this.additionTypePage,
-            freeAdditionInput: this.freeAdditionInput,
-            priceInput: this.priceInput
         })
     }
 
@@ -84,7 +78,7 @@ class OrdersEditingStore extends SubFeatureStore {
                 break;
             case OrdersActionTypes.SELECT_DISH:
                 this.addOrder(action.body);
-                this.quantityInput = StoresUtils.initIntInput(0);
+                this.quantity = 1;
                 break;
             case OrdersActionTypes.SELECT_DISH_PAGE:
                 this.dishPage = action.body;
@@ -94,22 +88,17 @@ class OrdersEditingStore extends SubFeatureStore {
                 this.editingGroup = null;
                 this.selectedOrder = null;
                 break;
-            case OrdersActionTypes.QUANTITY_CHANGE:
-                this.quantityInput = this.quantityInput.set("text", action.body);
-                break;
-            case OrdersActionTypes.QUANTITY_CHAR:
-                this.quantityInput = StoresUtils.intChar(this.quantityInput, action.body);
+            case OrdersActionTypes.QUANTITY_CONFIRM:
+                this.quantity = action.body;
                 break;
             case OrdersActionTypes.SELECT_GROUP:
                 this.selectedOrder = this.theChosenOne(action.body);
                 this.additionsPage = 0;
-                this.freeAdditionInput = StoresUtils.initTextInput(this.getSelectedOrder().get('notes'));
-                this.priceInput = StoresUtils.initFloatInput(this.getSelectedOrder().get('price'));
                 break;
             case OrdersActionTypes.TOGGLE_GROUP_EDITING:
-                if(this.editingGroup === action.body.get('groupId')){
+                if (this.editingGroup === action.body.get('groupId')) {
                     this.editingGroup = null;
-                }else {
+                } else {
                     this.editingGroup = action.body.get('groupId');
                 }
                 break;
@@ -118,20 +107,20 @@ class OrdersEditingStore extends SubFeatureStore {
                 this.orders = this.orders.filter(order => !ordersToRemove.includes(order.get('uuid')));
                 this.editingGroup = null;
                 break;
-            case OrdersActionTypes.SELECT_ADDITION_TYPE_PAGE:
-                this.additionTypePage = action.body;
-                break;
             case OrdersActionTypes.SELECT_ADDITION_PAGE:
                 this.additionsPage = action.body;
                 break;
             case OrdersActionTypes.TOGGLE_ADDITION:
                 this.toggleAddition(action.body);
                 break;
-            case OrdersActionTypes.FREE_ADDITION_CHAR:
-                this.freeAdditionChar(action.body);
+            case OrdersActionTypes.SET_FREE_ADDITION:
+                this.setFreeAddition(action.body);
                 break;
-            case OrdersActionTypes.PRICE_CHAR:
-                this.priceChar(action.body);
+            case OrdersActionTypes.SET_PRICE:
+                this.setPrice(action.body);
+                break;
+            case OrdersActionTypes.SET_QUANTITY:
+                this.setQuantity(action.body);
                 break;
             case OrdersActionTypes.ORDER_PHASE:
                 this.editOrderPhase(action.body);
@@ -143,29 +132,27 @@ class OrdersEditingStore extends SubFeatureStore {
         return changed;
     }
 
-    initOrdersEditor(){
+    initOrdersEditor() {
         this.wizardPage = OrdersWizardPages.DISHES_PAGE;
         this.selectedCategory = null;
         this.categoryPage = 0;
         this.selectedPhase = phasesStore.getPhases().getPayload().get(0).get('uuid');
-        this.quantityInput = StoresUtils.initIntInput(0);
+        this.quantity = 1;
     }
 
-    getSelectedOrder(){
+    getSelectedOrder() {
         return findByUuid(this.orders, this.selectedOrder);
     }
 
-    theChosenOne(grp){
+    theChosenOne(grp) {
         return grp.get('orders').get(0).get('uuid');
     }
 
-    addOrder(dishUuid){
-        let quantity = parseInt(this.quantityInput.get('text')) || 0;
-        quantity = Math.max(quantity, 1);
+    addOrder(dishUuid) {
         const phase = this.selectedPhase;
 
         let orders = List();
-        for(let i = 0;i < quantity;i++) {
+        for (let i = 0; i < this.quantity; i++) {
             let dish = findByUuid(dishesStore.getDishes().getPayload(), dishUuid);
             let newOrder = EntitiesUtils.newOrder(dish, phase);
             orders = orders.push(newOrder);
@@ -173,48 +160,68 @@ class OrdersEditingStore extends SubFeatureStore {
         this.orders = this.orders.concat(orders);
     }
 
-    toggleAddition(addition){
-        if(this.selectedOrder) {
+    toggleAddition(addition) {
+        if (this.selectedOrder) {
             let orderIndex = findIndexByUuid(this.orders, this.selectedOrder);
             let order = this.orders.get(orderIndex);
 
             let additionIndex = order.get('additions').indexOf(addition);
-            if(additionIndex !== -1){
+            if (additionIndex !== -1) {
                 order = order.set('additions', order.get('additions').remove(additionIndex));
-            }else{
+            } else {
                 order = order.set('additions', order.get('additions').push(addition));
             }
             this.orders = this.orders.set(orderIndex, order);
         }
     }
 
-    freeAdditionChar(char){
-        if(this.selectedOrder) {
+    setFreeAddition(text) {
+        if (this.selectedOrder) {
             let orderIndex = findIndexByUuid(this.orders, this.selectedOrder);
-            let order = this.orders.get(orderIndex);
 
-            this.freeAdditionInput = StoresUtils.textChar(this.freeAdditionInput, char)
-            order = order.set('notes', this.freeAdditionInput.get('text'));
+            let order = this.orders.get(orderIndex).set('notes', text);
 
             this.orders = this.orders.set(orderIndex, order);
         }
     }
 
-    priceChar(char){
-        if(this.selectedOrder) {
-            let orderIndex = findIndexByUuid(this.orders, this.selectedOrder);
-            let order = this.orders.get(orderIndex);
+    setQuantity(value) {
+        let oldValue = value;
+        let order = findByUuid(this.orders, this.selectedOrder);
+        let toRemove = [];
+        this.orders.forEach(o => {
+            if(OrdinationsUtils.sameOrder(o, order)){
+                if(value > 0){
+                    value--;
+                }else{
+                    toRemove.push(o.get('uuid'));
+                }
+            }
+        });
+        if(toRemove.length > 0){
+            this.orders = this.orders.filter(o => !toRemove.includes(o.get('uuid')));
+        }else {
+            while(value > 0){
+                this.orders = this.orders.push(EntitiesUtils.duplicateOrder(order));
+                value--;
+            }
+        }
+        if(oldValue === 0){
+            this.selectedOrder = null;
+        }
+    }
 
-            this.priceInput = StoresUtils.floatChar(this.priceInput, char);
-            if(!isNaN(parseFloat(this.priceInput.get('text'))))
-            order = order.set('price', parseFloat(this.priceInput.get('text')));
+    setPrice(value) {
+        if (this.selectedOrder) {
+            let orderIndex = findIndexByUuid(this.orders, this.selectedOrder);
+            let order = this.orders.get(orderIndex).set('price', value);
 
             this.orders = this.orders.set(orderIndex, order);
         }
     }
 
-    editOrderPhase(phase){
-        if(this.selectedOrder) {
+    editOrderPhase(phase) {
+        if (this.selectedOrder) {
             let orderIndex = findIndexByUuid(this.orders, this.selectedOrder);
             let order = this.orders.get(orderIndex);
 

@@ -1,54 +1,54 @@
-import {
-    ACT_BEGIN_CREATE_PRINTER,
-    ACT_CREATE_PRINTER,
-    ACT_DESELECT_PRINTER,
-    ACT_PRINTER_CREATOR_LC_ABORT,
-    ACT_PRINTER_CREATOR_NAME_ABORT,
-    ACT_UPDATE_PRINTER_CREATOR_LC,
-    ACT_UPDATE_PRINTER_CREATOR_MAIN,
-    ACT_UPDATE_PRINTER_CREATOR_NAME
-} from "../../actions/ActionTypes";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 
-class PrintersCreatorActions {
+export const PrintersCreatorActionTypes = {
+    BEGIN_PRINTER_CREATION: "BEGIN_PRINTER_CREATION",
+    CREATE_PRINTER: "CREATE_PRINTER",
+    ABORT_PRINTER_CREATION: "ABORT_PRINTER_CREATION",
+    SET_CREATING_PRINTER_NAME: "SET_CREATING_PRINTER_NAME",
+    SET_CREATING_PRINTER_MAIN: "SET_CREATING_PRINTER_MAIN",
+    SET_CREATING_PRINTER_LC: "SET_CREATING_PRINTER_LC",
+};
 
-    beginPrinterCreation() {
-        dispatcher.fireEnd(ACT_BEGIN_CREATE_PRINTER);
-    }
+export const PrintersCreatorActions = {
+
+    beginPrinterCreation: () =>
+        dispatcher.fireEnd(
+            PrintersCreatorActionTypes.BEGIN_PRINTER_CREATION
+        ),
 
     //Editor actions
 
-    onConfirm(printer) {
-        asyncActionBuilder.post(ACT_CREATE_PRINTER, 'printers', printer);
-    }
+    onConfirm: (printer) =>
+        asyncActionBuilder.post(
+            PrintersCreatorActionTypes.CREATE_PRINTER,
+            'printers',
+            printer
+        ),
 
-    onAbort(){
-        dispatcher.fireEnd(ACT_DESELECT_PRINTER);
-    }
+    onAbort: () =>
+        dispatcher.fireEnd(
+            PrintersCreatorActionTypes.ABORT_PRINTER_CREATION
+        ),
 
     //Name
 
-    onAbortNameEditing(){
-        dispatcher.fireEnd(ACT_PRINTER_CREATOR_NAME_ABORT);
-    }
+    confirmName: (uuid, value) =>
+        dispatcher.fireEnd(
+            PrintersCreatorActionTypes.SET_CREATING_PRINTER_NAME,
+            value
+        ),
 
-    onConfirmNameEditing(uuid, value){
-        dispatcher.fireEnd(ACT_UPDATE_PRINTER_CREATOR_NAME, value);
-    }
+    confirmMain: (uuid, value) =>
+        dispatcher.fireEnd(
+            PrintersCreatorActionTypes.SET_CREATING_PRINTER_MAIN,
+            value
+        ),
 
-    onConfirmMainEditing(uuid, value) {
-        dispatcher.fireEnd(ACT_UPDATE_PRINTER_CREATOR_MAIN, value);
-    }
+    confirmLineCharacters: (uuid, value) =>
+        dispatcher.fireEnd(
+            PrintersCreatorActionTypes.SET_CREATING_PRINTER_LC,
+            value
+        ),
 
-    onConfirmLineCharactersEditing(uuid, value){
-        dispatcher.fireEnd(ACT_UPDATE_PRINTER_CREATOR_LC, value);
-    }
-
-    onAbortLineCharactersEditing(){
-        dispatcher.fireEnd(ACT_PRINTER_CREATOR_LC_ABORT);
-    }
-}
-
-const printersCreatorActions = new PrintersCreatorActions();
-export default printersCreatorActions;
+};

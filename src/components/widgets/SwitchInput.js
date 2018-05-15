@@ -16,21 +16,21 @@ export default class SwitchInput extends Component {
 
     render() {
         let value = this.props.value;
-        const leftText = value || !this.props.rightText ? this.props.leftText : <b>{this.props.leftText}</b>;
-        const rightText = value ? <b>{this.props.rightText}</b> : this.props.rightText;
+        const leftText = !value || !this.props.rightText ? <b>{this.props.leftText}</b> : this.props.leftTextR;
+        const rightText = this.props.rightText && value ? <b>{this.props.rightText}</b> : this.props.rightText;
         let leftCol;
         if(leftText){
-            leftCol = <Column sm={this.props.rightText ? "3" : "2"} right>
+            leftCol = <Column auto>
                 <label>{leftText}</label>
             </Column>;
         }
         let rightCol;
         if(rightText){
-            rightCol = <Column sm="3" left>
+            rightCol = <Column auto>
                 <label>{rightText}</label>
             </Column>;
         }
-        return <Row align="center" topSpaced>
+        return <Row align="center">
             {leftCol}
             <Column auto>
                 <Switch

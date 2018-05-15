@@ -97,7 +97,8 @@ export default class Wizard extends Component {
 
     canMoveForward() {
         const currentPage = this.getCurrentPage();
-        return currentPage && currentPage.props.isValid && this.props.currentPage + 1 < this.pagesNumber();
+        return currentPage && (currentPage.props.isValid === undefined || currentPage.props.isValid)
+            && this.props.currentPage + 1 < this.pagesNumber();
     }
 
     buildForwardButton() {

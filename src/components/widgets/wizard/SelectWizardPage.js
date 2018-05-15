@@ -23,6 +23,7 @@ export default class SelectWizardPage extends Component {
                     colorRenderer={this.props.colorRenderer}
                     page={this.props.page}
                     onSelect={this.props.onSelect}
+                    onDeselect={this.props.onDeselect}
                     onSelectPage={this.props.onSelectPage}
                 />
             </GraphWizardPage>

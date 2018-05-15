@@ -1,5 +1,9 @@
 import React, {Component} from 'react';
 import SwitchInput from "../../SwitchInput";
+import Button from "../../../../widgets/Button";
+import Column from "../../../../widgets/Column";
+import Row from "../../../../widgets/Row";
+import Icon from "../../../../widgets/Icon";
 
 export default class BooleanEditor extends Component {
     constructor(props) {
@@ -14,10 +18,19 @@ export default class BooleanEditor extends Component {
 
     render() {
         const label = this.props.label;
-        return <SwitchInput
-            leftText={label}
-            value={this.props.value}
-            onToggle={value => this.onConfirm(value)}
+        let text = <Row>
+            <Column auto justify="center">
+                <span><b>{label}</b>:</span>
+            </Column>
+            <Column><span className="text-center boolean-check"><Icon
+                name={this.props.value ? "check" : "remove"}
+                type={this.props.value ? "success" : "danger"}
+            /></span></Column>
+        </Row>;
+        return <Button
+            highPadding
+            text={text}
+            commitAction={() => this.onConfirm(!this.props.value)}
         />;
     }
 

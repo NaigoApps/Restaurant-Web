@@ -8,7 +8,6 @@ import {findByUuid, iGet, uuid} from "../../../../utils/Utils";
 import Scrollable from "../../../../components/widgets/Scrollable";
 import DiningTablesUtils from "../../tables/DiningTablesUtils";
 import FormattedParagraph from "../../../../widgets/FormattedParagraph";
-import {DiningTablesEditorActions} from "../DiningTablesEditorActions";
 import {DiningTablesClosingActions} from "./DiningTablesClosingActions";
 
 export default class DiningTableClosingSplitPage extends Component {
@@ -27,31 +26,16 @@ export default class DiningTableClosingSplitPage extends Component {
         return "?";
     }
 
-    getRemainingCoverCharges() {
-        let table = this.props.data.get('editingTable');
-        let wizardData = this.props.wizardData;
-        let coverCharges = DiningTablesUtils.findTableOpenedCoverCharges(table);
-        coverCharges -= wizardData.get('coverCharges');
-        return coverCharges;
-    }
-
     buildDiningTableSummary() {
         let data = this.props.data;
         let dishes = data.get('dishes');
         let additions = data.get('additions');
         let table = iGet(data, "diningTablesEditing.diningTable");
-        let orders = DiningTablesUtils.findTableOpenedOrders(table);
-        let coverCharges = DiningTablesUtils.findTableOpenedCoverCharges(table);
-
         let wizardData = iGet(data, "diningTableClosing");
 
-        if (wizardData && wizardData.get('orders')) {
-            wizardData.get('orders').forEach(closedOrderUuid => {
-                let index = orders.findIndex(o => o.get('uuid') === closedOrderUuid);
-                orders = orders.splice(index, 1);
-            });
-            coverCharges -= wizardData.get('coverCharges');
-        }
+        let orders = DiningTablesUtils.findTableOpenedOrders(table, iGet(wizardData, "selectedBill"));
+        let coverCharges = DiningTablesUtils.findTableOpenedCoverCharges(table, iGet(wizardData, "selectedBill"));
+
         let total = OrdinationsUtils.total(orders) + coverCharges * iGet(data, "evening.coverCharge");
 
         orders = DiningTablesUtils.implode(orders);
@@ -125,14 +109,14 @@ export default class DiningTableClosingSplitPage extends Component {
         let dishes = data.get('dishes');
         let additions = data.get('additions');
         let wizardData = iGet(data, "diningTableClosing");
-        let invoiceOrders = wizardData.get('orders');
+        let invoiceOrders = iGet(wizardData, 'selectedBill.orders');
         let table = iGet(data, "diningTablesEditing.diningTable");
         let orders = DiningTablesUtils.findTableOrders(table);
         orders = orders.filter(order => invoiceOrders.includes(order.get('uuid')));
         let total = OrdinationsUtils.total(orders);
         orders = DiningTablesUtils.implode(orders);
         orders = OrdinationsUtils.sortByDish(orders, dishes, additions);
-        let coverCharges = wizardData.get('coverCharges');
+        let coverCharges = iGet(wizardData, 'selectedBill.coverCharges');
         total += coverCharges * iGet(data, "evening.coverCharge");
         return (
             <Row grow>

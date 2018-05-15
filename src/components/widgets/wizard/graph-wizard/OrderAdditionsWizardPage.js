@@ -1,16 +1,17 @@
 import React, {Component} from 'react';
-import graphWizardActions from "./GraphWizardActions";
 import GraphWizardPage from "./GraphWizardPage";
-import Button from "../../../../widgets/Button";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
 import {findByUuid, iGet} from "../../../../utils/Utils";
 import {OrdersActions} from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersActions";
 import SelectInput from "../../inputs/SelectInput";
-import TextInput from "../../inputs/text/TextInput";
 import FloatInput from "../../inputs/float/FloatInput";
 import OrdinationOrdersCrudList
     from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationOrdersCrudList";
+import TextEditor from "../../inputs/TextEditor";
+import FloatEditor from "../../inputs/float/FloatEditor";
+import IntegerEditor from "../../inputs/IntegerEditor";
+import OrdinationsUtils from "../../../../pages/eveningsEditing/OrdinationsUtils";
 
 const {List} = require('immutable');
 
@@ -51,40 +52,13 @@ export default class OrderAdditionsWizardPage extends Component {
 
         let additionTypePage = iGet(data, "ordersEditing.additionTypePage");
 
-        let content;
-        if (additionTypePage === AdditionPages.FIXED) {
-            content = this.buildFixedAdditionsContent();
-        } else if (additionTypePage === AdditionPages.FREE) {
-            content = this.buildFreeAdditionsContent();
-        } else if (additionTypePage === AdditionPages.PRICE) {
-            content = this.buildPriceContent();
-        }
+        let content = this.buildContent();
 
         return (
             <GraphWizardPage
                 abortAction={props.abortAction}
                 confirmAction={props.confirmAction}>
-                <Row>
-                    <Column>
-                        <Button text="Variante fissa"
-                                active={iGet(data, "ordersEditing.additionTypePage") === AdditionPages.FIXED}
-                                commitAction={() => OrdersActions.selectAdditionTypePage(AdditionPages.FIXED)}
-                        />
-                    </Column>
-                    <Column>
-                        <Button text="Variante libera"
-                                active={iGet(data, "ordersEditing.additionTypePage") === AdditionPages.FREE}
-                                commitAction={() => OrdersActions.selectAdditionTypePage(AdditionPages.FREE)}
-                        />
-                    </Column>
-                    <Column>
-                        <Button text="Prezzo e portata"
-                                active={iGet(data, "ordersEditing.additionTypePage") === AdditionPages.PRICE}
-                                commitAction={() => OrdersActions.selectAdditionTypePage(AdditionPages.PRICE)}
-                        />
-                    </Column>
-                </Row>
-                <Row topSpaced grow>
+                <Row grow>
                     <Column sm="5">
                         <Row grow>
                             <Column>
@@ -118,7 +92,7 @@ export default class OrderAdditionsWizardPage extends Component {
         )
     }
 
-    buildFixedAdditionsContent() {
+    buildContent() {
         let data = this.props.data;
         let additionsPage = iGet(data, "ordersEditing.additionsPage");
         let availableAdditions = data.get('additions');
@@ -136,37 +110,69 @@ export default class OrderAdditionsWizardPage extends Component {
                 .filter(addition => addition.get('generic') ||
                     selectedOrder.get('additions').includes(addition.get('uuid')) ||
                     this.canHaveAddition(selectedOrder.get('dish'), addition.get('uuid')))
+        } else {
+            availableAdditions = List();
         }
 
-        return <SelectInput
-            uuid="order_free_additions"
-            rows={7}
-            cols={2}
-            id={addition => addition.get('uuid')}
-            options={availableAdditions}
-            renderer={addition => addition.get('name')}
-            selected={selectedOrder ? selectedOrder.get('additions') : List()}
-            page={additionsPage}
-            onSelectPage={page => OrdersActions.selectAdditionPage(page)}
-            onSelect={addition => OrdersActions.toggleAddition(addition)}
-            onDeselect={addition => OrdersActions.toggleAddition(addition)}
-            multiSelect
-        />;
-    }
-
-    buildFreeAdditionsContent() {
-        let data = this.props.data;
-        let orders = iGet(data, "ordersEditing.orders");
-        let selectedOrderUuid = iGet(data, "ordersEditing.selectedOrder");
-        let selectedOrder = null;
-        if (orders) {
-            selectedOrder = findByUuid(orders, selectedOrderUuid);
-        }
         let freeAdditionText = selectedOrder ? selectedOrder.get('notes') : "";
-        return <TextInput
-            text={freeAdditionText}
-            onChar={char => OrdersActions.freeAdditionChar(char)}
-        />
+
+        return <Row>
+            <Column>
+                <Row>
+                    <Column>
+                        <TextEditor
+                            disabled={!selectedOrder}
+                            options={{
+                                label: "Variante libera",
+                                value: freeAdditionText,
+                                callback: result => OrdersActions.setFreeAddition(result)
+                            }}
+                        />
+                    </Column>
+                    <Column>
+                        <FloatEditor
+                            disabled={!selectedOrder}
+                            options={{
+                                label: "Prezzo",
+                                value: selectedOrder ? selectedOrder.get('price') : 0,
+                                callback: result => OrdersActions.setPrice(result)
+                            }}
+                        />
+                    </Column>
+                    <Column>
+                        <IntegerEditor
+                            disabled={!selectedOrder}
+                            options={{
+                                label: "Quantità",
+                                value: selectedOrder ? OrdinationsUtils.countOrders(orders, selectedOrder) : 0,
+                                callback: result => OrdersActions.setQuantity(result)
+                            }}
+                        />
+                    </Column>
+                </Row>
+                <Row topSpaced>
+                    <Column><h5>Varianti fisse</h5></Column>
+                </Row>
+                <Row ofList>
+                    <Column>
+                        <SelectInput
+                            uuid="order_free_additions"
+                            rows={7}
+                            cols={2}
+                            id={addition => addition.get('uuid')}
+                            options={availableAdditions}
+                            renderer={addition => addition.get('name')}
+                            selected={selectedOrder ? selectedOrder.get('additions') : List()}
+                            page={additionsPage}
+                            onSelectPage={page => OrdersActions.selectAdditionPage(page)}
+                            onSelect={addition => OrdersActions.toggleAddition(addition)}
+                            onDeselect={addition => OrdersActions.toggleAddition(addition)}
+                            multiSelect
+                        />
+                    </Column>
+                </Row>
+            </Column>
+        </Row>;
     }
 
     buildPriceContent() {

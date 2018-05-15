@@ -1,9 +1,11 @@
 import AbstractEntityStore from "./AbstractEntityStore";
 import {
-    ACT_CREATE_PRINTER, ACT_DELETE_PRINTER, ACT_RETRIEVE_PRINTER_SERVICES, ACT_RETRIEVE_PRINTERS,
-    ACT_UPDATE_PRINTER, ACT_UPDATE_PRINTER_LC, ACT_UPDATE_PRINTER_MAIN, ACT_UPDATE_PRINTER_NAME
+    ACT_RETRIEVE_PRINTER_SERVICES,
+    ACT_RETRIEVE_PRINTERS
 } from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
+import {PrintersCreatorActionTypes} from "../../pages/printers/PrintersCreatorActions";
+import {PrintersEditorActionTypes} from "../../pages/printers/PrintersEditorActions";
 
 const {fromJS, List} = require('immutable');
 
@@ -44,7 +46,7 @@ class PrintersStore extends AbstractEntityStore {
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_CREATE_PRINTER:
+            case PrintersCreatorActionTypes.CREATE_PRINTER:
                 this.createData(action.body);
                 break;
             case ACT_RETRIEVE_PRINTERS:
@@ -55,13 +57,10 @@ class PrintersStore extends AbstractEntityStore {
                 this.services = action.body;
                 this.setStatus(STATUSES.LOADED);
                 break;
-            case ACT_UPDATE_PRINTER:
-            case ACT_UPDATE_PRINTER_NAME:
-            case ACT_UPDATE_PRINTER_MAIN:
-            case ACT_UPDATE_PRINTER_LC:
+            case PrintersEditorActionTypes.UPDATE_EDITING_PRINTER:
                 this.updateData(action.body);
                 break;
-            case ACT_DELETE_PRINTER:
+            case PrintersEditorActionTypes.DELETE_EDITING_PRINTER:
                 this.deleteData(action.body);
                 break;
             default:
