@@ -1,0 +1,29 @@
+//$theme-colors: (
+//        "secondary": #BBBBBB,
+//        "info": #9CDBE4
+//);
+
+$theme-colors: (
+        "primary": #0275d8,
+        "secondary": #FFFFFF,
+        "success": #5cb85c,
+        "danger": #d9534f,
+        "warning": #f0ad4e,
+        "info": #5bc0de
+);
+
+.btn.btn-secondary {
+  border: 1px solid #ccc;
+}
+
+.btn.btn-warning {
+  color: white;
+}
+
+.btn.btn-info {
+  color: white;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+}

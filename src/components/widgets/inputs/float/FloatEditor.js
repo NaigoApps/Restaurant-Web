@@ -3,7 +3,7 @@ import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
 import Button from "../../../../widgets/Button";
 import {ApplicationActions} from "../../../../actions/ApplicationActions";
-import OrdinationsUtils from "../../../../pages/eveningsEditing/OrdinationsUtils";
+import OrdinationsUtils from "../../../../pages/eveningEditing/OrdinationsUtils";
 
 export default class FloatEditor extends Component {
     constructor(props) {

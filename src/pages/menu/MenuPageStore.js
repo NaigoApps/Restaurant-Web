@@ -107,6 +107,7 @@ class MenuPageStore extends AbstractStore {
             case CategoriesEditorActionTypes.DESELECT_EDITING_CATEGORY:
             case CategoriesEditorActionTypes.DELETE_EDITING_CATEGORY:
             case ApplicationActionTypes.GO_TO_PAGE:
+                this.dishesPage = 0;
                 this.category = null;
                 this.categoriesEditorStatus = EditorStatus.SURFING;
                 this.dish = null;

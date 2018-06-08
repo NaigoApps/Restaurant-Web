@@ -7,12 +7,12 @@ import {
 import {STATUSES} from "./LazyData";
 import AbstractEntityStore from "./generic/AbstractEntityStore";
 import {findIndexByUuid} from "../utils/Utils";
-import {OrdinationCreatorActionTypes} from "../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationsCreatorActions";
-import {OrdinationEditorActionTypes} from "../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationsEditorActions";
-import {EveningEditingActionTypes} from "../pages/eveningsEditing/EveningEditorActions";
-import {EveningSelectorActionTypes} from "../pages/eveningsEditing/eveningSelector/EveningSelectorActions";
-import {DiningTablesEditorActionTypes} from "../pages/eveningsEditing/diningTablesEditing/DiningTablesEditorActions";
-import {DiningTablesClosingActionTypes} from "../pages/eveningsEditing/diningTablesEditing/diningTableClosing/DiningTablesClosingActions";
+import {OrdinationCreatorActionTypes} from "../pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationsCreatorActions";
+import {OrdinationEditorActionTypes} from "../pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationsEditorActions";
+import {EveningEditingActionTypes} from "../pages/eveningEditing/EveningEditorActions";
+import {EveningSelectorActionTypes} from "../pages/eveningEditing/eveningSelector/EveningSelectorActions";
+import {DiningTablesEditorActionTypes} from "../pages/eveningEditing/diningTableEditing/DiningTablesEditorActions";
+import {DiningTablesClosingActionTypes} from "../pages/eveningEditing/diningTableEditing/tableClosingFeature/DiningTablesClosingActions";
 
 const {fromJS} = require('immutable');
 
@@ -93,8 +93,10 @@ class EveningStore extends AbstractEntityStore {
                 }
                 break;
             }
+            case DiningTablesClosingActionTypes.PRINT_BILL:
             case DiningTablesClosingActionTypes.DELETE_BILL:
             case DiningTablesClosingActionTypes.CONFIRM_CLOSING:
+            case DiningTablesClosingActionTypes.LOCK_TABLE:
             case OrdinationEditorActionTypes.DELETE_ORDINATION:
             case DiningTablesEditorActionTypes.CONFIRM_CCS:
             case DiningTablesEditorActionTypes.CONFIRM_WAITER:
@@ -122,25 +124,6 @@ class EveningStore extends AbstractEntityStore {
                         if (ordinationIndex !== -1) {
                             let ordinations = diningTable.get('ordinations').splice(ordinationIndex, 1, action.body);
                             diningTable = diningTable.set('ordinations', ordinations);
-                            let newEvening = evening.getPayload().updateIn(['diningTables'], tables =>
-                                tables.splice(diningTableIndex, 1, diningTable));
-                            this.updateData(newEvening);
-                        }
-                    }
-                }
-
-                break;
-            }
-            case DiningTablesClosingActionTypes.PRINT_BILL: {
-                let evening = this.getSingleData();
-                if (evening.isLoaded()) {
-                    let diningTableIndex = findIndexByUuid(evening.getPayload().get('diningTables'), action.body.get('table'));
-                    if (diningTableIndex !== -1) {
-                        let diningTable = evening.getPayload().get('diningTables').get(diningTableIndex);
-                        let billIndex = findIndexByUuid(diningTable.get('bills'), action.body.get('uuid'));
-                        if (billIndex !== -1) {
-                            let bills = diningTable.get('bills').splice(billIndex, 1, action.body);
-                            diningTable = diningTable.set('bills', bills);
                             let newEvening = evening.getPayload().updateIn(['diningTables'], tables =>
                                 tables.splice(diningTableIndex, 1, diningTable));
                             this.updateData(newEvening);

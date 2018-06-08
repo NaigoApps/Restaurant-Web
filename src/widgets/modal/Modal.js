@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {uuid} from "../../utils/Utils";
-import $ from "jquery";
 
 export default class Modal extends Component {
     constructor(props) {
@@ -12,26 +11,26 @@ export default class Modal extends Component {
 
     componentDidMount() {
         let component = this;
-        $("#" + this.state.uuid).on("shown.bs.modal", () => this.props.onModalShown && this.props.onModalShown());
+        global.$("#" + this.state.uuid).on("shown.bs.modal", () => this.props.onModalShown && this.props.onModalShown());
 
-        $("#" + this.state.uuid).on("hidden.bs.modal", () => this.props.onModalHidden && this.props.onModalHidden());
+        global.$("#" + this.state.uuid).on("hidden.bs.modal", () => this.props.onModalHidden && this.props.onModalHidden());
 
         if (this.props.visible) {
-            $("#" + this.state.uuid).modal("show");
+            global.$("#" + this.state.uuid).modal("show");
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (!prevProps.visible && this.props.visible) {
-            $("#" + this.state.uuid).modal("show");
+            global.$("#" + this.state.uuid).modal("show");
         } else if (prevProps.visible && !this.props.visible) {
-            $("#" + this.state.uuid).modal("hide");
+            global.$("#" + this.state.uuid).modal("hide");
         }
     }
 
     componentWillUnmount() {
         if (this.props.visible) {
-            $("#" + this.state.uuid).modal("hide");
+            global.$("#" + this.state.uuid).modal("hide");
         }
     }
 

@@ -16,7 +16,7 @@ export default class SwitchInput extends Component {
 
     render() {
         let value = this.props.value;
-        const leftText = !value || !this.props.rightText ? <b>{this.props.leftText}</b> : this.props.leftTextR;
+        const leftText = !value || !this.props.rightText ? <b>{this.props.leftText}</b> : this.props.leftText;
         const rightText = this.props.rightText && value ? <b>{this.props.rightText}</b> : this.props.rightText;
         let leftCol;
         if(leftText){

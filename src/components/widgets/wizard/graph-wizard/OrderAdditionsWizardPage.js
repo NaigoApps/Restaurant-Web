@@ -1,17 +1,17 @@
 import React, {Component} from 'react';
-import GraphWizardPage from "./GraphWizardPage";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
 import {findByUuid, iGet} from "../../../../utils/Utils";
-import {OrdersActions} from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersActions";
+import {OrdersActions} from "../../../../pages/eveningEditing/diningTableEditing/ordinationsEditing/ordersEditing/OrdersActions";
 import SelectInput from "../../inputs/SelectInput";
 import FloatInput from "../../inputs/float/FloatInput";
 import OrdinationOrdersCrudList
-    from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationOrdersCrudList";
+    from "../../../../pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationOrdersCrudList";
 import TextEditor from "../../inputs/TextEditor";
 import FloatEditor from "../../inputs/float/FloatEditor";
 import IntegerEditor from "../../inputs/IntegerEditor";
-import OrdinationsUtils from "../../../../pages/eveningsEditing/OrdinationsUtils";
+import OrdinationsUtils from "../../../../pages/eveningEditing/OrdinationsUtils";
+import SelectEditor from "../../inputs/SelectEditor";
 
 const {List} = require('immutable');
 
@@ -38,57 +38,28 @@ export default class OrderAdditionsWizardPage extends Component {
     }
 
     render() {
-        let props = this.props;
         let data = this.props.data;
-
-        let availablePhases = data.get('phases');
         let orders = iGet(data, "ordersEditing.orders");
-        let selectedOrderUuid = iGet(data, "ordersEditing.selectedOrder");
-        let selectedPhase = iGet(data, "ordersEditing.selectedPhase");
-        let selectedOrder = null;
-        if (orders) {
-            selectedOrder = findByUuid(orders, selectedOrderUuid);
-        }
-
-        let additionTypePage = iGet(data, "ordersEditing.additionTypePage");
-
         let content = this.buildContent();
 
         return (
-            <GraphWizardPage
-                abortAction={props.abortAction}
-                confirmAction={props.confirmAction}>
-                <Row grow>
-                    <Column sm="5">
-                        <Row grow>
-                            <Column>
-                                <OrdinationOrdersCrudList
-                                    data={this.props.data}
-                                    orders={orders}
-                                    trashAction={grp => OrdersActions.removeGroup(grp)}
-                                    commitAction={(grp) => OrdersActions.selectGroup(grp)}
-                                />
-                            </Column>
-                        </Row>
-                        <Row topSpaced>
-                            <Column>
-                                <SelectInput
-                                    rows={1}
-                                    cols={4}
-                                    id={phase => phase.get('uuid')}
-                                    options={availablePhases}
-                                    renderer={phase => phase.get('name')}
-                                    selected={selectedPhase}
-                                    page={0}
-                                    onSelect={phase => OrdersActions.selectPhase(phase)}/>
-                            </Column>
-                        </Row>
-                    </Column>
-                    <Column sm="7">
-                        {content}
-                    </Column>
-                </Row>
-            </GraphWizardPage>
+            <Row grow>
+                <Column sm="5">
+                    <Row grow>
+                        <Column>
+                            <OrdinationOrdersCrudList
+                                data={this.props.data}
+                                orders={orders}
+                                trashAction={grp => OrdersActions.removeGroup(grp)}
+                                commitAction={(grp) => OrdersActions.selectGroup(grp)}
+                            />
+                        </Column>
+                    </Row>
+                </Column>
+                <Column sm="7">
+                    {content}
+                </Column>
+            </Row>
         )
     }
 
@@ -129,13 +100,16 @@ export default class OrderAdditionsWizardPage extends Component {
                             }}
                         />
                     </Column>
+                </Row>
+                <Row ofList>
                     <Column>
                         <FloatEditor
                             disabled={!selectedOrder}
                             options={{
                                 label: "Prezzo",
                                 value: selectedOrder ? selectedOrder.get('price') : 0,
-                                callback: result => OrdersActions.setPrice(result)
+                                callback: result => OrdersActions.setPrice(result),
+                                min: 0.01,
                             }}
                         />
                     </Column>
@@ -146,6 +120,21 @@ export default class OrderAdditionsWizardPage extends Component {
                                 label: "Quantità",
                                 value: selectedOrder ? OrdinationsUtils.countOrders(orders, selectedOrder) : 0,
                                 callback: result => OrdersActions.setQuantity(result)
+                            }}
+                        />
+                    </Column>
+                    <Column>
+                        <SelectEditor
+                            disabled={!selectedOrder}
+                            options={{
+                                rows: 2,
+                                cols: 2,
+                                label: "Portata",
+                                values: data.get('phases'),
+                                id: p => p.get('uuid'),
+                                renderer: p => p ? p.get('name') : "",
+                                value: selectedOrder ? selectedOrder.get('phase') : null,
+                                callback: result => OrdersActions.editOrderPhase(result)
                             }}
                         />
                     </Column>

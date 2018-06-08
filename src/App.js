@@ -8,15 +8,16 @@ import WaitersPage from "./pages/waiters/WaitersPage";
 import MenuPage from "./pages/menu/MenuPage";
 import AdditionsPage from "./pages/additions/AdditionsPage";
 import CustomersPage from "./pages/customers/CustomersPage";
-import EveningPage from "./pages/eveningsEditing/EveningPage";
+import EveningPage from "./pages/eveningEditing/EveningPage";
 import applicationStore from "./stores/ApplicationStore";
-import eveningSelectorStore from "./pages/eveningsEditing/eveningSelector/EveningSelectorStore";
-import diningTablesEditingStore from "./pages/eveningsEditing/diningTablesEditing/DiningTableEditorStore";
-import ordinationEditingStore from "./pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationEditingStore";
-import ordersEditingStore from "./pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
-import diningTableClosingStore
-    from "./pages/eveningsEditing/diningTablesEditing/diningTableClosing/DiningTableClosingStore";
+import eveningSelectorStore from "./pages/eveningEditing/eveningSelector/EveningSelectorStore";
+import diningTableEditingStore from "./pages/eveningEditing/diningTableEditing/DiningTableEditorStore";
+import ordinationEditingStore from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationEditingStore";
+import ordersEditingStore from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
+import tableClosingFeatureStore
+    from "./pages/eveningEditing/diningTableEditing/tableClosingFeature/TableClosingFeatureStore";
 import SettingsPage from "./pages/SettingsPage";
+import Tile from "./widgets/Tile";
 
 const {Map} = require('immutable');
 
@@ -61,10 +62,10 @@ class App extends Component {
 
     requireModules(){
         console.log("Requiring " + eveningSelectorStore.getFeatureName());
-        console.log("Requiring " + diningTablesEditingStore.getFeatureName());
+        console.log("Requiring " + diningTableEditingStore.getFeatureName());
         console.log("Requiring " + ordinationEditingStore.getFeatureName());
         console.log("Requiring " + ordersEditingStore.getFeatureName());
-        console.log("Requiring " + diningTableClosingStore.getFeatureName());
+        console.log("Requiring " + tableClosingFeatureStore.getFeatureName());
     }
 
     componentDidMount() {

@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import Page from "./Page";
 import {CONFIGURATION, EVENINGS, SETTINGS} from "../App";
 import Row from "../widgets/Row";
-import Column from "../widgets/Column";
-import Button from "../widgets/Button";
 import {ApplicationActions} from "../actions/ApplicationActions";
+import Button from "../widgets/Button";
+import Column from "../widgets/Column";
 
 class HomePage extends Component {
 
@@ -17,33 +17,31 @@ class HomePage extends Component {
         return (
             <Page title="Home">
                 <Row grow>
-                    <Column>
+                    <Column sm="3">
                         <Button
-                            size="xl"
-                            icon="calendar"
-                            text="Serate"
-                            commitAction={() => this.goToPage(EVENINGS)}
-                            fill vertical
-                        />
-                    </Column>
-                </Row>
-                <Row grow ofList>
-                    <Column>
-                        <Button
-                            size="xl"
-                            icon="gears"
                             text="Impostazioni"
+                            icon="gears"
                             commitAction={() => this.goToPage(SETTINGS)}
-                            fill vertical
+                            size="xl"
+                            vertical fill
                         />
                     </Column>
-                    <Column>
+                    <Column sm="6">
                         <Button
+                            text="Serate"
+                            icon="calendar"
+                            commitAction={() => this.goToPage(EVENINGS)}
                             size="xl"
-                            icon="pencil"
+                            vertical fill
+                        />
+                    </Column>
+                    <Column sm="3">
+                        <Button
                             text="Configurazione"
+                            icon="pencil"
                             commitAction={() => this.goToPage(CONFIGURATION)}
-                            fill vertical
+                            size="xl"
+                            vertical fill
                         />
                     </Column>
                 </Row>

@@ -57,6 +57,7 @@ export default class SelectEditor extends Component {
 
         return <Button
             highPadding
+            disabled={this.props.disabled}
             textRows={this.props.textRows}
             type={this.props.type}
             text={text}

@@ -16,6 +16,7 @@ export default class Scrollable extends Component {
     componentDidMount() {
         const component = this;
         global.$("#" + this.state.uuid).draggable({
+            cancel: "",
             axis: "y",
             drag: function (event, ui) {
                 ui.position.top = Math.max(ui.position.top, ui.helper.parent().height() - ui.helper.height());

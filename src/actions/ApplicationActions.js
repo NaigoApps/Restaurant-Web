@@ -31,7 +31,7 @@ export const ApplicationActionTypes = {
     SELECT_INPUT_SELECT: "SELECT_INPUT_SELECT",
     SELECT_INPUT_DESELECT: "SELECT_INPUT_DESELECT",
     SELECT_INPUT_PAGE_CHANGE: "SELECT_INPUT_PAGE_CHANGE",
-    HIDE_SELECT_INPUT: "HIDE_SELECT_INPUT",
+    HIDE_SELECT_INPUT: "HIDE_SELECT_INPUT"
 };
 
 export const ApplicationActions = {
@@ -42,12 +42,16 @@ export const ApplicationActions = {
             "settings"
         ),
 
-    storeSettings: (value) =>
+    storeClientSettings: (value) =>
         asyncActionBuilder.put(
             ApplicationActionTypes.STORE_SETTINGS,
-            "settings",
+            "settings/client",
             JSON.stringify(value)
         ),
+
+    setMainPrinter: printer => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/main-printer", printer),
+    setFiscalPrinter: printer => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/fiscal-printer", printer),
+
 
     toggleFullScreen: () => dispatcher.fireEnd(ApplicationActionTypes.TOGGLE_FULL_SCREEN),
     requestFullScreen: () => dispatcher.fireEnd(ApplicationActionTypes.REQUEST_FULL_SCREEN),

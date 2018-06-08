@@ -256,7 +256,10 @@ export default class StoresUtils {
     }
 
     static settings(data, prop, def){
-        return iGet(data, "settings." + prop) || def;
+        if(data.get('settings')) {
+            return iGet(data, "settings.clientSettings." + prop) || def;
+        }
+        return def;
     }
 }
 

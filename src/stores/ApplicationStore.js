@@ -1,8 +1,18 @@
 import AbstractStore from "./RootFeatureStore";
 import {ApplicationActionTypes} from "../actions/ApplicationActions";
 import StoresUtils from "../pages/StoresUtils";
+import eveningStore from "./EveningStore";
+import phasesStore from "./generic/PhasesStore";
+import dispatcher from "../dispatcher/SimpleDispatcher";
+import additionsStore from "./generic/AdditionsStore";
+import categoriesStore from "./generic/CategoriesStore";
+import waitersStore from "./generic/WaitersStore";
+import customersStore from "./generic/CustomersStore";
+import tablesStore from "./generic/TablesStore";
+import dishesStore from "./generic/DishesStore";
+import printersStore from "./generic/PrintersStore";
 
-const {Map} = require('immutable');
+const {Map, fromJS} = require('immutable');
 
 export const EVT_APPLICATION_STORE_CHANGED = "EVT_APPLICATION_STORE_CHANGED";
 
@@ -16,10 +26,13 @@ class ApplicationStore extends AbstractStore {
         this.integerInput = Map();
         this.selectInput = Map();
         this.textInput = Map();
-        this.settings = Map();
+        this.settings = null;
+        this.mainPrinter = null;
+        this.fiscalPrinter = null;
     }
 
     handleCompletedAction(action) {
+
         let changed = true;
         switch (action.type) {
             case ApplicationActionTypes.TOGGLE_FULL_SCREEN:
@@ -92,6 +105,10 @@ class ApplicationStore extends AbstractStore {
             case ApplicationActionTypes.LOAD_SETTINGS:
             case ApplicationActionTypes.STORE_SETTINGS:
                 this.settings = action.body || Map();
+                if(this.settings.get('clientSettings')){
+                    this.settings = this.settings.set('clientSettings',
+                        fromJS(JSON.parse(this.settings.get('clientSettings'))));
+                }
                 break;
 
             default:

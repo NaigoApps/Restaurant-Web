@@ -27,6 +27,7 @@ export default class WaitersNav extends Component {
         elements.push(<NavElement
             key="waiters"
             text="Camerieri"
+            type="info"
             active={editorStatus === EditorStatus.SURFING}
             commitAction={() => WaitersEditorActions.deselectWaiter()}
         />);
@@ -39,6 +40,7 @@ export default class WaitersNav extends Component {
         } else if (editorStatus === EditorStatus.CREATING) {
             elements.push(<NavElement
                 key="selected"
+                type="info"
                 text={"Creazione cameriere"}
                 active={true}
             />);

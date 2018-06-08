@@ -96,7 +96,7 @@ export default class Button extends Component {
             <button
                 type="button"
                 className={this.getClassName()}
-                onClick={this.clickAction.bind(this)}
+                onMouseUp={this.clickAction.bind(this)}
                 disabled={!!this.props.disabled}>
                 {content}
             </button>

@@ -1,14 +1,12 @@
 import React, {Component} from 'react';
-import graphWizardActions from "./GraphWizardActions";
-import GraphWizardPage from "./GraphWizardPage";
 import {findByUuid, iGet} from "../../../../utils/Utils";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
 import NavElement from "../../../../widgets/NavElement";
 import SelectInput from "../../inputs/SelectInput";
-import {OrdersActions} from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/ordersEditing/OrdersActions";
+import {OrdersActions} from "../../../../pages/eveningEditing/diningTableEditing/ordinationsEditing/ordersEditing/OrdersActions";
 import OrdinationOrdersReview
-    from "../../../../pages/eveningsEditing/diningTablesEditing/ordinationsEditing/OrdinationOrdersReview";
+    from "../../../../pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationOrdersReview";
 import IntegerEditor from "../../inputs/IntegerEditor";
 import SelectEditor from "../../inputs/SelectEditor";
 
@@ -20,10 +18,6 @@ export default class OrderDishWizardPage extends Component {
         this.state = {
             scrollPulse: 0
         };
-    }
-
-    selectGroup(sampleOrder) {
-        graphWizardActions.setWizardData(this.props.wizardId, sampleOrder, "editing");
     }
 
     confirmDish(dish) {
@@ -54,67 +48,62 @@ export default class OrderDishWizardPage extends Component {
         let availablePhases = data.get('phases');
         let selectedPhase = iGet(data, 'ordersEditing.selectedPhase');
 
-        return (
-            <GraphWizardPage
-                abortAction={this.props.abortAction}
-                confirmAction={this.props.confirmAction}>
-                <Row grow>
-                    <Column lg="6">
-                        <Row grow>
-                            <Column>
-                                <OrdinationOrdersReview
-                                    data={data}
-                                    orders={orders}
-                                />
-                            </Column>
-                        </Row>
-                    </Column>
-                    <Column lg="6">
-                        <Row>
-                            <Column>
-                                <IntegerEditor
-                                    type="info"
-                                    options={{
+        return (<Row grow>
+                <Column lg="6">
+                    <Row grow>
+                        <Column>
+                            <OrdinationOrdersReview
+                                data={data}
+                                orders={orders}
+                            />
+                        </Column>
+                    </Row>
+                </Column>
+                <Column lg="6">
+                    <Row>
+                        <Column>
+                            <IntegerEditor
+                                type="info"
+                                options={{
                                     label: "Quantità",
                                     value: quantity,
                                     callback: result => OrdersActions.quantityConfirm(result),
                                     min: 1
                                 }}
-                                />
-                            </Column>
-                            <Column>
-                                <SelectEditor
-                                    type="info"
-                                    options={{
-                                        rows: 2,
-                                        cols: 2,
-                                        label: "Portata",
-                                        values: availablePhases,
-                                        id: p => p.get('uuid'),
-                                        renderer: p => p ? p.get('name') : "",
-                                        value: selectedPhase,
-                                        callback: result => OrdersActions.selectPhase(result)
-                                    }}
-                                />
-                            </Column>
-                        </Row>
-                        <Row topSpaced>
-                            <Column>
-                                <Row>
-                                    <Column>
-                                        {nav}
-                                    </Column>
-                                </Row>
-                                <Row ofList>
-                                    <Column>
-                                        {content}
-                                    </Column>
-                                </Row>
-                            </Column>
-                        </Row>
-                    </Column>
-                </Row>
-            </GraphWizardPage>
+                            />
+                        </Column>
+                        <Column>
+                            <SelectEditor
+                                type="info"
+                                options={{
+                                    rows: 2,
+                                    cols: 2,
+                                    label: "Portata",
+                                    values: availablePhases,
+                                    id: p => p.get('uuid'),
+                                    renderer: p => p ? p.get('name') : "",
+                                    value: selectedPhase,
+                                    callback: result => OrdersActions.selectPhase(result)
+                                }}
+                            />
+                        </Column>
+                    </Row>
+                    <Row topSpaced>
+                        <Column>
+                            <Row>
+                                <Column>
+                                    {nav}
+                                </Column>
+                            </Row>
+                            <Row ofList>
+                                <Column>
+                                    {content}
+                                </Column>
+                            </Row>
+                        </Column>
+                    </Row>
+                </Column>
+            </Row>
         )
     }
 

@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import graphWizardActions from "./GraphWizardActions";
 import Button from "../../../../widgets/Button";
-import GraphWizardPage from "./GraphWizardPage";
 import Modal from "../../../../widgets/modal/Modal";
 import {uuid} from "../../../../utils/Utils";
 import NavPills from "../../../../widgets/NavPills";
@@ -31,38 +29,11 @@ export default class GraphWizard extends Component {
         });
     }
 
-    componentDidMount() {
-        if (this.props.visible) {
-            this.openWizard();
-        }
-    }
-
-    openWizard() {
-        graphWizardActions.reset(this.state.uuid, this.initialWizardData(), this.props.initialPage);
-        graphWizardActions.open(this.state.uuid);
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (!prevProps.visible && this.props.visible) {
-            this.openWizard();
-        }
-    }
-
-    initialWizardData() {
-        let initialData = {};
-        React.Children.forEach(this.props.children, child => {
-            initialData[child.props.identifier] = GraphWizardPage.initializeWizard(child.props);
-        });
-        return initialData;
-    }
-
     confirmAction() {
         this.props.commitAction(this.state.data);
-        graphWizardActions.confirm(this.state.uuid);
     }
 
     abortAction() {
-        graphWizardActions.abort(this.state.uuid);
         if (this.props.abortAction) {
             this.props.abortAction();
         }

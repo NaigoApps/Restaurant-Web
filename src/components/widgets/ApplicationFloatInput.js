@@ -20,6 +20,14 @@ export default class ApplicationFloatInput extends Component {
         ApplicationActions.hideFloatInput();
     }
 
+    isValid() {
+        let data = this.props.data;
+        let value = data.get('value');
+        let min = data.get('min');
+        let max = data.get('max');
+        return (min === undefined || min <= value) && (max === undefined || value <= max);
+    }
+
     render() {
         let data = this.props.data;
         return <PopupContainer
@@ -38,7 +46,12 @@ export default class ApplicationFloatInput extends Component {
             </Row>
             <Row topSpaced>
                 <Column>
-                    <Button icon="check" type="success" commitAction={() => this.confirmFloatValue()}/>
+                    <Button
+                        icon="check"
+                        type="success"
+                        disabled={!this.isValid()}
+                        commitAction={() => this.confirmFloatValue()}
+                    />
                 </Column>
                 <Column>
                     <Button icon="times" type="danger" commitAction={() => ApplicationActions.hideFloatInput()}/>

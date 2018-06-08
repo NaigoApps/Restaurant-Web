@@ -67,43 +67,36 @@ export default class SelectInput extends Component {
 
         optionsList = distribute(entities, pageSize);
 
-        let currentPage = Math.min(this.props.page, optionsList.length - 1);
+        let currentPage = Math.min(this.props.page, optionsList.size - 1);
 
         pageButtons = this.buildPageButtons(optionsList, currentPage);
 
+        optionsList = optionsList.get(currentPage);
+        optionsList = distribute(optionsList, cols);
+        optionsList = optionsList.map((row, rowIndex) => {
+            let buttons = row.map(option => {
+                return (
+                    <Column key={this.id(option)}>
+                        <Button
+                            active={this.isSelected(this.id(option))}
+                            text={this.renderOption(option)}
+                            type={colorRenderer ? colorRenderer(option) : "secondary"}
+                            commitAction={this.select.bind(this, option)}
+                        />
+                    </Column>
+                );
+            });
 
-        optionsList = optionsList.map((group, index) => {
-            if (index === currentPage) {
-                let rowsGroups = distribute(group, cols);
-                let rowsComps = rowsGroups.map((row, rowIndex) => {
-                    let buttons = row.map(option => {
-                        return (
-                            <Column key={this.id(option)}>
-                                <Button
-                                    active={this.isSelected(this.id(option))}
-                                    text={this.renderOption(option)}
-                                    type={colorRenderer ? colorRenderer(option) : "secondary"}
-                                    commitAction={this.select.bind(this, option)}
-                                />
-                            </Column>
-                        );
-                    });
-
-                    while (buttons.length < cols) {
-                        buttons.push(<ColumnSpace key={buttons.length}/>);
-                    }
-
-                    return <Row key={rowIndex} ofList={rowIndex > 0}>{buttons}</Row>
-                });
-
-                return rowsComps;
+            while (buttons.size < cols) {
+                buttons = buttons.push(<ColumnSpace key={buttons.size}/>);
             }
-            return null;
+
+            return <Row key={rowIndex} ofList={rowIndex > 0}>{buttons}</Row>
         });
 
-        while (optionsList.length < rows) {
-            optionsList.push(
-                <Row key={optionsList.length + uuid()} grow ofList>
+        while (optionsList.size < rows) {
+            optionsList = optionsList.push(
+                <Row key={optionsList.size + uuid()} grow ofList>
                     <ColumnSpace/>
                 </Row>);
         }
@@ -121,7 +114,7 @@ export default class SelectInput extends Component {
     }
 
     buildPageButtons(groups, currentPage) {
-        if (groups.length > 1 || this.props.alwaysShowPages) {
+        if (groups.size > 1 || this.props.alwaysShowPages) {
             let btns = [];
             groups.forEach((group, index) => {
                 btns.push(

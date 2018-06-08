@@ -1,4 +1,5 @@
 import {CANC} from "./Characters";
+import {List} from "immutable";
 
 export function stringEquals(s1, s2){
     if(s1 && !s2 || s2 && !s1){
@@ -45,18 +46,18 @@ export function collectionsEquals(l1, l2){
 }
 
 export function distribute(array, value) {
-    let result = [];
-    let partition = [];
+    let result = List();
+    let partition = List();
     if(array) {
         array.forEach(element => {
-            if (partition.length >= value) {
-                result.push(partition);
-                partition = [];
+            if (partition.size >= value) {
+                result = result.push(partition);
+                partition = List();
             }
-            partition.push(element);
+            partition = partition.push(element);
         });
-        if (partition.length > 0) {
-            result.push(partition);
+        if (partition.size> 0) {
+            result = result.push(partition);
         }
     }
     return result;
