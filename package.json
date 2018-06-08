@@ -1,7 +1,7 @@
 {
   "name": "restaurant-web",
   "homepage": "/restaurant",
-  "version": "1.0.0",
+  "version": "1.1-SNAPSHOT",
   "private": true,
   "dependencies": {
     "autoprefixer": "7.1.1",
