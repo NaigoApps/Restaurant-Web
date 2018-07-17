@@ -11,6 +11,8 @@ import customersStore from "./generic/CustomersStore";
 import tablesStore from "./generic/TablesStore";
 import dishesStore from "./generic/DishesStore";
 import printersStore from "./generic/PrintersStore";
+import UTSettings from "./generic/UTSettings";
+import {iGet} from "../utils/Utils";
 
 const {Map, fromJS} = require('immutable');
 
@@ -108,6 +110,7 @@ class ApplicationStore extends AbstractStore {
                 if(this.settings.get('clientSettings')){
                     this.settings = this.settings.set('clientSettings',
                         fromJS(JSON.parse(this.settings.get('clientSettings'))));
+                    UTSettings.user = iGet(this.settings, 'clientSettings.utUser')
                 }
                 break;
 

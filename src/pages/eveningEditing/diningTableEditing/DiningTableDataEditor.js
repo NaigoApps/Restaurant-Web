@@ -15,7 +15,9 @@ export default class DiningTableDataEditor extends React.Component {
         let actionsProvider = this.props.actionsProvider;
         let table = iGet(this.props.data, "diningTableEditing.diningTable");
         let uuid = table.get('uuid');
-        let editorData = iGet(this.props.data, 'diningTableEditing.editor');
+
+        let availableWaiters = this.props.data.get('waiters')
+                .filter(waiter => waiter.get('status') === 'ATTIVO' || table.get('waiter') === waiter.get('uuid'));
 
         return <Row>
             <Column>
@@ -36,7 +38,7 @@ export default class DiningTableDataEditor extends React.Component {
                         <SelectEditor
                             options={{
                                 label: "Cameriere",
-                                values: this.props.data.get('waiters'),
+                                values: availableWaiters,
                                 id: w => w.get('uuid'),
                                 renderer: w => w ? w.get('name') : "",
                                 value: iGet(table, "waiter"),

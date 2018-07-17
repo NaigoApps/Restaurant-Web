@@ -43,8 +43,6 @@ export default class OrderDishWizardPage extends Component {
 
         let quantity = iGet(data, "ordersEditing.quantity");
 
-        let sampleOrder = this.props.wizardData["editing"];
-
         let availablePhases = data.get('phases');
         let selectedPhase = iGet(data, 'ordersEditing.selectedPhase');
 
@@ -143,7 +141,7 @@ export default class OrderDishWizardPage extends Component {
         let categoryPage = iGet(data, "ordersEditing.categoryPage");
         let availableCategories = this.props.data.get('categories');
         return <SelectInput
-            rows={4}
+            rows={7}
             cols={3}
             id={cat => cat.get('uuid')}
             options={availableCategories}
@@ -165,7 +163,7 @@ export default class OrderDishWizardPage extends Component {
             .filter(dish => dish.get('status') === "ATTIVO")
             .filter(dish => dish.get('category') === categoryUuid);
         return <SelectInput
-            rows={4}
+            rows={7}
             cols={2}
             id={dish => dish.get('uuid')}
             options={availableDishes}

@@ -10,6 +10,8 @@ export default class StoresUtils {
     SELECT INPUT
      */
 
+    static ALL_ACTIONS = "ALL_ACTIONS";
+
     static initSelectInput(options) {
         return Map({
             values: options.values,

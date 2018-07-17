@@ -12,8 +12,10 @@ import EveningPage from "./pages/eveningEditing/EveningPage";
 import applicationStore from "./stores/ApplicationStore";
 import eveningSelectorStore from "./pages/eveningEditing/eveningSelector/EveningSelectorStore";
 import diningTableEditingStore from "./pages/eveningEditing/diningTableEditing/DiningTableEditorStore";
-import ordinationEditingStore from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationEditingStore";
-import ordersEditingStore from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
+import ordinationEditingStore
+    from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationEditingStore";
+import ordersEditingStore
+    from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
 import tableClosingFeatureStore
     from "./pages/eveningEditing/diningTableEditing/tableClosingFeature/TableClosingFeatureStore";
 import SettingsPage from "./pages/SettingsPage";
@@ -52,7 +54,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentPage: null
+            currentPage: null,
         };
 
         this.requireModules();
@@ -60,7 +62,7 @@ class App extends Component {
         this.updateState = this.updateState.bind(this);
     }
 
-    requireModules(){
+    requireModules() {
         console.log("Requiring " + eveningSelectorStore.getFeatureName());
         console.log("Requiring " + diningTableEditingStore.getFeatureName());
         console.log("Requiring " + ordinationEditingStore.getFeatureName());

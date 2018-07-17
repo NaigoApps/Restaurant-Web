@@ -1,7 +1,9 @@
 import EventEmitter from "events";
 import dispatcher from "../dispatcher/SimpleDispatcher";
+import StoresUtils from "../pages/StoresUtils";
 
 export default class RootFeatureStore extends EventEmitter{
+
     constructor(changeEvent){
         super();
         this.token = dispatcher.register(this.handleAction.bind(this));
@@ -41,7 +43,7 @@ export default class RootFeatureStore extends EventEmitter{
         }
 
         this.subFeatureStores.forEach(store => {
-            if(store.getActions().includes(action.type)){
+            if(store.getActions() === StoresUtils.ALL_ACTIONS || store.getActions().includes(action.type)){
                 changed = true;
             }
         });

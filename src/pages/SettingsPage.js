@@ -10,6 +10,8 @@ import RestaurantNav from "../components/RestaurantNav";
 import SelectEditor from "../components/widgets/inputs/SelectEditor";
 import printersStore from "../stores/generic/PrintersStore";
 import printersPageActions from "./printers/PrintersPageActions";
+import TextEditor from "../components/widgets/inputs/TextEditor";
+import {OrdersActions} from "./eveningEditing/diningTableEditing/ordinationsEditing/ordersEditing/OrdersActions";
 
 const {Map} = require('immutable');
 
@@ -56,6 +58,7 @@ export default class SettingsPage extends Component {
         const printers = printersStore.getPrinters().getPayload();
         let options = [];
         if (settings) {
+            const clientSettings = settings.get('clientSettings');
             options.push([
                 <IntegerEditor options={this.makeIntegerOptions("Righe elenco stampanti", "printersRows")}/>,
                 <IntegerEditor options={this.makeIntegerOptions("Colonne elenco stampanti", "printersColumns")}/>
@@ -96,6 +99,14 @@ export default class SettingsPage extends Component {
                 <SelectEditor options={this.makeSelectOptions(
                     "Stampante fiscale", settings.get('fiscalPrinter'), printers,
                     ApplicationActions.setFiscalPrinter)}/>
+            ]);
+
+            options.push([
+                <TextEditor options={{
+                    label: "Usability test user",
+                    value: clientSettings.get('utUser'),
+                    callback: result => ApplicationActions.storeClientSettings(clientSettings.set('utUser', result))
+                }}/>
             ]);
         }
 

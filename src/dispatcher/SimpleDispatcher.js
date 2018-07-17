@@ -1,5 +1,7 @@
 import {Dispatcher} from "flux";
 import {ACTION_COMPLETED, ACTION_ERROR, ACTION_FAILED, ACTION_STARTED} from "../actions/ActionPhases";
+import asyncActionBuilder from "../actions/RequestBuilder";
+import UTSettings from "../stores/generic/UTSettings";
 
 /*
 * Dispatcher sends actions to Stores
@@ -43,6 +45,22 @@ class SimpleDispatcher extends Dispatcher {
         console.log(type + " -> COMPLETING");
         console.log(body);
         this.dispatch(this.buildAction(ACTION_COMPLETED, type, body));
+        if(UTSettings.user){
+            fetch(
+                asyncActionBuilder.BASE_URL + "ut" + asyncActionBuilder.buildParams({
+                    user: UTSettings.user,
+                    action: type
+                }),
+                {
+                    method: "POST",
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                }
+            )
+        }
         console.log(type + " -> COMPLETED");
     }
 

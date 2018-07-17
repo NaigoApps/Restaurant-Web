@@ -45,14 +45,14 @@ export default class OrdersEditor extends Component {
 
             <OrderDishWizardPage
                 identifier={OrdersWizardPages.DISHES_PAGE}
-                name="Piatti"
+                name="Inserimento piatti"
                 label={dish => dish.get('name')}
                 data={this.props.data}
             />
 
             <OrderAdditionsWizardPage
                 identifier="additions"
-                name="Varianti"
+                name="Inserimento varianti e modifica"
                 label={add => add.get('name')}
                 data={this.props.data}/>
 

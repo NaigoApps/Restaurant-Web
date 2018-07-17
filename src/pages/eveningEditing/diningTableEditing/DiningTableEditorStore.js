@@ -143,6 +143,14 @@ class DiningTableEditorStore extends SubFeatureStore {
             case DiningTablesClosingActionTypes.LOCK_TABLE:
                 this.diningTable = null;
                 this.status = EditorStatus.SURFING;
+                break;
+            case DiningTablesClosingActionTypes.PRINT_BILL:
+                const table = this.getSelectedDiningTable();
+                if(table && table.get('status') === 'CHIUSO'){
+                    this.status = EditorStatus.SURFING;
+                    this.diningTable = null;
+                }
+                break;
             default:
                 changed = false;
                 break;

@@ -75,7 +75,6 @@ export default class Page extends Component {
     }
 
     componentDidMount() {
-        loadingStore.addChangeListener(this.updateLoadingStatus);
         errorsStore.addChangeListener(this.updateErrorStatus);
         applicationStore.addChangeListener(this.updateApplicationStatus);
         this.updateLoadingStatus();
@@ -84,7 +83,6 @@ export default class Page extends Component {
     }
 
     componentWillUnmount() {
-        loadingStore.removeChangeListener(this.updateLoadingStatus);
         errorsStore.removeChangeListener(this.updateErrorStatus);
         applicationStore.removeChangeListener(this.updateApplicationStatus);
     }

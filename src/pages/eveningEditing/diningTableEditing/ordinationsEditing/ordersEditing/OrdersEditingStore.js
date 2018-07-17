@@ -8,6 +8,7 @@ import dishesStore from "../../../../../stores/generic/DishesStore";
 import {OrdinationCreatorActionTypes} from "../OrdinationsCreatorActions";
 import {AdditionPages} from "../../../../../components/widgets/wizard/graph-wizard/OrderAdditionsWizardPage";
 import OrdinationsUtils from "../../../OrdinationsUtils";
+import additionsStore from "../../../../../stores/generic/AdditionsStore";
 
 const {Map, List, fromJS} = require('immutable');
 
@@ -166,10 +167,15 @@ class OrdersEditingStore extends SubFeatureStore {
             let order = this.orders.get(orderIndex);
 
             let additionIndex = order.get('additions').indexOf(addition);
+
+            let additionEntity = findByUuid(additionsStore.getAdditions().getPayload(), addition);
+
             if (additionIndex !== -1) {
                 order = order.set('additions', order.get('additions').remove(additionIndex));
+                order = order.set('price', order.get('price') - additionEntity.get('price'));
             } else {
                 order = order.set('additions', order.get('additions').push(addition));
+                order = order.set('price', order.get('price') + additionEntity.get('price'));
             }
             this.orders = this.orders.set(orderIndex, order);
         }

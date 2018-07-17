@@ -23,7 +23,6 @@ export default class OrdinationEditor extends React.Component {
     render() {
         const data = this.props.data;
 
-        let ordinationEditorStatus = iGet(data, "ordinationEditing.status");
         let tableUuid = iGet(data, "diningTableEditing.diningTable.uuid");
         let ordinationUuid = iGet(data, "ordinationEditing.ordination.uuid");
 

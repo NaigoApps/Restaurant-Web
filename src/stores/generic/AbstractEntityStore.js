@@ -1,9 +1,10 @@
 import LazyData, {STATUSES} from "../LazyData";
-import AbstractStore from "../RootFeatureStore";
+import RootFeatureStore from "../RootFeatureStore";
 
-const {OrderedMap, List} = require('immutable');
+const {OrderedMap} = require('immutable');
 
-export default class AbstractEntityStore extends AbstractStore {
+export default class AbstractEntityStore extends RootFeatureStore {
+
     constructor(event) {
         super(event);
         this.status = STATUSES.NOT_LOADED;

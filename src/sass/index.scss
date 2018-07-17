@@ -4,17 +4,13 @@
 
 /*CSS*/
 
-.tile {
+.tiles-container {
   display: flex;
-  flex-direction: column!important;
-  justify-content: center;
-  border: 1px solid black;
-  margin: 5px;
-  border-radius: 5px;
 }
 
-.tile:hover {
-  background-color: #AAA;
+.tile {
+  display: flex;
+  height: 100px;
 }
 
 html {

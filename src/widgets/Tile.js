@@ -26,22 +26,7 @@ export default class Tile extends Component {
     }
 
     render() {
-        return <div className="tile" style={this.computeStyle()} onClick={() => this.onClick()}>
-            <Row>
-                <Column align="center">
-                    <h1>
-                        {this.props.text}
-                    </h1>
-                </Column>
-            </Row>
-            <Row>
-                <Column align="center">
-                    <h1>
-                        <Icon name={this.props.icon}/>
-                    </h1>
-                </Column>
-            </Row>
-        </div>;
+        return <div className="tile" style={this.computeStyle()} onClick={() => this.onClick()}/>;
     }
 
 }
