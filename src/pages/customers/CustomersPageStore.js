@@ -1,22 +1,14 @@
 import AbstractStore from "../../stores/RootFeatureStore";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
-import {
-    ACT_CREATE_CUSTOMER,
-    ACT_DELETE_CUSTOMER,
-    ACT_DESELECT_CUSTOMER,
-    ACT_RETRIEVE_CUSTOMERS,
-    ACT_SELECT_CUSTOMER,
-    ACT_UPDATE_CUSTOMER
-} from "../../actions/ActionTypes";
 import customersStore from "../../stores/generic/CustomersStore";
 import {CustomersCreatorActionTypes} from "./CustomerCreatorActions";
-import {EditorStatus} from "../StoresUtils";
+import EditorMode from "../../utils/EditorMode";
 import {CustomersEditorActionTypes} from "./CustomersEditorActions";
 import {findByUuid} from "../../utils/Utils";
-import additionsStore from "../../stores/generic/AdditionsStore";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
 import {ApplicationActionTypes} from "../../actions/ApplicationActions";
 import applicationStore from "../../stores/ApplicationStore";
+import {DataActionTypes} from "../../actions/DataActions";
 
 const {fromJS, Map} = require('immutable');
 
@@ -28,7 +20,7 @@ class CustomersPageStore extends AbstractStore {
         super(EVT_CUSTOMERS_PAGE_STORE_CHANGED);
         this.page = 0;
         this.customer = null;
-        this.editorStatus = EditorStatus.SURFING;
+        this.editorStatus = EditorMode.SURFING;
     }
 
     handleCompletedAction(action) {
@@ -37,30 +29,30 @@ class CustomersPageStore extends AbstractStore {
         switch (action.type) {
             case ApplicationActionTypes.LOAD_SETTINGS:
             case ApplicationActionTypes.STORE_SETTINGS:
-            case ACT_RETRIEVE_CUSTOMERS:
+            case DataActionTypes.LOAD_CUSTOMERS:
                 break;
             case CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER:
             case CustomersCreatorActionTypes.CREATE_CUSTOMER:
                 this.customer = action.body.get('uuid');
-                this.editorStatus = EditorStatus.EDITING;
+                this.editorStatus = EditorMode.EDITING;
                 break;
             case CustomersCreatorActionTypes.ABORT_CUSTOMER_CREATION:
             case CustomersEditorActionTypes.DESELECT_EDITING_CUSTOMER:
             case CustomersEditorActionTypes.DELETE_EDITING_CUSTOMER:
             case ApplicationActionTypes.GO_TO_PAGE:
                 this.customer = null;
-                this.editorStatus = EditorStatus.SURFING;
+                this.editorStatus = EditorMode.SURFING;
                 break;
             case CustomersEditorActionTypes.SELECT_EDITING_CUSTOMER:
                 this.customer = action.body;
-                this.editorStatus = EditorStatus.EDITING;
+                this.editorStatus = EditorMode.EDITING;
                 break;
             case CustomersEditorActionTypes.SELECT_EDITING_CUSTOMER_PAGE:
                 this.page = action.body;
                 break;
             case CustomersCreatorActionTypes.BEGIN_CUSTOMER_CREATION:
                 this.customer = EntitiesUtils.newCustomer();
-                this.editorStatus = EditorStatus.CREATING;
+                this.editorStatus = EditorMode.CREATING;
                 break;
             case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_NAME:
                 this.customer = this.customer.set('name', action.body);
@@ -110,9 +102,9 @@ class CustomersPageStore extends AbstractStore {
     }
 
     getSelectedCustomer() {
-        if (this.editorStatus === EditorStatus.EDITING) {
+        if (this.editorStatus === EditorMode.EDITING) {
             return findByUuid(customersStore.getCustomers().getPayload(), this.customer);
-        } else if (this.editorStatus === EditorStatus.CREATING) {
+        } else if (this.editorStatus === EditorMode.CREATING) {
             return this.customer;
         }
         return null;

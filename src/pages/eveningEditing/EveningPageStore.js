@@ -8,31 +8,17 @@ import {
     ACT_DELETE_BILL,
     ACT_DELETE_DINING_TABLE,
     ACT_DESELECT_BILL,
-    ACT_RETRIEVE_ADDITIONS,
-    ACT_RETRIEVE_CATEGORIES,
-    ACT_RETRIEVE_CUSTOMERS,
-    ACT_RETRIEVE_DISHES,
-    ACT_RETRIEVE_PHASES,
-    ACT_RETRIEVE_RESTAURANT_TABLES,
-    ACT_RETRIEVE_WAITERS,
     ACT_SELECT_BILL,
-    ACT_UPDATE_ORDINATION
-} from "../../actions/ActionTypes";
-import additionsStore from "../../stores/generic/AdditionsStore";
+    ACT_UPDATE_ORDINATION,
+    DataActionTypes
+} from "../../actions/DataActions";
 import eveningStore from "../../stores/EveningStore";
-import waitersStore from "../../stores/generic/WaitersStore";
-import tablesStore from "../../stores/generic/TablesStore";
-import categoriesStore from "../../stores/generic/CategoriesStore";
-import dishesStore from "../../stores/generic/DishesStore";
-import phasesStore from "../../stores/generic/PhasesStore";
-import AbstractEntityStore from "../../stores/generic/AbstractEntityStore";
 import {iSet} from "../../utils/Utils";
-import customersStore from "../../stores/generic/CustomersStore";
-import StoresUtils from "../StoresUtils";
 import RootFeatureStore from "../../stores/RootFeatureStore";
 import {EveningEditingActionTypes} from "./EveningEditorActions";
 import {ApplicationActionTypes} from "../../actions/ApplicationActions";
 import applicationStore from "../../stores/ApplicationStore";
+import dataStore from "../../stores/DataStore";
 
 const {Map, fromJS} = require('immutable');
 
@@ -50,13 +36,7 @@ class EveningPageStore extends RootFeatureStore {
         //FIXME: Generic stores should be waited in RootFeatureStore
         dispatcher.waitFor([
             eveningStore.getToken(),
-            waitersStore.getToken(),
-            tablesStore.getToken(),
-            categoriesStore.getToken(),
-            dishesStore.getToken(),
-            phasesStore.getToken(),
-            additionsStore.getToken(),
-            customersStore.getToken(),
+            dataStore.getToken(),
             applicationStore.getToken()
         ]);
 
@@ -69,13 +49,13 @@ class EveningPageStore extends RootFeatureStore {
         switch (action.type) {
             case ApplicationActionTypes.LOAD_SETTINGS:
             case ApplicationActionTypes.STORE_SETTINGS:
-            case ACT_RETRIEVE_WAITERS:
-            case ACT_RETRIEVE_RESTAURANT_TABLES:
-            case ACT_RETRIEVE_CATEGORIES:
-            case ACT_RETRIEVE_DISHES:
-            case ACT_RETRIEVE_PHASES:
-            case ACT_RETRIEVE_ADDITIONS:
-            case ACT_RETRIEVE_CUSTOMERS:
+            case DataActionTypes.LOAD_WAITERS:
+            case DataActionTypes.LOAD_RESTAURANT_TABLES:
+            case DataActionTypes.LOAD_CATEGORIES:
+            case DataActionTypes.LOAD_DISHES:
+            case DataActionTypes.LOAD_PHASES:
+            case DataActionTypes.LOAD_ADDITIONS:
+            case DataActionTypes.LOAD_CUSTOMERS:
 
             case ACT_CREATE_ORDINATION:
 
@@ -119,9 +99,9 @@ class EveningPageStore extends RootFeatureStore {
         if(Object.values(EveningEditingActionTypes).includes(action.type)){
             changed = true;
         }
-
-        changed &= AbstractEntityStore.areLoaded([waitersStore, tablesStore, categoriesStore, dishesStore,
-            phasesStore, additionsStore, eveningStore, customersStore]);
+//FIXME
+        // changed &= AbstractEntityStore.areLoaded([waitersStore, tablesStore, categoriesStore, dishesStore,
+        //     phasesStore, additionsStore, eveningStore, customersStore]);
 
         return changed;
     }
@@ -138,14 +118,14 @@ class EveningPageStore extends RootFeatureStore {
         let result = this.state;
         let evening = eveningStore.getEvening().getPayload();
         result = iSet(result, "evening", evening);
-
-        result = iSet(result, "waiters", waitersStore.getWaiters().getPayload());
-        result = iSet(result, "tables", tablesStore.getAllTables().getPayload());
-        result = iSet(result, "categories", categoriesStore.getCategories().getPayload());
-        result = iSet(result, "dishes", dishesStore.getDishes().getPayload());
-        result = iSet(result, "phases", phasesStore.getPhases().getPayload());
-        result = iSet(result, "additions", additionsStore.getAdditions().getPayload());
-        result = iSet(result, "customers", customersStore.getCustomers().getPayload());
+// FIXME
+        // result = iSet(result, "waiters", waitersStore.getWaiters().getPayload());
+        // result = iSet(result, "tables", tablesStore.getAllTables().getPayload());
+        // result = iSet(result, "categories", categoriesStore.getCategories().getPayload());
+        // result = iSet(result, "dishes", dishesStore.getDishes().getPayload());
+        // result = iSet(result, "phases", phasesStore.getPhases().getPayload());
+        // result = iSet(result, "additions", additionsStore.getAdditions().getPayload());
+        // result = iSet(result, "customers", customersStore.getCustomers().getPayload());
 
         result = iSet(result, 'settings', applicationStore.getSettings());
 

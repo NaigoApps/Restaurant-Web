@@ -1,4 +1,4 @@
-import {ACT_CLEAR_ERROR_MESSAGES, ACT_REMOVE_FAILED_ACTION} from "./ActionTypes";
+import {ACT_CLEAR_ERROR_MESSAGES, ACT_REMOVE_FAILED_ACTION} from "./DataActions";
 import dispatcher from "../dispatcher/SimpleDispatcher";
 
 

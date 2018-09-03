@@ -1,37 +1,23 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Page from "../Page";
 import printersPageStore from "./PrintersPageStore";
-import printersPageActions from "./PrintersPageActions";
 import PrinterEditor from "./PrinterEditor";
 import PrintersNavigator from "./PrintersNavigator";
 import PrintersNav from "./PrintersNav";
-import {EditorStatus} from "../StoresUtils";
-import {PrintersCreatorActions} from "./PrintersCreatorActions";
-import {PrintersEditorActions} from "./PrintersEditorActions";
+import ViewController from "../../widgets/ViewController";
+import EditorMode from "../../utils/EditorMode";
+import PrinterCreator from "./PrinterCreator";
+import {PrintersPageActions} from "./PrintersPageActions";
 
-const {fromJS, Map} = require('immutable');
-
-export default class PrintersPage extends Component {
+export default class PrintersPage extends ViewController {
 
     constructor(props) {
-        super(props);
-        this.state = printersPageStore.getState();
-
-        this.updateState = this.updateState.bind(this);
+        super(props, printersPageStore);
     }
 
     componentDidMount() {
-        printersPageStore.addChangeListener(this.updateState);
-
-        printersPageActions.initPrintersPage();
-    }
-
-    updateState(state) {
-        this.setState(state);
-    }
-
-    componentWillUnmount() {
-        printersPageStore.removeChangeListener(this.updateState);
+        super.componentDidMount();
+        PrintersPageActions.initPrintersPage();
     }
 
     render() {
@@ -45,20 +31,13 @@ export default class PrintersPage extends Component {
     }
 
     makePageContent() {
-        let state = this.state.data;
-        switch (state.get('status')) {
-            case EditorStatus.EDITING:
-                return <PrinterEditor
-                    data={state}
-                    actionsProvider={PrintersEditorActions}
-                />;
-            case EditorStatus.CREATING:
-                return <PrinterEditor
-                    data={state}
-                    actionsProvider={PrintersCreatorActions}
-                />;
-            default:
-                return <PrintersNavigator data={state}/>
+        let data = this.state.data;
+        if(data.editor.mode === EditorMode.CREATING){
+            return <PrinterCreator data={data}/>
+        }else if(data.editor.mode === EditorMode.EDITING){
+            return <PrinterEditor data={data}/>
+        }else{
+            return <PrintersNavigator data={data}/>
         }
     }
 

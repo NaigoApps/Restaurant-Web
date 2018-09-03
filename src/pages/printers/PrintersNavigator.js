@@ -1,11 +1,8 @@
 import React, {Component} from 'react';
-import {TYPES} from "../../components/editors/EntityEditor";
 import Row from "../../widgets/Row";
 import Column from "../../widgets/Column";
 import SelectInput from "../../components/widgets/inputs/SelectInput";
-import printersPageActions from "./PrintersPageActions";
-import {PrintersEditorActions} from "./PrintersEditorActions";
-import {PrintersCreatorActions} from "./PrintersCreatorActions";
+import {PrintersPageActions} from "./PrintersPageActions";
 import StoresUtils from "../StoresUtils";
 import RoundButton from "../../widgets/RoundButton";
 
@@ -22,14 +19,13 @@ export default class PrintersNavigator extends Component {
             <Column>
                 <SelectInput
                     bordered
-                    rows={StoresUtils.settings(data, "printersRows", 3)}
-                    cols={StoresUtils.settings(data, "printersColumns", 3)}
-                    id={printer => printer.get('uuid')}
-                    options={data.get('printers')}
-                    page={data.get('page')}
-                    renderer={printer => printer.get('name')}
-                    onSelectPage={index => printersPageActions.onSelectPrinterPage(index)}
-                    onSelect={printer => PrintersEditorActions.selectPrinter(printer)}
+                    rows={StoresUtils.option(data, "printersRows", 3)}
+                    cols={StoresUtils.option(data, "printersColumns", 3)}
+                    options={data.printers}
+                    page={data.navigator.page}
+                    renderer={printer => printer.name}
+                    onSelectPage={index => PrintersPageActions.selectPrinterNavigatorPage(index)}
+                    onSelect={printer => PrintersPageActions.selectPrinter(printer)}
                 />
             </Column>
         </Row>,
@@ -38,7 +34,7 @@ export default class PrintersNavigator extends Component {
                     <RoundButton icon="plus"
                                  text="Nuova stampante"
                                  type="success"
-                                 commitAction={() => PrintersCreatorActions.beginPrinterCreation()}
+                                 commitAction={() => PrintersPageActions.beginPrinterCreation()}
                     />
                 </Column>
             </Row>];

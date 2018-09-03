@@ -31,54 +31,55 @@ export const ApplicationActionTypes = {
     SELECT_INPUT_SELECT: "SELECT_INPUT_SELECT",
     SELECT_INPUT_DESELECT: "SELECT_INPUT_DESELECT",
     SELECT_INPUT_PAGE_CHANGE: "SELECT_INPUT_PAGE_CHANGE",
-    HIDE_SELECT_INPUT: "HIDE_SELECT_INPUT"
+    HIDE_SELECT_INPUT: "HIDE_SELECT_INPUT",
+
+    SHOW_COLOR_INPUT: "SHOW_COLOR_INPUT",
+    COLOR_INPUT_SELECT: "COLOR_INPUT_SELECT",
+    COLOR_INPUT_DESELECT: "COLOR_INPUT_DESELECT",
+    COLOR_INPUT_PAGE_CHANGE: "COLOR_INPUT_PAGE_CHANGE",
+    HIDE_COLOR_INPUT: "HIDE_COLOR_INPUT"
 };
 
-export const ApplicationActions = {
+export class ApplicationActions {
 
-    loadSettings: () =>
-        asyncActionBuilder.get(
-            ApplicationActionTypes.LOAD_SETTINGS,
-            "settings"
-        ),
+    static loadSettings = () => asyncActionBuilder.get(ApplicationActionTypes.LOAD_SETTINGS, "settings");
 
-    storeClientSettings: (value) =>
-        asyncActionBuilder.put(
-            ApplicationActionTypes.STORE_SETTINGS,
-            "settings/client",
-            JSON.stringify(value)
-        ),
+    static storeClientSettings = (value) => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/client", JSON.stringify(value));
 
-    setMainPrinter: printer => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/main-printer", printer),
-    setFiscalPrinter: printer => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/fiscal-printer", printer),
+    static setMainPrinter = printer => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/main-printer", printer);
+    static setFiscalPrinter = printer => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/fiscal-printer", printer);
 
 
-    toggleFullScreen: () => dispatcher.fireEnd(ApplicationActionTypes.TOGGLE_FULL_SCREEN),
-    requestFullScreen: () => dispatcher.fireEnd(ApplicationActionTypes.REQUEST_FULL_SCREEN),
-    dismissFullScreen: () => dispatcher.fireEnd(ApplicationActionTypes.DISMISS_FULL_SCREEN),
+    static toggleFullScreen = () => dispatcher.fireEnd(ApplicationActionTypes.TOGGLE_FULL_SCREEN);
+    static requestFullScreen = () => dispatcher.fireEnd(ApplicationActionTypes.REQUEST_FULL_SCREEN);
+    static dismissFullScreen = () => dispatcher.fireEnd(ApplicationActionTypes.DISMISS_FULL_SCREEN);
 
-    goToPage: (page) => dispatcher.fireEnd(ApplicationActionTypes.GO_TO_PAGE, page),
+    static goToPage = (page) => dispatcher.fireEnd(ApplicationActionTypes.GO_TO_PAGE, page);
 
-    setKeyboardVisible: (visible) => dispatcher.fireEnd(ApplicationActionTypes.SET_KEYBOARD_VISIBLE, visible),
+    static showTextInput = (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_TEXT_INPUT, options);
+    static hideTextInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_TEXT_INPUT);
+    static textInputChar = (char) => dispatcher.fireEnd(ApplicationActionTypes.TEXT_INPUT_CHAR, char);
+    static textInputCaret = (pos) => dispatcher.fireEnd(ApplicationActionTypes.TEXT_INPUT_CARET, pos);
 
-    showTextInput: (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_TEXT_INPUT, options),
-    hideTextInput: () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_TEXT_INPUT),
-    textInputChar: (char) => dispatcher.fireEnd(ApplicationActionTypes.TEXT_INPUT_CHAR, char),
-    textInputCaret: (pos) => dispatcher.fireEnd(ApplicationActionTypes.TEXT_INPUT_CARET, pos),
+    static showFloatInput = (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_FLOAT_INPUT, options);
+    static hideFloatInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_FLOAT_INPUT);
+    static floatInputChar = (char) => dispatcher.fireEnd(ApplicationActionTypes.FLOAT_INPUT_CHAR, char);
+    static floatInputChange = (text) => dispatcher.fireEnd(ApplicationActionTypes.FLOAT_INPUT_CHANGE, text);
 
-    showFloatInput: (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_FLOAT_INPUT, options),
-    hideFloatInput: () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_FLOAT_INPUT),
-    floatInputChar: (char) => dispatcher.fireEnd(ApplicationActionTypes.FLOAT_INPUT_CHAR, char),
-    floatInputChange: (text) => dispatcher.fireEnd(ApplicationActionTypes.FLOAT_INPUT_CHANGE, text),
+    static showIntegerInput = (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_INTEGER_INPUT, options);
+    static hideIntegerInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_INTEGER_INPUT);
+    static integerInputChar = (char) => dispatcher.fireEnd(ApplicationActionTypes.INTEGER_INPUT_CHAR, char);
+    static integerInputChange = (text) => dispatcher.fireEnd(ApplicationActionTypes.INTEGER_INPUT_CHANGE, text);
 
-    showIntegerInput: (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_INTEGER_INPUT, options),
-    hideIntegerInput: () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_INTEGER_INPUT),
-    integerInputChar: (char) => dispatcher.fireEnd(ApplicationActionTypes.INTEGER_INPUT_CHAR, char),
-    integerInputChange: (text) => dispatcher.fireEnd(ApplicationActionTypes.INTEGER_INPUT_CHANGE, text),
+    static showSelectInput = (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_SELECT_INPUT, options);
+    static hideSelectInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_SELECT_INPUT);
+    static selectInputSelect = (value) => dispatcher.fireEnd(ApplicationActionTypes.SELECT_INPUT_SELECT, value);
+    static selectInputDeselect = (value) => dispatcher.fireEnd(ApplicationActionTypes.SELECT_INPUT_DESELECT, value);
+    static selectInputPageChange = (value) => dispatcher.fireEnd(ApplicationActionTypes.SELECT_INPUT_PAGE_CHANGE, value);
 
-    showSelectInput: (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_SELECT_INPUT, options),
-    hideSelectInput: () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_SELECT_INPUT),
-    selectInputSelect: (value) => dispatcher.fireEnd(ApplicationActionTypes.SELECT_INPUT_SELECT, value),
-    selectInputDeselect: (value) => dispatcher.fireEnd(ApplicationActionTypes.SELECT_INPUT_DESELECT, value),
-    selectInputPageChange: (value) => dispatcher.fireEnd(ApplicationActionTypes.SELECT_INPUT_PAGE_CHANGE, value),
-};
+    static showColorInput = (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_COLOR_INPUT, options);
+    static hideColorInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_COLOR_INPUT);
+    static colorInputSelect = (value) => dispatcher.fireEnd(ApplicationActionTypes.COLOR_INPUT_SELECT, value);
+    static colorInputDeselect = (value) => dispatcher.fireEnd(ApplicationActionTypes.COLOR_INPUT_DESELECT, value);
+    static colorInputPageChange = (value) => dispatcher.fireEnd(ApplicationActionTypes.COLOR_INPUT_PAGE_CHANGE, value);
+}

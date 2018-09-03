@@ -2,7 +2,7 @@ import React from 'react';
 import EntityEditor from "../../components/editors/EntityEditor";
 import Column from "../../widgets/Column";
 import Row from "../../widgets/Row";
-import {EditorStatus} from "../StoresUtils";
+import EditorMode from "../../utils/EditorMode";
 import {iGet} from "../../utils/Utils";
 import TextEditor from "../../components/widgets/inputs/TextEditor";
 import BooleanEditor from "../../components/widgets/inputs/boolean/BooleanEditor";
@@ -26,7 +26,7 @@ export default class AdditionEditor extends React.Component {
             <Column>
                 <Row>
                     <Column>
-                        <h3 className="text-center">{editorStatus === EditorStatus.CREATING ?
+                        <h3 className="text-center">{editorStatus === EditorMode.CREATING ?
                             "Creazione variante" : "Modifica variante"}</h3>
                     </Column>
                 </Row>

@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import NavElement from "../../widgets/NavElement";
 import RestaurantNav from "../../components/RestaurantNav";
 import NavConfigurationButton from "../../widgets/NavConfigurationButton";
-import {WaitersEditorActions} from "./WaitersEditorActions";
-import {EditorStatus} from "../StoresUtils";
+import EditorMode from "../../utils/EditorMode";
+import {WaitersPageActions} from "./WaitersPageActions";
 
 export default class WaitersNav extends Component {
 
@@ -19,25 +19,23 @@ export default class WaitersNav extends Component {
     static makeNavContent(data) {
         let elements = [];
 
-        const editorStatus = data.get('editorStatus');
-        const waiter = data.get('waiter');
+        const editor = data.editor;
 
         elements.push(<NavConfigurationButton key="home"/>);
 
         elements.push(<NavElement
             key="waiters"
             text="Camerieri"
-            type="info"
-            active={editorStatus === EditorStatus.SURFING}
-            commitAction={() => WaitersEditorActions.deselectWaiter()}
+            active={!editor.waiter}
+            commitAction={() => WaitersPageActions.selectWaiter(null)}
         />);
-        if (editorStatus === EditorStatus.EDITING) {
+        if (editor.mode === EditorMode.EDITING) {
             elements.push(<NavElement
                 key="selected"
-                text={waiter.get('name')}
+                text={editor.waiter.name}
                 active={true}
             />);
-        } else if (editorStatus === EditorStatus.CREATING) {
+        } else if (editor.mode === EditorMode.CREATING) {
             elements.push(<NavElement
                 key="selected"
                 type="info"

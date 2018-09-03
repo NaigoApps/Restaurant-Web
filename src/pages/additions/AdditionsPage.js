@@ -5,10 +5,9 @@ import additionsPageActions from "./AdditionsPageActions";
 import {AdditionsEditorActions} from "./AdditionsEditorActions";
 import AdditionEditor from "./AdditionEditor";
 import AdditionsNavigator from "./AdditionsNavigator";
-import MenuPage from "../menu/MenuPage";
-import {EditorStatus} from "../StoresUtils";
 import {AdditionsCreatorActions} from "./AdditionsCreatorActions";
 import AdditionsNav from "./AdditionsNav";
+import EditorMode from "../../utils/EditorMode";
 
 const {Map} = require('immutable');
 
@@ -48,9 +47,9 @@ export default class AdditionsPage extends Component {
 
     static makePageContent(state) {
         const editorStatus = state.get('editorStatus');
-        if (editorStatus === EditorStatus.EDITING) {
+        if (editorStatus === EditorMode.EDITING) {
             return <AdditionEditor data={state} actionsProvider={AdditionsEditorActions}/>
-        } else if (editorStatus === EditorStatus.CREATING) {
+        } else if (editorStatus === EditorMode.CREATING) {
             return <AdditionEditor data={state} actionsProvider={AdditionsCreatorActions}/>
         } else {
             return <AdditionsNavigator data={state}/>

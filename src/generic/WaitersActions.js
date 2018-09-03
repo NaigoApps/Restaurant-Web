@@ -1,20 +1,14 @@
-import {
-    ACT_CREATE_WAITER,
-    ACT_DELETE_WAITER,
-    ACT_RETRIEVE_WAITER_STATUSES,
-    ACT_RETRIEVE_WAITERS,
-    ACT_UPDATE_WAITER
-} from "../actions/ActionTypes";
 import asyncActionBuilder from "../actions/RequestBuilder";
+import {DataActionTypes} from "../actions/DataActions";
 
 class WaitersActions {
 
     retrieveWaiters() {
-        return asyncActionBuilder.get(ACT_RETRIEVE_WAITERS, 'waiters');
+        return asyncActionBuilder.get(DataActionTypes.LOAD_WAITERS, 'waiters');
     }
 
     retrieveWaiterStatuses() {
-        return asyncActionBuilder.get(ACT_RETRIEVE_WAITER_STATUSES, 'waiter-statuses');
+        return asyncActionBuilder.get(DataActionTypes.LOAD_WAITER_STATUSES, 'waiter-statuses');
     }
 
 }

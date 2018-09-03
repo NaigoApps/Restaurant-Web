@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import NavElement from "../../widgets/NavElement";
 import RestaurantNav from "../../components/RestaurantNav";
 import NavConfigurationButton from "../../widgets/NavConfigurationButton";
-import {EditorStatus} from "../StoresUtils";
+import EditorMode from "../../utils/EditorMode";
 import {AdditionsEditorActions} from "./AdditionsEditorActions";
 
 export default class AdditionsNav extends Component {
@@ -27,16 +27,16 @@ export default class AdditionsNav extends Component {
         elements.push(<NavElement
             key="additions"
             text="Varianti"
-            active={editorStatus === EditorStatus.SURFING}
+            active={editorStatus === EditorMode.SURFING}
             commitAction={() => AdditionsEditorActions.deselectAddition()}
         />);
-        if (editorStatus === EditorStatus.EDITING) {
+        if (editorStatus === EditorMode.EDITING) {
             elements.push(<NavElement
                 key="selected"
                 text={addition.get('name')}
                 active={true}
             />);
-        } else if (editorStatus === EditorStatus.CREATING) {
+        } else if (editorStatus === EditorMode.CREATING) {
             elements.push(<NavElement
                 key="selected"
                 text={"Creazione variante"}

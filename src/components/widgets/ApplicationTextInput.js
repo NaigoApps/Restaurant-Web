@@ -13,24 +13,24 @@ export default class ApplicationTextInput extends Component {
 
     confirmTextValue() {
         let data = this.props.data;
-        let callback = data.get('callback');
+        let callback = data.callback;
         if (callback) {
-            callback(data.get('value'));
+            callback(data.value);
         }
         ApplicationActions.hideTextInput();
     }
 
     isValid() {
         let data = this.props.data;
-        let value = data.get('value');
-        return !data.get('checker') || data.get('checker')(value);
+        let value = data.value;
+        return !data.checker || data.checker(value);
     }
 
     componentDidUpdate() {
-        if (this.props.data.get('visible')) {
+        if (this.props.data.visible) {
             let textInput = global.$('#app-text-input');
             setTimeout(() => {
-                textInput[0].setSelectionRange(this.props.data.get('caret'), this.props.data.get('caret'));
+                textInput[0].setSelectionRange(this.props.data.caret, this.props.data.caret);
                 textInput[0].focus();
             }, 100);
         }
@@ -40,14 +40,14 @@ export default class ApplicationTextInput extends Component {
         let data = this.props.data;
         return <PopupContainer
             id="app-text-input"
-            visible={data.get('visible')}
-            blurCallback={() => ApplicationActions.hideIntegerInput()}>
+            visible={data.visible}
+            blurCallback={() => ApplicationActions.hideTextInput()}>
             <Row>
                 <Column>
-                    {data.get('label')}
+                    {data.label}
                     <TextInput
                         id="app-text-input"
-                        text={data.get('value')}
+                        text={data.value}
                         onSetCaret={caret => ApplicationActions.textInputCaret(caret)}
                         onChar={char => ApplicationActions.textInputChar(char)}
                     />

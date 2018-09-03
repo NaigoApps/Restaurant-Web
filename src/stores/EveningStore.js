@@ -3,7 +3,7 @@ import {
     ACT_DELETE_DINING_TABLE,
     ACT_DELETE_ORDINATION,
     ACT_UPDATE_ORDINATION
-} from "../actions/ActionTypes";
+} from "../actions/DataActions";
 import {STATUSES} from "./LazyData";
 import AbstractEntityStore from "./generic/AbstractEntityStore";
 import {findIndexByUuid} from "../utils/Utils";

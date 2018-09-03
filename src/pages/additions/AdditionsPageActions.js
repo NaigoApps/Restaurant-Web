@@ -1,11 +1,12 @@
 import additionsActions from "../../generic/AdditionsActions";
 import {ApplicationActions} from "../../actions/ApplicationActions";
+import {SettingsPageActions} from "../settings/SettingsPageActions";
 
 class AdditionsPageActions {
 
     initAdditionsPage(){
         additionsActions.retrieveAdditions();
-        ApplicationActions.loadSettings();
+        SettingsPageActions.loadSettings();
     }
 }
 

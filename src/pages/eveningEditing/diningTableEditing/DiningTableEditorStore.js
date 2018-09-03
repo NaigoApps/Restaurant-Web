@@ -1,6 +1,5 @@
 import SubFeatureStore from "../../../stores/SubFeatureStore";
 import eveningPageStore from "../EveningPageStore";
-import {EditorStatus} from "../../StoresUtils";
 import eveningStore from "../../../stores/EveningStore";
 import {findByUuid} from "../../../utils/Utils";
 import {EntitiesUtils} from "../../../utils/EntitiesUtils";
@@ -9,6 +8,7 @@ import {RECEIPT} from "./tableClosingFeature/DiningTableClosingWizard";
 import {EveningEditingActionTypes} from "../EveningEditorActions";
 import {DiningTablesEditorActionTypes} from "./DiningTablesEditorActions";
 import {DiningTablesClosingActionTypes} from "./tableClosingFeature/DiningTablesClosingActions";
+import EditorMode from "../../../utils/EditorMode";
 
 const {Map} = require('immutable');
 
@@ -22,7 +22,7 @@ class DiningTableEditorStore extends SubFeatureStore {
     constructor() {
         super(eveningPageStore, "diningTableEditing");
         this.page = 0;
-        this.status = EditorStatus.SURFING;
+        this.status = EditorMode.SURFING;
         this.editorMode = DiningTableEditorMode.ORDINATIONS;
 
         this.mergeEditor = DiningTableEditorStore.initMergeEditor();
@@ -72,7 +72,7 @@ class DiningTableEditorStore extends SubFeatureStore {
                 break;
             case DiningTablesEditorActionTypes.SELECT_DINING_TABLE:
                 this.diningTable = action.body;
-                this.status = EditorStatus.EDITING;
+                this.status = EditorMode.EDITING;
                 this.editorMode = DiningTableEditorMode.ORDINATIONS;
                 break;
             case DiningTablesEditorActionTypes.SELECT_DINING_TABLE_PAGE:
@@ -89,15 +89,15 @@ class DiningTableEditorStore extends SubFeatureStore {
             case DiningTablesEditorActionTypes.DESELECT_DINING_TABLE:
                 this.deletingDiningTable = false;
                 this.diningTable = null;
-                this.status = EditorStatus.SURFING;
+                this.status = EditorMode.SURFING;
                 break;
             case DiningTablesEditorActionTypes.BEGIN_DINING_TABLE_CREATION:
                 this.diningTable = EntitiesUtils.newDiningTable();
-                this.status = EditorStatus.CREATING;
+                this.status = EditorMode.CREATING;
                 break;
             case DiningTablesEditorActionTypes.CREATE_DINING_TABLE:
                 this.diningTable = action.body.get('uuid');
-                this.status = EditorStatus.EDITING;
+                this.status = EditorMode.EDITING;
                 this.editorMode = DiningTableEditorMode.ORDINATIONS;
                 break;
             //CoverCharges
@@ -127,7 +127,7 @@ class DiningTableEditorStore extends SubFeatureStore {
                 break;
             case DiningTablesEditorActionTypes.MERGE_DINING_TABLE:
                 this.diningTable = this.mergeEditor.get('target');
-                this.status = EditorStatus.EDITING;
+                this.status = EditorMode.EDITING;
                 this.mergeEditor = DiningTableEditorStore.initMergeEditor();
                 break;
             //CLOSING
@@ -142,12 +142,12 @@ class DiningTableEditorStore extends SubFeatureStore {
                 break;
             case DiningTablesClosingActionTypes.LOCK_TABLE:
                 this.diningTable = null;
-                this.status = EditorStatus.SURFING;
+                this.status = EditorMode.SURFING;
                 break;
             case DiningTablesClosingActionTypes.PRINT_BILL:
                 const table = this.getSelectedDiningTable();
                 if(table && table.get('status') === 'CHIUSO'){
-                    this.status = EditorStatus.SURFING;
+                    this.status = EditorMode.SURFING;
                     this.diningTable = null;
                 }
                 break;
@@ -183,12 +183,12 @@ class DiningTableEditorStore extends SubFeatureStore {
     }
 
     getSelectedDiningTable() {
-        if (this.status === EditorStatus.EDITING) {
+        if (this.status === EditorMode.EDITING) {
             let evening = eveningStore.getEvening().getPayload();
             if (evening) {
                 return findByUuid(evening.get('diningTables'), this.diningTable);
             }
-        } else if (this.status === EditorStatus.CREATING) {
+        } else if (this.status === EditorMode.CREATING) {
             return this.diningTable;
         }
         return null;

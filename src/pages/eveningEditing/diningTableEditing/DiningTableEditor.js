@@ -18,11 +18,11 @@ import OrdinationsUtils from "../OrdinationsUtils";
 import SelectInput from "../../../components/widgets/inputs/SelectInput";
 import {OrdersActions} from "./ordinationsEditing/ordersEditing/OrdersActions";
 import {OrdinationsCreatorActions} from "./ordinationsEditing/OrdinationsCreatorActions";
-import {EditorStatus} from "../../StoresUtils";
 import DiningTableReview from "../tables/DiningTableReview";
 import OrdinationEditor from "./ordinationsEditing/OrdinationEditor";
 import BillReview from "../tables/BillReview";
 import BillPrintWizard from "./BillPrintWizard";
+import EditorMode from "../../../utils/EditorMode";
 
 export default class DiningTableEditor extends React.Component {
     constructor(props) {
@@ -89,11 +89,11 @@ export default class DiningTableEditor extends React.Component {
         let ordinationsEditorStatus = iGet(data, "ordinationEditing.status");
 
         switch (ordinationsEditorStatus) {
-            case EditorStatus.SURFING:
+            case EditorMode.SURFING:
                 return <DiningTableReview data={data}/>;
-            case EditorStatus.CREATING:
+            case EditorMode.CREATING:
                 return <OrdinationEditor data={data} actionsProvider={OrdinationsCreatorActions}/>;
-            case EditorStatus.EDITING:
+            case EditorMode.EDITING:
                 return <OrdinationEditor data={data} actionsProvider={OrdinationsEditorActions}/>;
         }
 
@@ -134,7 +134,7 @@ export default class DiningTableEditor extends React.Component {
         let ordination = iGet(data, "ordinationEditing.ordination");
         let status = iGet(data, "ordinationEditing.status");
 
-        if (ordination && status === EditorStatus.EDITING) {
+        if (ordination && status === EditorMode.EDITING) {
             const isDeleting = iGet(data, "ordinationEditing.deletingOrdination");
             return DiningTableEditor.buildOrdinationButtons(table, ordination, isDeleting);
         }else{

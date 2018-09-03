@@ -1,5 +1,5 @@
 import AbstractStore from "./RootFeatureStore";
-import {ACT_CLEAR_ERROR_MESSAGES} from "../actions/ActionTypes";
+import {ACT_CLEAR_ERROR_MESSAGES} from "../actions/DataActions";
 
 const EVT_ERRORS_STORE_CHANGED = "EVT_ERRORS_STORE_CHANGED";
 

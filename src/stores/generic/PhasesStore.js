@@ -1,7 +1,7 @@
-import {ACT_RETRIEVE_PHASES} from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
 import {numberCompare} from "../../utils/Utils";
+import {DataActionTypes} from "../../actions/DataActions";
 
 const EVT_PHASES_STORE_CHANGED = "EVT_PHASES_STORE_CHANGED";
 
@@ -21,7 +21,7 @@ class PhasesStore extends AbstractEntityStore {
     handleStartedAction(action){
         let changed = true;
         switch (action.type){
-            case ACT_RETRIEVE_PHASES:
+            case DataActionTypes.LOAD_PHASES:
                 this.setStatus(STATUSES.LOADING);
                 break;
             default:
@@ -34,7 +34,7 @@ class PhasesStore extends AbstractEntityStore {
     handleCompletedAction(action){
         let changed = true;
         switch (action.type){
-            case ACT_RETRIEVE_PHASES:
+            case DataActionTypes.LOAD_PHASES:
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;

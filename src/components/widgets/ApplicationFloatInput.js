@@ -13,18 +13,18 @@ export default class ApplicationFloatInput extends Component {
 
     confirmFloatValue(){
         let data = this.props.data;
-        let callback = data.get('callback');
+        let callback = data.callback;
         if(callback) {
-            callback(data.get('value'));
+            callback(data.value);
         }
         ApplicationActions.hideFloatInput();
     }
 
     isValid() {
         let data = this.props.data;
-        let value = data.get('value');
-        let min = data.get('min');
-        let max = data.get('max');
+        let value = data.value;
+        let min = data.min;
+        let max = data.max;
         return (min === undefined || min <= value) && (max === undefined || value <= max);
     }
 
@@ -33,12 +33,12 @@ export default class ApplicationFloatInput extends Component {
         return <PopupContainer
             id="app-float-input"
             blurCallback={() => ApplicationActions.hideFloatInput()}
-            visible={data.get('visible')}>
+            visible={data.visible}>
             <Row>
                 <Column>
-                    {data.get('label')}
+                    {data.label}
                     <FloatInput
-                        text={data.get('text')}
+                        text={data.text}
                         onChange={text => ApplicationActions.floatInputChange(text)}
                         onChar={char => ApplicationActions.floatInputChar(char)}
                     />

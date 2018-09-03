@@ -2,10 +2,9 @@ import React, {Component} from 'react';
 import Row from "../../widgets/Row";
 import Column from "../../widgets/Column";
 import SelectInput from "../../components/widgets/inputs/SelectInput";
-import {TablesEditorActions} from "./TablesEditorActions";
-import {TablesCreatorActions} from "./TablesCreatorActions";
 import StoresUtils from "../StoresUtils";
 import RoundButton from "../../widgets/RoundButton";
+import {TablesPageActions} from "./TablesPageActions";
 
 export default class TablesNavigator extends Component {
 
@@ -20,14 +19,13 @@ export default class TablesNavigator extends Component {
             <Column>
                 <SelectInput
                     bordered
-                    id={table => table.get('uuid')}
-                    rows={StoresUtils.settings(data, "tablesRows", 3)}
-                    cols={StoresUtils.settings(data, "tablesColumns", 3)}
-                    options={data.get('tables')}
-                    page={data.get('page')}
-                    renderer={table => table.get('name')}
-                    onSelectPage={index => TablesEditorActions.selectTablePage(index)}
-                    onSelect={table => TablesEditorActions.selectTable(table)}
+                    rows={StoresUtils.option(data, "tablesRows", 3)}
+                    cols={StoresUtils.option(data, "tablesColumns", 3)}
+                    options={data.tables}
+                    page={data.navigator.page}
+                    renderer={table => table.name}
+                    onSelectPage={index => TablesPageActions.selectNavigatorPage(index)}
+                    onSelect={table => TablesPageActions.selectTable(table)}
                 />
             </Column>
         </Row>,
@@ -37,7 +35,7 @@ export default class TablesNavigator extends Component {
                                  icon="plus"
                                  text="Nuovo tavolo"
                                  type="success"
-                                 commitAction={() => TablesCreatorActions.beginTableCreation()}
+                                 commitAction={() => TablesPageActions.beginTableCreation()}
                     />
                 </Column>
             </Row>];

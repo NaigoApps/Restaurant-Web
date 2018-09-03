@@ -1,10 +1,10 @@
 import asyncActionBuilder from "../actions/RequestBuilder";
-import {ACT_RETRIEVE_LOCATIONS} from "../actions/ActionTypes";
+import {DataActionTypes} from "../actions/DataActions";
 
 class LocationsActions {
 
     retrieveLocations() {
-        asyncActionBuilder.get(ACT_RETRIEVE_LOCATIONS, 'locations');
+        asyncActionBuilder.get(DataActionTypes.LOAD_LOCATIONS, 'locations');
     }
 
 }

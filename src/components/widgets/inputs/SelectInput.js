@@ -75,13 +75,15 @@ export default class SelectInput extends Component {
         optionsList = distribute(optionsList, cols);
         optionsList = optionsList.map((row, rowIndex) => {
             let buttons = row.map(option => {
+                const color = this.props.color ? this.props.color(option) : "#000000";
                 return (
-                    <Column key={this.id(option)}>
+                    <Column key={uuid()}>
                         <Button
                             active={this.isSelected(this.id(option))}
+                            color={color}
                             text={this.renderOption(option)}
                             type={colorRenderer ? colorRenderer(option) : "secondary"}
-                            commitAction={this.select.bind(this, option)}
+                            commitAction={() => this.select(option)}
                         />
                     </Column>
                 );

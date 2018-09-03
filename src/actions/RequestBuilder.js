@@ -100,7 +100,7 @@ class RequestBuilder {
 
     put(action, resource, target, params) {
         dispatcher.fireStart(action);
-
+        console.log(target);
         if (params) {
             resource += this.buildParams(params);
         }

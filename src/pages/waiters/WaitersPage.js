@@ -1,42 +1,23 @@
 import React, {Component} from 'react';
-import waitersPageActions from "./WaitersPageActions";
 import Page from "../Page";
 import waitersPageStore from "./WaitersPageStore";
 import WaiterEditor from "./WaiterEditor";
 import WaitersNavigator from "./WaitersNavigator";
-import {findByUuid} from "../../utils/Utils";
-import NavPills from "../../widgets/NavPills";
-import NavElement from "../../widgets/NavElement";
-import NavElementLink from "../../widgets/NavElementLink";
-import {CONFIGURATION} from "../../App";
-import {EditorStatus} from "../StoresUtils";
-import {WaitersCreatorActions} from "./WaitersCreatorActions";
 import WaitersNav from "./WaitersNav";
-import {WaitersEditorActions} from "./WaitersEditorActions";
+import EditorMode from "../../utils/EditorMode";
+import ViewController from "../../widgets/ViewController";
+import {WaitersPageActions} from "./WaitersPageActions";
+import WaiterCreator from "./WaiterCreator";
 
-const {Map} = require('immutable');
-
-export default class WaitersPage extends Component {
+export default class WaitersPage extends ViewController {
 
     constructor(props) {
-        super(props);
-        this.state = waitersPageStore.getState();
-
-        this.updateState = this.updateState.bind(this);
+        super(props, waitersPageStore);
     }
 
     componentDidMount() {
-        waitersPageStore.addChangeListener(this.updateState);
-
-        waitersPageActions.initWaitersPage();
-    }
-
-    componentWillUnmount() {
-        waitersPageStore.removeChangeListener(this.updateState);
-    }
-
-    updateState(state) {
-        this.setState(state);
+        super.componentDidMount();
+        WaitersPageActions.initWaitersPage();
     }
 
     render() {
@@ -50,12 +31,11 @@ export default class WaitersPage extends Component {
     }
 
     static makePageContent(data) {
-        const editorStatus = data.get('editorStatus');
 
-        if (editorStatus === EditorStatus.EDITING) {
-            return <WaiterEditor data={data} actionsProvider={WaitersEditorActions}/>
-        } else if (editorStatus === EditorStatus.CREATING) {
-            return <WaiterEditor data={data} actionsProvider={WaitersCreatorActions}/>
+        if (data.editor.mode === EditorMode.EDITING) {
+            return <WaiterEditor data={data}/>
+        } else if (data.editor.mode  === EditorMode.CREATING) {
+            return <WaiterCreator data={data}/>
         } else {
             return <WaitersNavigator data={data}/>
         }

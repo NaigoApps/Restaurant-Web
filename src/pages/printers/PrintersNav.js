@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import NavElement from "../../widgets/NavElement";
-import {EditorStatus} from "../StoresUtils";
 import RestaurantNav from "../../components/RestaurantNav";
-import {PrintersEditorActions} from "./PrintersEditorActions";
 import NavConfigurationButton from "../../widgets/NavConfigurationButton";
+import EditorMode from "../../utils/EditorMode";
+import {PrintersPageActions} from "./PrintersPageActions";
 
 export default class PrintersNav extends Component {
 
@@ -19,24 +19,23 @@ export default class PrintersNav extends Component {
     static makeNavContent(data) {
         let elements = [];
 
-        let printer = data.get('printer');
-        let status = data.get('status');
+        let editor = data.editor;
 
         elements.push(<NavConfigurationButton key="home"/>);
 
         elements.push(<NavElement
             key="printers"
             text="Stampanti"
-            active={status === EditorStatus.SURFING}
-            commitAction={() => PrintersEditorActions.deselectPrinter()}
+            active={!editor.printer}
+            commitAction={() => PrintersPageActions.selectPrinter(null)}
         />);
-        if (status === EditorStatus.EDITING) {
+        if (editor.mode === EditorMode.EDITING) {
             elements.push(<NavElement
                 key="selected"
-                text={printer.get('name')}
+                text={editor.printer.name}
                 active={true}
             />);
-        }else if (status === EditorStatus.CREATING) {
+        }else if (editor.mode === EditorMode.CREATING) {
             elements.push(<NavElement
                 key="selected"
                 text="Creazione stampante"

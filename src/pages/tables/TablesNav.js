@@ -2,10 +2,8 @@ import React, {Component} from 'react';
 import NavElement from "../../widgets/NavElement";
 import RestaurantNav from "../../components/RestaurantNav";
 import NavConfigurationButton from "../../widgets/NavConfigurationButton";
-import {ApplicationActions} from "../../actions/ApplicationActions";
-import {TABLES} from "../../App";
-import {EditorStatus} from "../StoresUtils";
-import {TablesEditorActions} from "./TablesEditorActions";
+import EditorMode from "../../utils/EditorMode";
+import {TablesPageActions} from "./TablesPageActions";
 
 export default class TablesNav extends Component {
 
@@ -18,29 +16,26 @@ export default class TablesNav extends Component {
         return <RestaurantNav>{navContent}</RestaurantNav>;
     }
 
-
-
-    static makeNavContent(state) {
+    static makeNavContent(data) {
         let elements = [];
 
-        const editorStatus = state.get('editorStatus');
-        const table = state.get('table');
+        const editor = data.editor;
 
         elements.push(<NavConfigurationButton key="home"/>);
 
         elements.push(<NavElement
             key="tables"
             text="Tavoli"
-            active={editorStatus === EditorStatus.SURFING}
-            commitAction={() => TablesEditorActions.deselectTable()}
+            active={!editor.table}
+            commitAction={() => TablesPageActions.selectTable(null)}
         />);
-        if (editorStatus === EditorStatus.EDITING) {
+        if (editor.mode === EditorMode.EDITING) {
             elements.push(<NavElement
                 key="selected"
-                text={table.get('name')}
+                text={editor.table.name}
                 active={true}
             />);
-        } else if (editorStatus === EditorStatus.CREATING) {
+        } else if (editor.mode === EditorMode.CREATING) {
             elements.push(<NavElement
                 key="selected"
                 text={"Nuovo tavolo"}

@@ -1,15 +1,15 @@
 import SubFeatureStore from "../../../../stores/SubFeatureStore";
 import eveningPageStore from "../../EveningPageStore";
-import {EditorStatus} from "../../../StoresUtils";
 import eveningStore from "../../../../stores/EveningStore";
-import diningTableEditingStore, {DiningTableEditorMode} from "../DiningTableEditorStore";
+import diningTableEditingStore from "../DiningTableEditorStore";
 import {findByUuid} from "../../../../utils/Utils";
 import {EntitiesUtils} from "../../../../utils/EntitiesUtils";
 import {OrdinationCreatorActionTypes} from "./OrdinationsCreatorActions";
 import {OrdinationEditorActionTypes} from "./OrdinationsEditorActions";
-import {OrdersActions, OrdersActionTypes} from "./ordersEditing/OrdersActions";
+import {OrdersActionTypes} from "./ordersEditing/OrdersActions";
 import {DiningTablesEditorActionTypes} from "../DiningTablesEditorActions";
 import {EveningEditingActionTypes} from "../../EveningEditorActions";
+import EditorMode from "../../../../utils/EditorMode";
 
 const {Map, List, fromJS} = require('immutable');
 
@@ -21,7 +21,7 @@ class OrdinationEditingStore extends SubFeatureStore {
 
     init(){
         this.page = 0;
-        this.status = EditorStatus.SURFING;
+        this.status = EditorMode.SURFING;
         this.ordination = null;
         this.ordinationEditor = this.resetOrdinationEditor();
         this.deletingOrdination = false;
@@ -53,7 +53,7 @@ class OrdinationEditingStore extends SubFeatureStore {
             case DiningTablesEditorActionTypes.BEGIN_ORDINATIONS_EDITING:
             case DiningTablesEditorActionTypes.BEGIN_DATA_EDITING:
             case DiningTablesEditorActionTypes.BEGIN_BILLS_EDITING:
-                this.status = EditorStatus.SURFING;
+                this.status = EditorMode.SURFING;
                 this.ordination = null;
                 break;
             case OrdinationEditorActionTypes.SELECT_ORDINATION_PAGE:
@@ -63,12 +63,12 @@ class OrdinationEditingStore extends SubFeatureStore {
                 this.ordinationEditor = this.initOrdinationEditor(this.getSelectedOrdination());
                 break;
             case OrdinationCreatorActionTypes.BEGIN_ORDINATION_CREATION:
-                this.status = EditorStatus.CREATING;
+                this.status = EditorMode.CREATING;
                 this.ordination = EntitiesUtils.newOrdination();
                 this.ordinationEditor = this.initOrdinationEditor(this.getSelectedOrdination());
                 break;
             case OrdinationCreatorActionTypes.CREATE_ORDINATION:
-                this.status = EditorStatus.EDITING;
+                this.status = EditorMode.EDITING;
                 this.ordination = action.body.get('uuid');
                 this.ordinationEditor = this.resetOrdinationEditor();
                 break;
@@ -76,7 +76,7 @@ class OrdinationEditingStore extends SubFeatureStore {
                 this.ordinationEditor = this.resetOrdinationEditor();
                 break;
             case OrdinationEditorActionTypes.BEGIN_ORDINATION_EDITING:
-                this.status = EditorStatus.EDITING;
+                this.status = EditorMode.EDITING;
                 this.ordination = action.body;
                 this.ordinationEditor = this.resetOrdinationEditor();
                 break;
@@ -92,7 +92,7 @@ class OrdinationEditingStore extends SubFeatureStore {
             case OrdinationEditorActionTypes.ABORT_ORDINATION_EDITING:
             case OrdinationCreatorActionTypes.ABORT_ORDINATION_CREATION:
                 this.deletingOrdination = false;
-                this.status = EditorStatus.SURFING;
+                this.status = EditorMode.SURFING;
                 this.ordination = null;
                 this.ordinationEditor = this.resetOrdinationEditor();
                 break;
@@ -118,7 +118,7 @@ class OrdinationEditingStore extends SubFeatureStore {
     }
 
     getSelectedOrdination(){
-        if(this.status === EditorStatus.EDITING){
+        if(this.status === EditorMode.EDITING){
             let evening = eveningStore.getEvening().getPayload();
             if(evening){
                 let table = diningTableEditingStore.getState().get('diningTable');
@@ -126,7 +126,7 @@ class OrdinationEditingStore extends SubFeatureStore {
                     return findByUuid(table.get('ordinations'), this.ordination);
                 }
             }
-        }else if(this.status === EditorStatus.CREATING){
+        }else if(this.status === EditorMode.CREATING){
             return this.ordination;
         }
         return null;

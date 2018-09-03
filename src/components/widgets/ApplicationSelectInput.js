@@ -13,14 +13,14 @@ export default class ApplicationSelectInput extends Component {
 
     canConfirm() {
         let data = this.props.data;
-        return data.get('isValid') === undefined || data.get('isValid')(data.get('value'));
+        return data.isValid === undefined || data.isValid(data.value);
     }
 
     confirmSelectValue() {
         let data = this.props.data;
-        let callback = data.get('callback');
+        let callback = data.callback;
         if (callback) {
-            callback(data.get('value'));
+            callback(data.value);
         }
         ApplicationActions.hideSelectInput();
     }
@@ -29,27 +29,28 @@ export default class ApplicationSelectInput extends Component {
         let data = this.props.data;
         return <PopupContainer
             id="app-select-input"
-            visible={data.get('visible')}
+            visible={data.visible}
             blurCallback={() => ApplicationActions.hideSelectInput()}>
             <Row>
                 <Column>
                     <Row>
                         <Column>
-                            <h5>{data.get('label')}</h5>
+                            <h5>{data.label}</h5>
                         </Column>
                     </Row>
                     <Row ofList>
                         <Column>
                             <SelectInput
-                                rows={data.get('rows')}
-                                cols={data.get('cols')}
-                                page={data.get('page')}
-                                id={data.get('id')}
-                                multiSelect={data.get('multiSelect')}
-                                selected={data.get('value')}
-                                options={data.get('values')}
-                                renderer={data.get('renderer')}
-                                colorRenderer={data.get('colorRenderer')}
+                                rows={data.rows}
+                                cols={data.cols}
+                                page={data.page}
+                                id={data.id}
+                                multiSelect={data.multiSelect}
+                                selected={data.value}
+                                options={data.values}
+                                renderer={data.renderer}
+                                color={data.color}
+                                colorRenderer={data.colorRenderer}
 
                                 onSelect={option => ApplicationActions.selectInputSelect(option)}
                                 onDeselect={(option) => ApplicationActions.selectInputDeselect(option)}

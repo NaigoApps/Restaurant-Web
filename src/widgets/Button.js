@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Icon from "./Icon";
 import Row from "./Row";
 import Column from "./Column";
+import Text from "./Text";
 
 /**
  * Expects:
@@ -85,17 +86,23 @@ export default class Button extends Component {
                 </Row>;
             }
         } else if (text) {
-            content = text;
+            content = <Text color={this.props.color || "#000000"}>{text}</Text>;
         } else if (icon) {
             content = <Icon name={icon}/>
         } else {
             content = <span>&nbsp;</span>
         }
 
+        let bg = undefined;
+        if (this.props.backgroundColor) {
+            bg = this.props.backgroundColor.toHexString();
+        }
+
         return (
             <button
                 type="button"
                 className={this.getClassName()}
+                style={{backgroundColor : bg}}
                 onMouseUp={this.clickAction.bind(this)}
                 disabled={!!this.props.disabled}>
                 {content}

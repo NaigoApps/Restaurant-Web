@@ -1,39 +1,23 @@
-import React, {Component} from 'react';
-import tablesPageStore from "./TablesPageStore";
-import tablesPageActions from "./TablesPageActions";
+import React from 'react';
 import Page from "../Page";
 import TableEditor from "./TableEditor";
 import TablesNavigator from "./TablesNavigator";
-import {EditorStatus} from "../StoresUtils";
 import TablesNav from "./TablesNav";
-import {TablesCreatorActions} from "./TablesCreatorActions";
-import {TablesEditorActions} from "./TablesEditorActions";
+import EditorMode from "../../utils/EditorMode";
+import ViewController from "../../widgets/ViewController";
+import {TablesPageActions} from "./TablesPageActions";
+import tablesPageStore from "./TablesPageStore";
+import TableCreator from "./TableCreator";
 
-const {Map} = require('immutable');
-
-const {fromJS} = require('immutable');
-
-export default class TablesPage extends Component {
+export default class TablesPage extends ViewController {
 
     constructor(props) {
-        super(props);
-        this.state = tablesPageStore.getState();
-
-        this.updateState = this.updateState.bind(this);
+        super(props, tablesPageStore);
     }
 
     componentDidMount() {
-        tablesPageStore.addChangeListener(this.updateState);
-
-        tablesPageActions.initTablesPage();
-    }
-
-    updateState(state) {
-        this.setState(state);
-    }
-
-    componentWillUnmount() {
-        tablesPageStore.removeChangeListener(this.updateState);
+        super.componentDidMount();
+        TablesPageActions.initTablesPage();
     }
 
     render() {
@@ -46,20 +30,14 @@ export default class TablesPage extends Component {
         )
     }
 
-    static makePageContent(state) {
-        let editorStatus = state.get('editorStatus');
-        if (editorStatus === EditorStatus.EDITING) {
-            return <TableEditor
-                data={state}
-                actionsProvider={TablesEditorActions}
-            />
-        } else if (editorStatus === EditorStatus.CREATING) {
-            return <TableEditor
-                data={state}
-                actionsProvider={TablesCreatorActions}
-            />
+    static makePageContent(data) {
+        const editor = data.editor;
+        if (editor.mode === EditorMode.EDITING) {
+            return <TableEditor data={data}/>
+        } else if (editor.mode === EditorMode.CREATING) {
+            return <TableCreator data={data}/>
         } else {
-            return <TablesNavigator data={state}/>
+            return <TablesNavigator data={data}/>
         }
     }
 }

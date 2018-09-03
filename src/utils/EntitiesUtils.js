@@ -1,12 +1,15 @@
 import {uuid} from "./Utils";
+import DishStatus from "../model/DishStatus";
 
 const {fromJS} = require("immutable");
 
-export const NEW_DINING_TABLE_UUID = "new-dining-table-uuid";
-export const NEW_ORDINATION_UUID = "new-ordination-uuid";
 export const NEW_CUSTOMER_UUID = "new-customer-uuid";
 
 export class EntitiesUtils {
+    static nameComparator(e1, e2){
+        return e1.name.localeCompare(e2.name);
+    }
+
     static newDiningTable() {
         return fromJS({
             coverCharges: 0,
@@ -92,20 +95,23 @@ export class EntitiesUtils {
     }
 
     static newCategory() {
-        return fromJS({
+        return {
             name: "",
             location: null,
-            dishes: []
-        });
+            color: 0x000000,
+            dishes: [],
+            additions: []
+        };
     }
 
     static newDish() {
-        return fromJS({
+        return {
             name: "",
             price: 0.0,
             description: "",
-            category: ""
-        });
+            category: null,
+            status: DishStatus.ACTIVE
+        };
     }
 
     static newAddition() {

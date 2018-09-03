@@ -1,4 +1,4 @@
-import {ACT_RETRIEVE_RESTAURANT_TABLES} from "./ActionTypes";
+import {ACT_RETRIEVE_RESTAURANT_TABLES} from "./DataActions";
 import asyncActionBuilder from "./RequestBuilder";
 
 class RestaurantTablesActions {

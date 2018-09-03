@@ -3,7 +3,7 @@ import EntityEditor from "../../components/editors/EntityEditor";
 import Column from "../../widgets/Column";
 import Row from "../../widgets/Row";
 import TextEditor from "../../components/widgets/inputs/TextEditor";
-import {EditorStatus} from "../StoresUtils";
+import {TablesPageActions} from "./TablesPageActions";
 
 export default class TableEditor extends React.Component {
     constructor(props) {
@@ -11,31 +11,25 @@ export default class TableEditor extends React.Component {
     }
 
     render() {
-        const editorData = this.props.data;
-        const actionsProvider = this.props.actionsProvider;
+        const data = this.props.data;
+        const editor = data.editor;
 
-        const table = editorData.get('table');
-        const editorStatus = editorData.get('editorStatus');
-
-        const components = TableEditor.buildComponents(editorData, actionsProvider, table);
+        const components = TableEditor.buildComponents(data);
 
         return <Row key="editor" topSpaced grow>
             <Column>
                 <Row>
                     <Column>
-                        <h3 className="text-center">{editorStatus === EditorStatus.CREATING ?
-                            "Creazione tavolo" : "Modifica tavolo"}</h3>
+                        <h3 className="text-center">Modifica tavolo</h3>
                     </Column>
                 </Row>
                 <Row grow>
                     <Column>
                         <EntityEditor
-                            valid={!!table.get('name')}
-                            entity={table}
-                            confirmMethod={actionsProvider.onConfirm}
-                            abortMethod={actionsProvider.onAbort}
+                            valid={!!editor.table.name}
+                            entity={editor.table}
                             deleteMessage="Eliminazione tavolo"
-                            deleteMethod={actionsProvider.onDelete}>
+                            deleteMethod={(uuid) => TablesPageActions.deleteTable(uuid)}>
                             <Row grow>
                                 {components}
                             </Row>
@@ -46,20 +40,18 @@ export default class TableEditor extends React.Component {
         </Row>;
     }
 
-    static buildComponents(editorData, actionsProvider, printer) {
+    static buildComponents(data) {
         let components = [];
-        if (actionsProvider.confirmName) {
-            components.push(TableEditor.buildNameEditor(editorData, actionsProvider, printer));
-        }
+        components.push(TableEditor.buildNameEditor(data));
         return components.map((component, index) => <Column key={index}>{component}</Column>);
     }
 
-    static buildNameEditor(editorData, actionsProvider, table) {
+    static buildNameEditor(data) {
         return <TextEditor
             options={{
                 label: "Nome",
-                value: table.get('name'),
-                callback: result => actionsProvider.confirmName(table.get('uuid'), result)
+                value: data.editor.table.name,
+                callback: result => TablesPageActions.updateTableName(data.editor.table.uuid, result)
             }}
         />;
     }

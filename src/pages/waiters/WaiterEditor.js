@@ -4,7 +4,7 @@ import Column from "../../widgets/Column";
 import Row from "../../widgets/Row";
 import TextEditor from "../../components/widgets/inputs/TextEditor";
 import SelectEditor from "../../components/widgets/inputs/SelectEditor";
-import {iGet} from "../../utils/Utils";
+import {WaitersPageActions} from "./WaitersPageActions";
 
 export default class WaiterEditor extends React.Component {
     constructor(props) {
@@ -13,44 +13,41 @@ export default class WaiterEditor extends React.Component {
 
     render() {
         const data = this.props.data;
-        const actionsProvider = this.props.actionsProvider;
 
-        const editorStatus = data.get('editorStatus');
-        const waiter = data.get('waiter');
-        const uuid = waiter.get('uuid');
+        const editor = data.editor;
+        const waiter = editor.waiter;
 
-        const actions = WaiterEditor.buildActions(data, actionsProvider);
+        const actions = WaiterEditor.buildActions(data);
 
-        return <Row topSpaced>
+        return <Row topSpaced grow>
             <Column>
-                <EntityEditor
-                    entity={waiter}
-                    valid={!!waiter.get('name')}
-                    confirmMethod={actionsProvider.onConfirm}
-                    abortMethod={actionsProvider.onAbort}
-                    deleteMessage="Eliminazione cameriere"
-                    deleteMethod={actionsProvider.onDelete}>
-                    {actions}
-                </EntityEditor>
+                <Row>
+                    <Column>
+                        <h3 className="text-center">Modifica cameriere</h3>
+                    </Column>
+                </Row>
+                <Row grow>
+                    <Column>
+                        <EntityEditor
+                            entity={waiter}
+                            valid={!!waiter.name}
+                            deleteMessage="Eliminazione cameriere"
+                            deleteMethod={(waiter) => WaitersPageActions.deleteWaiter(waiter)}>
+                            {actions}
+                        </EntityEditor>
+                    </Column>
+                </Row>
             </Column>
         </Row>;
 
     }
 
-    static buildActions(data, actionsProvider) {
+    static buildActions(data) {
         const actions = [];
-        if (actionsProvider.confirmName) {
-            actions.push(WaiterEditor.buildNameEditor(data, actionsProvider));
-        }
-        if (actionsProvider.confirmSurname) {
-            actions.push(WaiterEditor.buildSurnameEditor(data, actionsProvider));
-        }
-        if (actionsProvider.confirmCf) {
-            actions.push(WaiterEditor.buildCfEditor(data, actionsProvider));
-        }
-        if (actionsProvider.confirmStatus) {
-            actions.push(WaiterEditor.buildStatusEditor(data, actionsProvider));
-        }
+        actions.push(WaiterEditor.buildNameEditor(data));
+        actions.push(WaiterEditor.buildSurnameEditor(data));
+        actions.push(WaiterEditor.buildCfEditor(data));
+        actions.push(WaiterEditor.buildStatusEditor(data));
         return actions.map((action, index) => {
             return <Row key={index} ofList={index > 0}>
                 <Column>
@@ -60,37 +57,37 @@ export default class WaiterEditor extends React.Component {
         });
     }
 
-    static buildNameEditor(data, actionsProvider) {
+    static buildNameEditor(data) {
         return <TextEditor options={{
             label: "Nome",
-            value: iGet(data, 'waiter.name'),
-            callback: result => actionsProvider.confirmName(iGet(data, 'waiter.uuid'), result)
+            value: data.editor.waiter.name,
+            callback: result => WaitersPageActions.updateWaiterName(data.editor.waiter.uuid, result)
         }}/>;
     }
 
-    static buildSurnameEditor(data, actionsProvider) {
+    static buildSurnameEditor(data) {
         return <TextEditor options={{
             label: "Cognome",
-            value: iGet(data, 'waiter.surname'),
-            callback: result => actionsProvider.confirmSurname(iGet(data, 'waiter.uuid'), result)
+            value: data.editor.waiter.surname,
+            callback: result => WaitersPageActions.updateWaiterSurname(data.editor.waiter.uuid, result)
         }}/>;
     }
 
-    static buildCfEditor(data, actionsProvider) {
+    static buildCfEditor(data) {
         return <TextEditor options={{
             label: "Codice fiscale",
-            value: iGet(data, 'waiter.cf'),
-            callback: result => actionsProvider.confirmCf(iGet(data, 'waiter.uuid'), result)
+            value: data.editor.waiter.cf,
+            callback: result => WaitersPageActions.updateWaiterCf(data.editor.waiter.uuid, result)
         }}/>;
     }
 
-    static buildStatusEditor(data, actionsProvider) {
+    static buildStatusEditor(data) {
         return <SelectEditor options={{
             label: "Stato",
-            value: iGet(data, 'waiter.status'),
-            values: data.get('waiterStatuses'),
+            value: data.editor.waiter.status,
+            values: data.waiterStatuses,
             isValid: status => !!status,
-            callback: status => actionsProvider.confirmStatus(iGet(data, 'waiter.uuid'), status)
+            callback: result => WaitersPageActions.updateWaiterStatus(data.editor.waiter.uuid, result)
         }}/>;
     }
 }

@@ -1,127 +1,82 @@
-import AbstractStore from "./RootFeatureStore";
 import {ApplicationActionTypes} from "../actions/ApplicationActions";
 import StoresUtils from "../pages/StoresUtils";
-import eveningStore from "./EveningStore";
-import phasesStore from "./generic/PhasesStore";
-import dispatcher from "../dispatcher/SimpleDispatcher";
-import additionsStore from "./generic/AdditionsStore";
-import categoriesStore from "./generic/CategoriesStore";
-import waitersStore from "./generic/WaitersStore";
-import customersStore from "./generic/CustomersStore";
-import tablesStore from "./generic/TablesStore";
-import dishesStore from "./generic/DishesStore";
-import printersStore from "./generic/PrintersStore";
-import UTSettings from "./generic/UTSettings";
-import {iGet} from "../utils/Utils";
+import RootFeatureStore from "./RootFeatureStore";
+import {DataActionTypes} from "../actions/DataActions";
+import {Utils} from "../utils/Utils";
 
 const {Map, fromJS} = require('immutable');
 
 export const EVT_APPLICATION_STORE_CHANGED = "EVT_APPLICATION_STORE_CHANGED";
 
-class ApplicationStore extends AbstractStore {
+class ApplicationStore extends RootFeatureStore {
 
     constructor() {
         super(EVT_APPLICATION_STORE_CHANGED);
         this.isFullScreen = false;
         this.currentPage = null;
-        this.floatInput = Map();
-        this.integerInput = Map();
-        this.selectInput = Map();
-        this.textInput = Map();
+        this.floatInput = {};
+        this.integerInput = {};
+        this.selectInput = {};
+        this.textInput = {};
+        this.colorInput = {};
         this.settings = null;
         this.mainPrinter = null;
         this.fiscalPrinter = null;
     }
 
-    handleCompletedAction(action) {
+    getCompletionHandlers() {
+        const handlers = {};
 
-        let changed = true;
-        switch (action.type) {
-            case ApplicationActionTypes.TOGGLE_FULL_SCREEN:
-                this.isFullScreen = !this.isFullScreen;
-                break;
-            case ApplicationActionTypes.REQUEST_FULL_SCREEN:
-                this.isFullScreen = true;
-                break;
-            case ApplicationActionTypes.DISMISS_FULL_SCREEN:
-                this.isFullScreen = false;
-                break;
-            case ApplicationActionTypes.GO_TO_PAGE:
-                this.currentPage = action.body;
-                break;
+        handlers[ApplicationActionTypes.TOGGLE_FULL_SCREEN] = () => this.isFullScreen = !this.isFullScreen;
+        handlers[ApplicationActionTypes.REQUEST_FULL_SCREEN] = () => this.isFullScreen = true;
+        handlers[ApplicationActionTypes.DISMISS_FULL_SCREEN] = () => this.isFullScreen = false;
 
-            case ApplicationActionTypes.SHOW_TEXT_INPUT:
-                this.textInput = StoresUtils.initTextInput(action.body);
-                break;
-            case ApplicationActionTypes.TEXT_INPUT_CHAR:
-                this.textInput = StoresUtils.textChar(this.textInput, action.body);
-                break;
-            case ApplicationActionTypes.TEXT_INPUT_CARET:
-                this.textInput = StoresUtils.textCaret(this.textInput, action.body);
-                break;
-            case ApplicationActionTypes.HIDE_TEXT_INPUT:
-                this.textInput = StoresUtils.resetTextInput();
-                break;
+        handlers[ApplicationActionTypes.GO_TO_PAGE] = (page) => this.currentPage = page;
 
-            case ApplicationActionTypes.SHOW_FLOAT_INPUT:
-                this.floatInput = StoresUtils.initFloatInput(action.body);
-                break;
-            case ApplicationActionTypes.FLOAT_INPUT_CHAR:
-                this.floatInput = StoresUtils.floatChar(this.floatInput, action.body);
-                break;
-            case ApplicationActionTypes.FLOAT_INPUT_CHANGE:
-                this.floatInput = StoresUtils.floatChange(this.floatInput, action.body);
-                break;
-            case ApplicationActionTypes.HIDE_FLOAT_INPUT:
-                this.floatInput = StoresUtils.resetFloatInput();
-                break;
+        handlers[ApplicationActionTypes.SHOW_TEXT_INPUT] = (options) => this.textInput = StoresUtils.initTextInput(options);
+        handlers[ApplicationActionTypes.TEXT_INPUT_CHAR] = (char) => StoresUtils.textChar(this.textInput, char);
+        handlers[ApplicationActionTypes.TEXT_INPUT_CARET] = (position) => StoresUtils.textCaret(this.textInput, position);
+        handlers[ApplicationActionTypes.HIDE_TEXT_INPUT] = () => this.textInput = StoresUtils.resetTextInput();
 
-            case ApplicationActionTypes.SHOW_INTEGER_INPUT:
-                this.integerInput = StoresUtils.initIntInput(action.body);
-                break;
-            case ApplicationActionTypes.INTEGER_INPUT_CHAR:
-                this.integerInput = StoresUtils.intChar(this.integerInput, action.body);
-                break;
-            case ApplicationActionTypes.INTEGER_INPUT_CHANGE:
-                this.integerInput = StoresUtils.intChange(this.integerInput, action.body);
-                break;
-            case ApplicationActionTypes.HIDE_INTEGER_INPUT:
-                this.integerInput = StoresUtils.resetIntInput();
-                break;
-            case ApplicationActionTypes.SHOW_SELECT_INPUT:
-                this.selectInput = StoresUtils.initSelectInput(action.body);
-                break;
-            case ApplicationActionTypes.SELECT_INPUT_SELECT:
-                this.selectInput = StoresUtils.selectInputSelect(this.selectInput, action.body);
-                break;
-            case ApplicationActionTypes.SELECT_INPUT_DESELECT:
-                this.selectInput = StoresUtils.selectInputDeselect(this.selectInput, action.body);
-                break;
-            case ApplicationActionTypes.SELECT_INPUT_PAGE_CHANGE:
-                this.selectInput = StoresUtils.selectPageChange(this.selectInput, action.body);
-                break;
-            case ApplicationActionTypes.HIDE_SELECT_INPUT:
-                this.selectInput = StoresUtils.resetSelectInput(this.selectInput);
-                break;
+        handlers[ApplicationActionTypes.SHOW_FLOAT_INPUT] = (options) => this.floatInput = StoresUtils.initFloatInput(options);
+        handlers[ApplicationActionTypes.FLOAT_INPUT_CHAR] = (char) => StoresUtils.floatChar(this.floatInput, char);
+        handlers[ApplicationActionTypes.FLOAT_INPUT_CHANGE] = (data) => StoresUtils.floatChange(this.floatInput, data);
+        handlers[ApplicationActionTypes.HIDE_FLOAT_INPUT] = () => this.floatInput = StoresUtils.resetFloatInput();
 
-            case ApplicationActionTypes.LOAD_SETTINGS:
-            case ApplicationActionTypes.STORE_SETTINGS:
-                this.settings = action.body || Map();
-                if(this.settings.get('clientSettings')){
-                    this.settings = this.settings.set('clientSettings',
-                        fromJS(JSON.parse(this.settings.get('clientSettings'))));
-                    UTSettings.user = iGet(this.settings, 'clientSettings.utUser')
-                }
-                break;
+        handlers[ApplicationActionTypes.SHOW_INTEGER_INPUT] = (options) => this.integerInput = StoresUtils.initIntInput(options);
+        handlers[ApplicationActionTypes.INTEGER_INPUT_CHAR] = (char) => StoresUtils.intChar(this.integerInput, char);
+        handlers[ApplicationActionTypes.INTEGER_INPUT_CHANGE] = (data) => StoresUtils.intChange(this.integerInput, data);
+        handlers[ApplicationActionTypes.HIDE_INTEGER_INPUT] = () => this.integerInput = StoresUtils.resetIntInput();
 
-            default:
-                changed = false;
-                break;
-        }
-        return changed;
+        handlers[ApplicationActionTypes.SHOW_SELECT_INPUT] = (options) => this.selectInput = StoresUtils.initSelectInput(options);
+        handlers[ApplicationActionTypes.SELECT_INPUT_SELECT] = (value) => StoresUtils.selectInputSelect(this.selectInput, value);
+        handlers[ApplicationActionTypes.SELECT_INPUT_DESELECT] = (value) => StoresUtils.selectInputDeselect(this.selectInput, value);
+        handlers[ApplicationActionTypes.SELECT_INPUT_PAGE_CHANGE] = (page) => StoresUtils.selectPageChange(this.selectInput, page);
+        handlers[ApplicationActionTypes.HIDE_SELECT_INPUT] = () => StoresUtils.resetSelectInput(this.selectInput);
+
+        handlers[ApplicationActionTypes.SHOW_COLOR_INPUT] = (options) => this.colorInput = StoresUtils.initColorInput(options);
+        handlers[ApplicationActionTypes.COLOR_INPUT_SELECT] = (value) => StoresUtils.colorInputSelect(this.colorInput, value);
+        handlers[ApplicationActionTypes.COLOR_INPUT_DESELECT] = (value) => StoresUtils.colorInputDeselect(this.colorInput, value);
+        handlers[ApplicationActionTypes.COLOR_INPUT_PAGE_CHANGE] = (page) => StoresUtils.colorPageChange(this.colorInput, page);
+        handlers[ApplicationActionTypes.HIDE_COLOR_INPUT] = () => StoresUtils.resetColorInput(this.colorInput);
+
+        handlers[ApplicationActionTypes.LOAD_SETTINGS] = (settings) => this.storeSettings(settings);
+        handlers[ApplicationActionTypes.STORE_SETTINGS] = (settings) => this.storeSettings(settings);
+
+        handlers[DataActionTypes.LOAD_PRINTERS] = Utils.nop;
+
+        return handlers;
     }
 
-    getState(){
+    storeSettings(settings){
+        this.settings = settings ? settings.toJS() : {};
+        if (this.settings.clientSettings) {
+            this.settings.clientSettings = JSON.parse(this.settings.clientSettings);
+            // UTSettings.user = this.settings.clientSettings.utUser;
+        }
+    }
+
+    buildState() {
         return {
             fullScreen: this.isFullScreen,
             currentPage: this.currentPage,
@@ -130,11 +85,12 @@ class ApplicationStore extends AbstractStore {
             textInput: this.textInput,
             integerInput: this.integerInput,
             selectInput: this.selectInput,
+            colorInput: this.colorInput,
             settings: this.settings
         };
     }
 
-    getSettings(){
+    getSettings() {
         return this.settings;
     }
 

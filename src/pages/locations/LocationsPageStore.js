@@ -1,27 +1,13 @@
 import AbstractStore from "../../stores/RootFeatureStore";
-import dispatcher from "../../dispatcher/SimpleDispatcher";
-import {
-    ACT_BEGIN_CREATE_LOCATION,
-    ACT_CREATE_LOCATION,
-    ACT_DELETE_LOCATION,
-    ACT_DESELECT_LOCATION,
-    ACT_RETRIEVE_LOCATIONS,
-    ACT_SELECT_LOCATION,
-    ACT_UPDATE_LOCATION,
-    ACT_UPDATE_LOCATION_NAME,
-    ACT_UPDATE_LOCATION_PRINTER
-} from "../../actions/ActionTypes";
-import locationsStore from "../../stores/LocationsStore";
-import printersStore from "../../stores/generic/PrintersStore";
-import {LocationsCreatorActions, LocationsCreatorActionTypes} from "./LocationsCreatorActions";
-import {EditorStatus} from "../StoresUtils";
-import {findByUuid} from "../../utils/Utils";
-import {LocationsEditorActions, LocationsEditorActionTypes} from "./LocationsEditorActions";
+import {Utils} from "../../utils/Utils";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
 import {ApplicationActionTypes} from "../../actions/ApplicationActions";
 import applicationStore from "../../stores/ApplicationStore";
-
-const {fromJS, Map} = require('immutable');
+import dataStore, {Topics} from "../../stores/DataStore";
+import EditorMode from "../../utils/EditorMode";
+import {DataActionTypes} from "../../actions/DataActions";
+import {LocationsPageActionTypes} from "./LocationsPageActions";
+import Location from "../../model/Location";
 
 const EVT_LOCATIONS_PAGE_STORE_CHANGED = "EVT_LOCATIONS_PAGE_STORE_CHANGED";
 
@@ -29,82 +15,62 @@ class LocationsPageStore extends AbstractStore {
 
     constructor() {
         super(EVT_LOCATIONS_PAGE_STORE_CHANGED);
-        this.location = null;
-        this.editorStatus = EditorStatus.SURFING;
-        this.page = 0;
+        this.navigator = {
+            page: 0
+        };
+        this.editor = {
+            mode: null,
+            location: null
+        };
     }
 
-    handleCompletedAction(action) {
-        let changed = true;
-        dispatcher.waitFor([locationsStore.getToken(), printersStore.getToken(), applicationStore.getToken()]);
-        switch (action.type) {
-            case ApplicationActionTypes.LOAD_SETTINGS:
-            case ApplicationActionTypes.STORE_SETTINGS:
-            case ACT_RETRIEVE_LOCATIONS:
-                break;
-            case LocationsCreatorActionTypes.CREATE_LOCATION:
-                this.editorStatus = EditorStatus.EDITING;
-                this.location = action.body.get('uuid');
-                break;
-                //FIXME Anche no...
-            case LocationsEditorActionTypes.UPDATE_EDITING_LOCATION:
-                this.editorStatus = EditorStatus.EDITING;
-                this.location = action.body.get('uuid');
-                break;
-            case LocationsCreatorActionTypes.BEGIN_LOCATION_CREATION:
-                this.editorStatus = EditorStatus.CREATING;
-                this.location = EntitiesUtils.newLocation();
-                break;
-            case LocationsEditorActionTypes.SELECT_EDITING_LOCATION:
-                this.editorStatus = EditorStatus.EDITING;
-                this.location = action.body;
-                break;
-            case LocationsEditorActionTypes.SELECT_LOCATIONS_EDITOR_PAGE:
-                this.page = action.body;
-                break;
-            case LocationsEditorActionTypes.DELETE_EDITING_LOCATION:
-            case LocationsEditorActionTypes.DESELECT_EDITING_LOCATION:
-            case LocationsCreatorActionTypes.ABORT_LOCATION_CREATION:
-            case ApplicationActionTypes.GO_TO_PAGE:
-                this.editorStatus = EditorStatus.SURFING;
-                this.location = null;
-                break;
-            case LocationsCreatorActionTypes.SET_CREATING_LOCATION_NAME:
-                this.location = this.location.set('name', action.body);
-                break;
-            case LocationsCreatorActionTypes.SET_CREATING_LOCATION_PRINTER:
-                this.location = this.location.set('printer', action.body);
-                break;
-            default:
-                changed = false;
-                break;
+    getStoreDependencies() {
+        return [dataStore, applicationStore];
+    }
+
+    getCompletionHandlers() {
+        const handlers = {};
+        handlers[LocationsPageActionTypes.SELECT_EDITING_LOCATION] = (location) => this.initEditor(location, false);
+        handlers[LocationsPageActionTypes.SELECT_LOCATION_NAVIGATOR_PAGE] = (index) => this.navigator.page = index;
+        handlers[LocationsPageActionTypes.BEGIN_LOCATION_CREATION] = () =>
+            this.initEditor(new Location(EntitiesUtils.newLocation(), dataStore.getPool()), true);
+        handlers[LocationsPageActionTypes.SET_LOCATION_EDITOR_NAME] = (name) => this.editor.location.name = name;
+        handlers[LocationsPageActionTypes.SET_LOCATION_EDITOR_PRINTER] = (printer) => this.editor.location.printer = printer;
+        handlers[LocationsPageActionTypes.CREATE_LOCATION] = (location) =>
+            this.initEditor(new Location(location.toJS(), dataStore.getPool()));
+        handlers[LocationsPageActionTypes.UPDATE_EDITING_LOCATION] = (location) =>
+            this.initEditor(new Location(location.toJS(), dataStore.getPool()));
+        handlers[LocationsPageActionTypes.DELETE_EDITING_LOCATION] = () => this.initEditor();
+
+        handlers[DataActionTypes.LOAD_LOCATIONS] = () => Utils.nop();
+        handlers[ApplicationActionTypes.LOAD_SETTINGS] = () => Utils.nop();
+
+        return handlers;
+    }
+
+    initEditor(location, creating) {
+        this.editor = {
+            mode: null,
+            location: null
+        };
+        if (location) {
+            this.editor.mode = creating ? EditorMode.CREATING : EditorMode.EDITING;
+            this.editor.location = location;
         }
-        return changed;
     }
 
     getState() {
-        let result = Map({
-            locations: locationsStore.getLocations().getPayload(),
-            printers: printersStore.getPrinters().getPayload(),
-
-            page: this.page,
-            editorStatus: this.editorStatus,
-            location: this.getSelectedLocation(),
-
-            settings: applicationStore.getSettings()
-        });
         return {
-            data : result
-        }
-    }
+            data: {
+                locations: dataStore.getEntities(Topics.LOCATIONS),
+                printers: dataStore.getEntities(Topics.PRINTERS),
 
-    getSelectedLocation() {
-        if (this.editorStatus === EditorStatus.EDITING) {
-            return findByUuid(locationsStore.getLocations().getPayload(), this.location);
-        } else if (this.editorStatus === EditorStatus.CREATING) {
-            return this.location;
+                navigator: this.navigator,
+                editor: this.editor,
+                settings: applicationStore.getSettings()
+            }
         }
-        return null;
+
     }
 }
 

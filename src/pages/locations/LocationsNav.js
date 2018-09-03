@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import NavElement from "../../widgets/NavElement";
 import RestaurantNav from "../../components/RestaurantNav";
 import NavConfigurationButton from "../../widgets/NavConfigurationButton";
-import {EditorStatus} from "../StoresUtils";
-import {LocationsEditorActions} from "./LocationsEditorActions";
+import EditorMode from "../../utils/EditorMode";
+import {LocationsPageActions} from "./LocationsPageActions";
 
 export default class LocationsNav extends Component {
 
@@ -17,26 +17,24 @@ export default class LocationsNav extends Component {
     }
 
     static makeNavContent(data) {
+        let editor = data.editor;
         let elements = [];
-
-        const editorStatus = data.get('editorStatus');
-        const location = data.get('location');
 
         elements.push(<NavConfigurationButton key="home"/>);
 
         elements.push(<NavElement
             key="locations"
             text="Postazioni"
-            active={editorStatus === EditorStatus.SURFING}
-            commitAction={() => LocationsEditorActions.deselectLocation()}
+            active={!editor.location}
+            commitAction={() => LocationsPageActions.selectLocation(null)}
         />);
-        if (editorStatus === EditorStatus.EDITING) {
+        if (editor.mode === EditorMode.EDITING) {
             elements.push(<NavElement
                 key="selected"
-                text={location.get('name')}
+                text={editor.location.name}
                 active={true}
             />);
-        } else if (editorStatus === EditorStatus.CREATING) {
+        } else if (editor.mode === EditorMode.CREATING) {
             elements.push(<NavElement
                 key="selected"
                 text={"Creazione postazione"}

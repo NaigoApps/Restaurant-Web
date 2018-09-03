@@ -4,10 +4,10 @@ import OrdinationsUtils from "../../OrdinationsUtils";
 import SubFeatureStore from "../../../../stores/SubFeatureStore";
 import {DiningTablesClosingActionTypes} from "./DiningTablesClosingActions";
 import diningTableEditingStore from "../DiningTableEditorStore";
-import {EditorStatus} from "../../../StoresUtils";
 import {findByUuid, iGet} from "../../../../utils/Utils";
 import {DiningTablesEditorActionTypes} from "../DiningTablesEditorActions";
 import {EntitiesUtils} from "../../../../utils/EntitiesUtils";
+import EditorMode from "../../../../utils/EditorMode";
 
 const {Map, List, fromJS} = require('immutable');
 
@@ -25,7 +25,7 @@ class TableClosingFeatureStore extends SubFeatureStore {
     constructor() {
         super(eveningPageStore, "tableClosingFeature");
         this.init();
-        this.editorStatus = EditorStatus.SURFING;
+        this.editorStatus = EditorMode.SURFING;
     }
 
     init() {
@@ -58,17 +58,17 @@ class TableClosingFeatureStore extends SubFeatureStore {
             closingWizard: this.closingWizard,
             printWizard: this.printWizard,
 
-            isEditing: () => this.bill && this.editorStatus === EditorStatus.EDITING,
-            isCreating: () => this.bill && this.editorStatus === EditorStatus.CREATING
+            isEditing: () => this.bill && this.editorStatus === EditorMode.EDITING,
+            isCreating: () => this.bill && this.editorStatus === EditorMode.CREATING
         });
     }
 
     updatePages() {
         let pages = List();
-        if (this.editorStatus === EditorStatus.CREATING) {
+        if (this.editorStatus === EditorMode.CREATING) {
             pages = pages.push(DiningTableClosingWizardPages.MODE_PAGE);
         }
-        if (!this.closingWizard.get('quick') || this.editorStatus === EditorStatus.EDITING) {
+        if (!this.closingWizard.get('quick') || this.editorStatus === EditorMode.EDITING) {
             pages = pages.push(DiningTableClosingWizardPages.SPLIT_PAGE);
         }
         pages = pages.push(DiningTableClosingWizardPages.REVIEW_PAGE);
@@ -83,7 +83,7 @@ class TableClosingFeatureStore extends SubFeatureStore {
             case DiningTablesEditorActionTypes.BEGIN_DATA_EDITING:
             case DiningTablesEditorActionTypes.BEGIN_BILLS_EDITING:
                 this.bill = null;
-                this.editorStatus = EditorStatus.SURFING;
+                this.editorStatus = EditorMode.SURFING;
                 break;
             case DiningTablesClosingActionTypes.SELECT_BILL_PAGE:
                 this.billPage = action.body;
@@ -109,7 +109,7 @@ class TableClosingFeatureStore extends SubFeatureStore {
                 break;
             case DiningTablesClosingActionTypes.PRINT_BILL:
                 this.bill = null;
-                this.editorStatus = EditorStatus.SURFING;
+                this.editorStatus = EditorMode.SURFING;
                 this.resetPrintWizard();
                 break;
             case DiningTablesClosingActionTypes.ABORT_BILL_PRINTING:
@@ -117,11 +117,11 @@ class TableClosingFeatureStore extends SubFeatureStore {
                 break;
             case DiningTablesClosingActionTypes.SELECT_BILL:
                 this.bill = findByUuid(iGet(diningTableEditingStore.getState(), 'diningTable.bills'), action.body);
-                this.editorStatus = EditorStatus.EDITING;
+                this.editorStatus = EditorMode.EDITING;
                 break;
             case DiningTablesClosingActionTypes.DESELECT_BILL:
                 this.bill = null;
-                this.editorStatus = EditorStatus.SURFING;
+                this.editorStatus = EditorMode.SURFING;
                 break;
             case DiningTablesClosingActionTypes.BEGIN_BILL_DELETION:
                 this.deletingBill = true;
@@ -130,13 +130,13 @@ class TableClosingFeatureStore extends SubFeatureStore {
                 this.deletingBill = false;
                 break;
             case DiningTablesClosingActionTypes.DELETE_BILL:
-                this.editorStatus = EditorStatus.SURFING;
+                this.editorStatus = EditorMode.SURFING;
                 this.bill = null;
                 this.billPage = 0;
                 this.deletingBill = false;
                 break;
             case DiningTablesClosingActionTypes.BEGIN_BILL_CREATION:
-                this.editorStatus = EditorStatus.CREATING;
+                this.editorStatus = EditorMode.CREATING;
                 this.bill = EntitiesUtils.newBill();
                 this.resetClosingWizard();
                 this.closeAllOrders();
@@ -224,7 +224,7 @@ class TableClosingFeatureStore extends SubFeatureStore {
             case DiningTablesClosingActionTypes.CONFIRM_CLOSING:
             case DiningTablesClosingActionTypes.ABORT_CLOSING:
                 this.resetClosingWizard();
-                this.editorStatus = EditorStatus.SURFING;
+                this.editorStatus = EditorMode.SURFING;
                 break;
             case DiningTablesClosingActionTypes.BEGIN_TABLE_LOCKING:
                 this.lockingTable = true;

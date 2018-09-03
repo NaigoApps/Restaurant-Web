@@ -1,4 +1,4 @@
-import {ACT_RETRIEVE_DISH_STATUSES} from "../../actions/ActionTypes";
+import {ACT_RETRIEVE_DISH_STATUSES} from "../../actions/DataActions";
 import {STATUSES} from "../LazyData";
 import AbstractDataStore from "../AbstractDataStore";
 

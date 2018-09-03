@@ -13,18 +13,18 @@ export default class ApplicationIntegerInput extends Component {
 
     confirmIntegerValue() {
         let data = this.props.data;
-        let callback = data.get('callback');
+        let callback = data.callback;
         if (callback) {
-            callback(data.get('value'));
+            callback(data.value);
         }
         ApplicationActions.hideIntegerInput();
     }
 
     isValid() {
         let data = this.props.data;
-        let value = data.get('value');
-        let min = data.get('min');
-        let max = data.get('max');
+        let value = data.value;
+        let min = data.min;
+        let max = data.max;
         return (min === undefined || min <= value) && (max === undefined || value <= max);
     }
 
@@ -32,13 +32,13 @@ export default class ApplicationIntegerInput extends Component {
         let data = this.props.data;
         return <PopupContainer
             id="app-int-input"
-            visible={data.get('visible')}
+            visible={data.visible}
             blurCallback={() => ApplicationActions.hideIntegerInput()}>
             <Row>
                 <Column>
-                    {data.get('label')}
+                    {data.label}
                     <IntegerInput
-                        text={data.get('text')}
+                        text={data.text}
                         onChange={text => ApplicationActions.integerInputChange(text)}
                         onChar={char => ApplicationActions.integerInputChar(char)}
                     />

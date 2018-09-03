@@ -44,24 +44,25 @@ class SimpleDispatcher extends Dispatcher {
     fireEnd(type, body) {
         console.log(type + " -> COMPLETING");
         console.log(body);
+        console.time(type);
         this.dispatch(this.buildAction(ACTION_COMPLETED, type, body));
-        if(UTSettings.user){
-            fetch(
-                asyncActionBuilder.BASE_URL + "ut" + asyncActionBuilder.buildParams({
-                    user: UTSettings.user,
-                    action: type
-                }),
-                {
-                    method: "POST",
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
-                }
-            )
-        }
-        console.log(type + " -> COMPLETED");
+        // if(UTSettings.user){
+        //     fetch(
+        //         asyncActionBuilder.BASE_URL + "ut" + asyncActionBuilder.buildParams({
+        //             user: UTSettings.user,
+        //             action: type
+        //         }),
+        //         {
+        //             method: "POST",
+        //             mode: 'cors',
+        //             headers: {
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             body: JSON.stringify(body)
+        //         }
+        //     )
+        // }
+        console.timeEnd(type);
     }
 
     fireError(type, body) {

@@ -1,12 +1,10 @@
 import React from 'react';
 import IntegerEditor from "../../components/widgets/inputs/IntegerEditor";
 import SelectEditor from "../../components/widgets/inputs/SelectEditor";
-import BooleanEditor from "../../components/widgets/inputs/boolean/BooleanEditor";
 import EntityEditor from "../../components/editors/EntityEditor";
 import Column from "../../widgets/Column";
 import Row from "../../widgets/Row";
-import {iGet} from "../../utils/Utils";
-import {EditorStatus} from "../StoresUtils";
+import {PrintersPageActions} from "./PrintersPageActions";
 
 export default class PrinterEditor extends React.Component {
     constructor(props) {
@@ -14,31 +12,25 @@ export default class PrinterEditor extends React.Component {
     }
 
     render() {
-        const editorData = this.props.data;
-        const actionsProvider = this.props.actionsProvider;
+        const data = this.props.data;
+        const editor = data.editor;
 
-        const printer = editorData.get('printer');
-        const editorStatus = editorData.get('status');
+        const components = PrinterEditor.buildComponents(data);
 
-        const components = PrinterEditor.buildComponents(editorData, actionsProvider, printer);
-
-        return <Row key="editor" topSpaced grow>
+        return <Row key="creator" topSpaced grow>
             <Column>
                 <Row>
                     <Column>
-                        <h3 className="text-center">{editorStatus === EditorStatus.CREATING ?
-                            "Creazione stampante" : "Modifica stampante"}</h3>
+                        <h3 className="text-center">Modifica stampante</h3>
                     </Column>
                 </Row>
                 <Row grow>
                     <Column>
                         <EntityEditor
-                            valid={!!printer.get('name')}
-                            entity={printer}
-                            confirmMethod={actionsProvider.onConfirm}
-                            abortMethod={actionsProvider.onAbort}
+                            valid={!!editor.printer.name}
+                            entity={editor.printer}
                             deleteMessage="Eliminazione stampante"
-                            deleteMethod={actionsProvider.onDelete}>
+                            deleteMethod={(printer) => PrintersPageActions.deletePrinter(printer)}>
                             <Row align="center">
                                 <Column>
                                     {components}
@@ -51,17 +43,10 @@ export default class PrinterEditor extends React.Component {
         </Row>;
     }
 
-    static buildComponents(editorData, actionsProvider, printer) {
+    static buildComponents(data) {
         let actions = [];
-        if (actionsProvider.confirmName) {
-            actions.push(PrinterEditor.buildNameEditor(editorData, actionsProvider, printer));
-        }
-        if (actionsProvider.confirmLineCharacters) {
-            actions.push(PrinterEditor.buildLineCharactersEditor(editorData, actionsProvider, printer));
-        }
-        if (actionsProvider.confirmMain) {
-            actions.push(PrinterEditor.buildMainEditor(editorData, actionsProvider, printer));
-        }
+        actions.push(PrinterEditor.buildNameEditor(data));
+        actions.push(PrinterEditor.buildLineCharactersEditor(data));
         return actions.map((action, index) => {
             return <Row key={index} ofList={index > 0}>
                 <Column>
@@ -71,31 +56,23 @@ export default class PrinterEditor extends React.Component {
         });
     }
 
-    static buildNameEditor(editorData, actionsProvider, printer) {
+    static buildNameEditor(data) {
         return <SelectEditor options={{
             label: "Nome",
-            values: editorData.get('services'),
-            value: iGet(editorData, 'printer.name'),
+            values: data.services,
+            value: data.editor.printer.name,
             isValid: name => !!name,
-            callback: name => actionsProvider.confirmName(printer.get('uuid'), name)
+            callback: name => PrintersPageActions.setPrinterName(data.editor.printer.uuid, name)
         }}/>;
     }
 
-    static buildMainEditor(editorData, actionsProvider, printer) {
-        return <BooleanEditor
-            label="Principale"
-            value={printer.get('main')}
-            onConfirm={result => actionsProvider.confirmMain(iGet(printer, "uuid"), result)}
-        />;
-    }
-
-    static buildLineCharactersEditor(editorData, actionsProvider, printer) {
+    static buildLineCharactersEditor(data) {
         return <IntegerEditor
             options={{
                 label: "Lunghezza riga",
-                value: printer.get('lineCharacters'),
+                value: data.editor.printer.lineCharacters,
                 min: 1,
-                callback: result => actionsProvider.confirmLineCharacters(printer.get('uuid'), result)
+                callback: lcs => PrintersPageActions.setPrinterLineCharacters(data.editor.printer.uuid, lcs)
             }}
         />;
     }

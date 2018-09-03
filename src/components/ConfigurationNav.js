@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {SIZES} from "./RestaurantNav";
 import Row from "../widgets/Row";
 import Column from "../widgets/Column";
-import {ADDITIONS, CUSTOMERS, LOCATIONS, MENU, PRINTERS, TABLES, WAITERS} from "../App";
+import {ADDITIONS, CATEGORIES, CUSTOMERS, DISHES, LOCATIONS, PRINTERS, TABLES, WAITERS} from "../App";
 import Button from "../widgets/Button";
 import {ApplicationActions} from "../actions/ApplicationActions";
 
@@ -68,9 +68,17 @@ export default class ConfigurationNav extends Component {
                         <Column>
                             <Button
                                 icon="cutlery"
-                                text="Menu"
+                                text="Categorie"
                                 size="xl"
-                                commitAction={() => this.goToPage(MENU)}
+                                commitAction={() => this.goToPage(CATEGORIES)}
+                                fill vertical/>
+                        </Column>
+                        <Column>
+                            <Button
+                                icon="cutlery"
+                                text="Piatti"
+                                size="xl"
+                                commitAction={() => this.goToPage(DISHES)}
                                 fill vertical/>
                         </Column>
                         <Column>

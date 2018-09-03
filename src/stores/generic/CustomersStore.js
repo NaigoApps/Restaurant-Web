@@ -1,14 +1,8 @@
-import {
-    ACT_BEGIN_CREATE_RESTAURANT_TABLES,
-    ACT_CREATE_CUSTOMER,
-    ACT_DELETE_CUSTOMER,
-    ACT_RETRIEVE_CUSTOMERS,
-    ACT_UPDATE_CUSTOMER
-} from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
 import {CustomersCreatorActionTypes} from "../../pages/customers/CustomerCreatorActions";
 import {CustomersEditorActionTypes} from "../../pages/customers/CustomersEditorActions";
+import {DataActionTypes} from "../../actions/DataActions";
 
 export const EVT_CUSTOMER_STORE_CHANGED = "EVT_CUSTOMER_STORE_CHANGED";
 
@@ -33,7 +27,7 @@ class CustomersStore extends AbstractEntityStore {
     handleStartedAction(action){
         let changed = true;
         switch (action.type){
-            case ACT_RETRIEVE_CUSTOMERS:
+            case DataActionTypes.LOAD_CUSTOMERS:
                 this.setStatus(STATUSES.LOADING);
                 break;
             default:
@@ -49,7 +43,7 @@ class CustomersStore extends AbstractEntityStore {
             case CustomersCreatorActionTypes.CREATE_CUSTOMER:
                 this.createData(action.body);
                 break;
-            case ACT_RETRIEVE_CUSTOMERS:
+            case DataActionTypes.LOAD_CUSTOMERS:
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;

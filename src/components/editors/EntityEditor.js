@@ -71,39 +71,36 @@ export default class EntityEditor extends Component {
 
         let doDelete = () => {
             this.setState({showDeleteModal: false});
-            method(entity.get('uuid'));
+            method(entity);
         };
 
         let doNotDelete = () => {
             this.setState({showDeleteModal: false});
         };
 
-        let button = (
-            <div>
-                <Button icon="trash"
-                        text={this.props.deleteMessage}
-                        type="danger"
-                        commitAction={showDeleteModal}
-                        highPadding
-                />
+        return <div>
+            <Button icon="trash"
+                    text={this.props.deleteMessage}
+                    type="danger"
+                    commitAction={showDeleteModal}
+                    highPadding
+            />
 
-                <Modal visible={this.state.showDeleteModal}>
-                    <div className="modal-header">
-                        <h4 className="modal-title text-danger text-center">
-                            Eliminare?
-                        </h4>
-                    </div>
-                    <div className="modal-body">
-                        <div className="text-center text-danger">{this.state.errorMessage}</div>
-                    </div>
-                    <div className="modal-footer">
-                        <Button type="danger" text="Sì" commitAction={doDelete} highPadding/>
-                        <Button text="No" commitAction={doNotDelete} highPadding/>
-                    </div>
-                </Modal>
-            </div>
-        );
-        return button;
+            <Modal visible={this.state.showDeleteModal}>
+                <div className="modal-header">
+                    <h4 className="modal-title text-danger text-center">
+                        Eliminare?
+                    </h4>
+                </div>
+                <div className="modal-body">
+                    <div className="text-center text-danger">{this.state.errorMessage}</div>
+                </div>
+                <div className="modal-footer">
+                    <Button type="danger" text="Sì" commitAction={doDelete} highPadding/>
+                    <Button text="No" commitAction={doNotDelete} highPadding/>
+                </div>
+            </Modal>
+        </div>;
     }
 
 
@@ -113,10 +110,10 @@ export default class EntityEditor extends Component {
         if (method) {
             button = <Column key="confirm" align="end">
                 <RoundButton icon="check"
-                        disabled={!this.props.valid}
-                        type="success"
-                        size="lg"
-                        commitAction={() => method(entity)}/>
+                             disabled={!this.props.valid}
+                             type="success"
+                             size="lg"
+                             commitAction={() => method(entity)}/>
             </Column>
         }
         return button;
@@ -127,9 +124,9 @@ export default class EntityEditor extends Component {
         if (method) {
             button = <Column key="abort" align="start">
                 <RoundButton icon="times"
-                        type="danger"
-                        size="lg"
-                        commitAction={() => method(entity)}/>
+                             type="danger"
+                             size="lg"
+                             commitAction={() => method(entity)}/>
             </Column>
         }
         return button;

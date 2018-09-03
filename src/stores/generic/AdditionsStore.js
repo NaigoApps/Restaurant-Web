@@ -1,19 +1,8 @@
-import {
-    ACT_BEGIN_CREATE_ADDITION,
-    ACT_CREATE_ADDITION,
-    ACT_DELETE_ADDITION,
-    ACT_DESELECT_ADDITION,
-    ACT_RETRIEVE_ADDITIONS,
-    ACT_SELECT_ADDITION,
-    ACT_UPDATE_ADDITION,
-    ACT_UPDATE_ADDITION_GENERIC,
-    ACT_UPDATE_ADDITION_NAME,
-    ACT_UPDATE_ADDITION_PRICE
-} from "../../actions/ActionTypes";
 import {STATUSES} from "../LazyData";
 import AbstractEntityStore from "./AbstractEntityStore";
-import {AdditionsCreatorActions, AdditionsCreatorActionTypes} from "../../pages/additions/AdditionsCreatorActions";
+import {AdditionsCreatorActionTypes} from "../../pages/additions/AdditionsCreatorActions";
 import {AdditionsEditorActionTypes} from "../../pages/additions/AdditionsEditorActions";
+import {DataActionTypes} from "../../actions/DataActions";
 
 const EVT_ADDITIONS_STORE_CHANGE = "EVT_ADDITIONS_STORE_CHANGE";
 
@@ -29,7 +18,7 @@ class AdditionsStore extends AbstractEntityStore {
     handleStartedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_RETRIEVE_ADDITIONS:
+            case DataActionTypes.LOAD_ADDITIONS:
                 this.setStatus(STATUSES.LOADING);
                 break;
             default:
@@ -42,7 +31,7 @@ class AdditionsStore extends AbstractEntityStore {
     handleCompletedAction(action) {
         let changed = true;
         switch (action.type) {
-            case ACT_RETRIEVE_ADDITIONS:
+            case DataActionTypes.LOAD_ADDITIONS:
                 this.setData(action.body);
                 this.setStatus(STATUSES.LOADED);
                 break;

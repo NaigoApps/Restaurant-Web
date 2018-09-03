@@ -1,11 +1,10 @@
 import requestBuilder from "./RequestBuilder";
-import {ACT_RETRIEVE_PHASES} from "./ActionTypes";
-
+import {DataActionTypes} from "./DataActions";
 
 class PhasesActions {
 
     retrievePhases() {
-        requestBuilder.get(ACT_RETRIEVE_PHASES, 'phases');
+        requestBuilder.get(DataActionTypes.LOAD_PHASES, 'phases');
     }
 
 }

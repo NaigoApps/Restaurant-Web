@@ -1,12 +1,12 @@
-import asyncActionBuilder from "../../actions/RequestBuilder";
-import {ACT_RETRIEVE_CUSTOMERS} from "../../actions/ActionTypes";
+import {DataActions} from "../../actions/DataActions";
 import {ApplicationActions} from "../../actions/ApplicationActions";
+import {SettingsPageActions} from "../settings/SettingsPageActions";
 
 class CustomersPageActions {
 
     initCustomersPage(){
-        asyncActionBuilder.get(ACT_RETRIEVE_CUSTOMERS, 'customers');
-        ApplicationActions.loadSettings();
+        DataActions.loadCustomers();
+        SettingsPageActions.loadSettings();
     }
 
 }

@@ -1,11 +1,11 @@
 import {CANC} from "./Characters";
 import {List} from "immutable";
 
-export function stringEquals(s1, s2){
-    if(s1 && !s2 || s2 && !s1){
+export function stringEquals(s1, s2) {
+    if (s1 && !s2 || s2 && !s1) {
         return false;
     }
-    if(!s1 && !s2){
+    if (!s1 && !s2) {
         return true;
     }
     return s1.localeCompare(s2) === 0;
@@ -28,11 +28,11 @@ export function findIndexByUuid(array, uuid) {
 
 }
 
-export function collectionsEquals(l1, l2){
-    if(l1 === l2 || l1 && !l2 || l2 && !l1){
+export function collectionsEquals(l1, l2) {
+    if (l1 === l2 || l1 && !l2 || l2 && !l1) {
         return false;
     }
-    if(l1.size !== l2.size){
+    if (l1.size !== l2.size) {
         return false;
     }
     let ok = true;
@@ -48,7 +48,7 @@ export function collectionsEquals(l1, l2){
 export function distribute(array, value) {
     let result = List();
     let partition = List();
-    if(array) {
+    if (array) {
         array.forEach(element => {
             if (partition.size >= value) {
                 result = result.push(partition);
@@ -56,7 +56,7 @@ export function distribute(array, value) {
             }
             partition = partition.push(element);
         });
-        if (partition.size> 0) {
+        if (partition.size > 0) {
             result = result.push(partition);
         }
     }
@@ -67,26 +67,28 @@ export function uuid() {
     return Math.random().toString(16).slice(2);
 }
 
-export function foo() {
+export class Utils {
+    static nop() {
+    }
 }
 
-export function iGet(map, namespace){
+export function iGet(map, namespace) {
     return map.getIn(namespace.split('.'));
 }
 
-export function iSet(map, namespace, value){
+export function iSet(map, namespace, value) {
     return map.setIn(namespace.split('.'), value);
 }
 
 export function appendIntEditorChar(oldText, char) {
-    if(char === CANC){
+    if (char === CANC) {
         return "";
     }
-    if(oldText === "0"){
+    if (oldText === "0") {
         oldText = "";
     }
     let newText = oldText + char;
-    if(!isNaN(parseInt(newText))){
+    if (!isNaN(parseInt(newText))) {
         return newText;
     }
     return oldText;

@@ -1,4 +1,4 @@
-import {ACT_UPDATE_ENTITY} from "../../../../actions/ActionTypes";
+import {ACT_UPDATE_ENTITY} from "../../../../actions/DataActions";
 import dispatcher from "../../../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../../../actions/RequestBuilder";
 

@@ -4,11 +4,11 @@ import SubFeatureStore from "../../../../../stores/SubFeatureStore";
 import phasesStore from "../../../../../stores/generic/PhasesStore";
 import {EntitiesUtils} from "../../../../../utils/EntitiesUtils";
 import {findByUuid, findIndexByUuid} from "../../../../../utils/Utils";
-import dishesStore from "../../../../../stores/generic/DishesStore";
 import {OrdinationCreatorActionTypes} from "../OrdinationsCreatorActions";
 import {AdditionPages} from "../../../../../components/widgets/wizard/graph-wizard/OrderAdditionsWizardPage";
 import OrdinationsUtils from "../../../OrdinationsUtils";
 import additionsStore from "../../../../../stores/generic/AdditionsStore";
+import dataStore, {Topics} from "../../../../../stores/DataStore";
 
 const {Map, List, fromJS} = require('immutable');
 
@@ -154,7 +154,7 @@ class OrdersEditingStore extends SubFeatureStore {
 
         let orders = List();
         for (let i = 0; i < this.quantity; i++) {
-            let dish = findByUuid(dishesStore.getDishes().getPayload(), dishUuid);
+            let dish = findByUuid(dataStore.getEntities(Topics.DISHES), dishUuid);
             let newOrder = EntitiesUtils.newOrder(dish, phase);
             orders = orders.push(newOrder);
         }

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import NavElement from "../../widgets/NavElement";
 import RestaurantNav from "../../components/RestaurantNav";
 import NavConfigurationButton from "../../widgets/NavConfigurationButton";
-import {EditorStatus} from "../StoresUtils";
+import EditorMode from "../../utils/EditorMode";
 import {CustomersEditorActions} from "./CustomersEditorActions";
 
 export default class CustomersNav extends Component {
@@ -27,16 +27,16 @@ export default class CustomersNav extends Component {
         elements.push(<NavElement
             key="customers"
             text="Clienti"
-            active={editorStatus === EditorStatus.SURFING}
+            active={editorStatus === EditorMode.SURFING}
             commitAction={() => CustomersEditorActions.deselectCustomer()}
         />);
-        if (editorStatus === EditorStatus.EDITING) {
+        if (editorStatus === EditorMode.EDITING) {
             elements.push(<NavElement
                 key="selected"
                 text={customer.get('name')}
                 active={true}
             />);
-        } else if (editorStatus === EditorStatus.CREATING) {
+        } else if (editorStatus === EditorMode.CREATING) {
             elements.push(<NavElement
                 key="selected"
                 text={"Creazione cliente"}

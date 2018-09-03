@@ -2,87 +2,118 @@ import EventEmitter from "events";
 import dispatcher from "../dispatcher/SimpleDispatcher";
 import StoresUtils from "../pages/StoresUtils";
 
-export default class RootFeatureStore extends EventEmitter{
+export default class RootFeatureStore extends EventEmitter {
 
-    constructor(changeEvent){
+    constructor(changeEvent) {
         super();
         this.token = dispatcher.register(this.handleAction.bind(this));
         this.changeEvent = changeEvent;
         this.subFeatureStores = [];
+        this.postConstruct();
     }
 
-    getToken(){
+    postConstruct() {
+        this.completionHandlers = this.getCompletionHandlers();
+    }
+
+    /**
+     * Subclasses may override this
+     * @returns {object} Map of completion handlers
+     */
+    getCompletionHandlers() {
+        return {};
+    }
+
+    /**
+     * Subclasses may override this
+     * @returns {array} Array of stores to wait for
+     */
+    getStoreDependencies() {
+        return [];
+    }
+
+    getToken() {
         return this.token;
     }
 
-    addChangeListener(callback){
+    addChangeListener(callback) {
         this.addListener(this.changeEvent, callback);
     }
 
-    removeChangeListener(callback){
+    removeChangeListener(callback) {
         this.removeListener(this.changeEvent, callback);
     }
 
-    addSubFeature(subFeatureStore){
+    addSubFeature(subFeatureStore) {
         this.subFeatureStores.push(subFeatureStore);
     }
 
-    handleAction(action){
+    handleAction(action) {
         let changed = false;
 
         dispatcher.waitFor(this.subFeatureStores.map(subFeature => subFeature.getToken()));
 
-        if(action.isCompleted()){
-            changed |= this.handleCompletedAction(action);
-        }else if(action.isInProgress()){
+        dispatcher.waitFor(this.getStoreDependencies().map(store => store.getToken()));
+
+        if (action.isCompleted()) {
+            if (this.completionHandlers[action.type]) {
+                this.completionHandlers[action.type](action.body);
+                changed = true;
+            } else {
+                changed |= this.handleCompletedAction(action);
+            }
+        } else if (action.isInProgress()) {
             changed |= this.handleStartedAction(action);
-        }else if(action.isError()){
+        } else if (action.isError()) {
             changed |= this.handleErrorAction(action);
-        }else if(action.isFailed()){
+        } else if (action.isFailed()) {
             changed |= this.handleFailedAction(action);
         }
 
         this.subFeatureStores.forEach(store => {
-            if(store.getActions() === StoresUtils.ALL_ACTIONS || store.getActions().includes(action.type)){
+            if (store.getActions() === StoresUtils.ALL_ACTIONS || store.getActions().includes(action.type)) {
                 changed = true;
             }
         });
 
-        if(changed) {
+        if (changed) {
             this.emit(this.changeEvent, this.getState());
         }
     }
 
-    buildState(){
+    buildState() {
         console.warn("No buildState() method definition in " + this.constructor.name);
     }
 
-    getState(){
+    getState() {
         let data = this.buildState();
 
         this.subFeatureStores.forEach(store => {
-            data = data.set(store.getFeatureName(), store.getState());
+            data[store.getFeatureName()] = store.getState();
         });
 
         return {
-            data : data
+            data: data
         }
     }
 
-    handleCompletedAction(action){
-        console.warn("No completed event handler");
+    handleCompletedAction(action) {
+        // console.warn("No completed event handler");
         return false;
     }
-    handleStartedAction(action){
-        console.warn("No started event handler");
+
+    handleStartedAction(action) {
+        // console.warn("No started event handler");
         return false;
     }
-    handleErrorAction(action){
-        console.warn("No error event handler");
+
+    handleErrorAction(action) {
+        // console.warn("No error event handler");
         return false;
     }
-    handleFailedAction(action){
-        console.warn("No failed event handler");
+
+    handleFailedAction(action) {
+        // console.warn("No failed event handler");
         return false;
     }
 }

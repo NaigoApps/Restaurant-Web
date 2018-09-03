@@ -3,6 +3,7 @@ import Button from "../../../widgets/Button";
 import {ApplicationActions} from "../../../actions/ApplicationActions";
 import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
+import Text from "../../../widgets/Text";
 
 /**
  * Events:
@@ -16,8 +17,17 @@ import Row from "../../../widgets/Row";
  */
 
 export default class SelectEditor extends Component {
+export default class SelectEditor extends Component {
     constructor(props) {
         super(props);
+    }
+
+    static defaultComparator(a, b) {
+        return -1;
+    }
+
+    static defaultColor(a) {
+        return "#000000";
     }
 
     renderValue(value) {
@@ -43,10 +53,13 @@ export default class SelectEditor extends Component {
         if (!options.multiSelect) {
             value = this.renderValue(this.findValue(options.value));
         } else {
+            const color = options.color || SelectEditor.defaultColor;
+
             value = options.value
-                .map(v => this.renderValue(this.findValue(v)))
-                .sort((s1, s2) => s1.trim().localeCompare(s2.trim()))
-                .reduce((v1, v2) => v1 + ", " + v2)
+                .sort(options.comparator || SelectEditor.defaultComparator)
+                .map((v, i) => <Text key={i} color={color(v)}>
+                    {((i > 0) ? ", " : "") + this.renderValue(this.findValue(v))}
+                </Text>);
         }
         let text = <Row>
             <Column auto justify="center">

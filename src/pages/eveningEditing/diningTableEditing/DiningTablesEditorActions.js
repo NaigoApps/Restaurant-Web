@@ -83,7 +83,6 @@ export const DiningTablesEditorActions = {
     selectMergeTarget: (uuid) => dispatcher.fireEnd(DiningTablesEditorActionTypes.SELECT_MERGE_TARGET, uuid),
     selectMergePage: (page) => dispatcher.fireEnd(DiningTablesEditorActionTypes.SELECT_MERGE_PAGE, page),
     abortMerge: () => dispatcher.fireEnd(DiningTablesEditorActionTypes.ABORT_MERGE),
-    beginDiningTableMerge: () => dispatcher.fireEnd(DiningTablesEditorActionTypes.BEGIN_MERGE),
     confirmMerge: (src, dest) => requestBuilder.post(
         DiningTablesEditorActionTypes.MERGE_DINING_TABLE,
         'evenings/tables/merge/' + src,

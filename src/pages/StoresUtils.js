@@ -1,6 +1,6 @@
 import {CANC} from "../utils/Characters";
 import {BACKSPACE, LEFT, RIGHT} from "../components/widgets/inputs/Keyboard";
-import {iGet} from "../utils/Utils";
+import {iGet, Utils} from "../utils/Utils";
 
 const {Map, List} = require('immutable');
 
@@ -13,11 +13,12 @@ export default class StoresUtils {
     static ALL_ACTIONS = "ALL_ACTIONS";
 
     static initSelectInput(options) {
-        return Map({
+        return {
             values: options.values,
             id: options.id,
             renderer: options.renderer,
             label: options.label,
+            color: options.color,
             colorRenderer: options.colorRenderer,
             rows: options.rows,
             cols: options.cols,
@@ -27,30 +28,68 @@ export default class StoresUtils {
             page: 0,
             multiSelect: options.multiSelect,
             callback: options.callback
-        });
+        };
     }
 
     static selectInputSelect(editor, value) {
-        if (!editor.get('multiSelect')) {
-            return editor.set('value', value);
+        if (!editor.multiSelect) {
+            editor.value = value;
+        } else {
+            editor.value.push(value);
         }
-        return editor.set('value', editor.get('value').push(value));
     }
 
     static selectInputDeselect(editor, value) {
-        if (!editor.get('multiSelect')) {
-            return editor.set('value', null);
+        if (!editor.multiSelect) {
+            editor.value = null;
+        } else {
+            let index = editor.value.indexOf(value);
+            editor.value.splice(index, 1);
         }
-        let index = editor.get('value').indexOf(value);
-        return editor.set('value', editor.get('value').splice(index, 1));
     }
 
     static selectPageChange(editor, page) {
-        return editor.set('page', page);
+        return editor.page = page;
     }
 
     static resetSelectInput(editor) {
-        return editor.set('visible', false);
+        editor.visible = false;
+    }
+
+    /*
+
+    COLOR INPUT
+
+     */
+
+    static initColorInput(options) {
+        return {
+            values: options.values,
+            label: options.label,
+            rows: options.rows,
+            cols: options.cols,
+            value: options.value,
+            visible: true,
+            isValid: options.isValid,
+            page: 0,
+            callback: options.callback
+        };
+    }
+
+    static colorInputSelect(editor, value) {
+        editor.value = value;
+    }
+
+    static colorInputDeselect(editor, value) {
+        editor.value = null;
+    }
+
+    static colorPageChange(editor, page) {
+        editor.page = page;
+    }
+
+    static resetColorInput(editor) {
+        editor.visible = false;
     }
 
     /*
@@ -58,7 +97,7 @@ export default class StoresUtils {
      */
 
     static initIntInput(options) {
-        return Map({
+        return {
             visible: true,
             label: options.label,
             text: options.value ? options.value.toString() : "",
@@ -67,45 +106,43 @@ export default class StoresUtils {
             min: options.min,
             max: options.max,
             hit: false
-        });
+        };
     }
 
     static intChar(editor, char) {
-        let oldText = editor.get('text');
+        let oldText = editor.text;
         if (char === CANC) {
-            editor = editor.set('text', "0");
-            return editor.set('value', 0);
+            editor.text = "0";
+            editor.value = 0;
+            return;
         }
-        if (oldText === "0" || !editor.get('hit')) {
+        if (oldText === "0" || !editor.hit) {
             oldText = "";
         }
-        editor = editor.set('hit', true);
+        editor.hit = true;
         let newText = oldText + char;
         if (!isNaN(parseInt(newText))) {
-            editor = editor.set('text', newText);
-            return editor.set('value', parseInt(newText));
+            editor.text = newText;
+            editor.value = parseInt(newText);
         }
-        return editor;
     }
 
     static intChange(editor, text) {
         if (!isNaN(parseInt(text))) {
-            editor = editor.set('text', text);
-            editor = editor.set('hit', true);
-            return editor.set('value', parseInt(text));
+            editor.text = text;
+            editor.hit = true;
+            editor.value = parseInt(text);
         }
-        return editor;
     }
 
     static resetIntInput() {
-        return Map({
+        return {
             visible: false,
             label: "",
             text: "",
             value: 0,
-            callback: () => {
-            }
-        });
+            callback: Utils.nop
+        };
     }
 
     /*
@@ -113,7 +150,7 @@ export default class StoresUtils {
      */
 
     static initFloatInput(options) {
-        return Map({
+        return {
             visible: true,
             label: options.label,
             text: options.value ? options.value.toString() : "",
@@ -122,44 +159,42 @@ export default class StoresUtils {
             min: options.min,
             max: options.max,
             hit: false
-        });
+        };
     }
 
     static floatChar(editor, char) {
-        let oldText = editor.get('text');
+        let oldText = editor.text
         if (char === CANC) {
-            return editor.set('text', "");
+            editor.text = "";
+            return;
         }
-        if (oldText === "0" || !editor.get('hit')) {
+        if (oldText === "0" || !editor.hit) {
             oldText = "";
         }
         let newText = oldText + char;
-        editor = editor.set('hit', true);
+        editor.hit = true;
         if (!isNaN(parseFloat(newText))) {
-            editor = editor.set('text', newText);
-            return editor.set('value', parseFloat(newText));
+            editor.text = newText;
+            editor.value = parseFloat(newText);
         }
-        return editor;
     }
 
     static floatChange(editor, text) {
         if (!isNaN(parseFloat(text))) {
-            editor = editor.set('text', text);
-            editor = editor.set('hit', true);
-            return editor.set('value', parseFloat(text));
+            editor.text = text;
+            editor.hit = true;
+            editor.value = parseFloat(text);
         }
-        return editor;
     }
 
     static resetFloatInput() {
-        return Map({
+        return {
             visible: false,
             label: "",
             text: "",
             value: 0,
-            callback: () => {
-            }
-        });
+            callback: Utils.nop
+        };
     }
 
     /*
@@ -191,58 +226,56 @@ export default class StoresUtils {
     }
 
     static initTextInput(options) {
-        return Map({
+        return {
             visible: true,
             label: options.label,
             value: options.value || "",
             caret: options.value ? options.value.length : 0,
             callback: options.callback,
             checker: options.checker
-        });
+        };
     }
 
     static textChar(editor, char) {
-        let oldText = editor.get('value');
-        let caret = editor.get('caret');
+        let oldText = editor.value;
+        let caret = editor.caret;
         switch (char.toUpperCase()) {
             case BACKSPACE:
                 if (oldText.length > 0 && caret > 0) {
-                    editor = editor.set('value', oldText.slice(0, caret - 1) + oldText.slice(caret, oldText.length));
-                    editor = editor.set('caret', editor.get('caret') - 1);
+                    editor.value = oldText.slice(0, caret - 1) + oldText.slice(caret, oldText.length);
+                    editor.caret--;
                 }
                 break;
             case LEFT:
                 if (caret > 0) {
-                    editor = editor.set('caret', caret - 1);
+                    editor.caret--;
                 }
                 break;
             case RIGHT:
                 if (caret < oldText.length) {
-                    editor = editor.set('caret', caret + 1);
+                    editor.caret++;
                 }
                 break;
             default:
-                if(char.length === 1) {
-                    editor = editor.set('value', oldText.slice(0, caret) + char + oldText.slice(caret, oldText.length));
-                    editor = editor.set('caret', caret + 1);
+                if (char.length === 1) {
+                    editor.value = oldText.slice(0, caret) + char + oldText.slice(caret, oldText.length);
+                    editor.caret++;
                 }
                 break;
         }
-        return editor;
     }
 
     static textCaret(editor, position) {
-        return editor.set('caret', position);
+        editor.caret = position;
     }
 
     static resetTextInput() {
-        return Map({
+        return {
             visible: false,
             label: "",
             value: "",
-            callback: () => {
-            }
-        });
+            callback: Utils.nop
+        };
     }
 
     static isInteger(text) {
@@ -257,16 +290,17 @@ export default class StoresUtils {
         return !isNaN(parseFloat(text));
     }
 
-    static settings(data, prop, def){
-        if(data.get('settings')) {
+    static option(data, optionName, def) {
+        if (data.settings) {
+            return data.settings.clientSettings[optionName] || def;
+        }
+        return def;
+    }
+
+    static settings(data, prop, def) {
+        if (data.get('settings')) {
             return iGet(data, "settings.clientSettings." + prop) || def;
         }
         return def;
     }
-}
-
-export class EditorStatus {
-    static CREATING = "CREATING";
-    static EDITING = "EDITING";
-    static SURFING = "SURFING";
 }

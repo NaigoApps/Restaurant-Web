@@ -181,7 +181,6 @@ export default class DiningTableClosingSplitPage extends Component {
                 </Column>
             </Row>
         );
-        return null;
     }
 
 
