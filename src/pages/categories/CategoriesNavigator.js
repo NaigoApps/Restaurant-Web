@@ -13,7 +13,7 @@ export default class CategoriesNavigator extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
 
         return [
             <Row key="list" topSpaced>
@@ -22,7 +22,7 @@ export default class CategoriesNavigator extends Component {
                         bordered
                         rows={StoresUtils.option(data, "categoriesRows", 3)}
                         cols={StoresUtils.option(data, "categoriesColumns", 3)}
-                        options={data.categories}
+                        options={data.data.categories}
                         page={data.navigator.page}
                         color={cat => cat.color}
                         renderer={category => category.name}

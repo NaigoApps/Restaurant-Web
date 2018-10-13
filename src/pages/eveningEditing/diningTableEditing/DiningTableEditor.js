@@ -7,9 +7,9 @@ import GraphWizard from "../../../components/widgets/wizard/graph-wizard/GraphWi
 import SelectWizardPage from "../../../components/widgets/wizard/SelectWizardPage";
 import Column from "../../../widgets/Column";
 import Button from "../../../widgets/Button";
-import {DiningTableEditorMode} from "./DiningTableEditorStore";
+import {DiningTableEditorTabs} from "./DiningTableEditorStore";
 import ConfirmModal from "../../../widgets/ConfirmModal";
-import {DiningTablesEditorActions} from "./DiningTablesEditorActions";
+import DiningTablesEditorActions from "./DiningTablesEditorActions";
 import DiningTablesUtils from "../tables/DiningTablesUtils";
 import {DiningTablesClosingActions} from "./tableClosingFeature/DiningTablesClosingActions";
 import DiningTableClosingWizard from "./tableClosingFeature/DiningTableClosingWizard";
@@ -23,6 +23,8 @@ import OrdinationEditor from "./ordinationsEditing/OrdinationEditor";
 import BillReview from "../tables/BillReview";
 import BillPrintWizard from "./BillPrintWizard";
 import EditorMode from "../../../utils/EditorMode";
+import OrdinationsSection from "./ordinationsEditing/OrdinationsSection";
+import BillsSection from "./tableClosingFeature/BillsSection";
 
 export default class DiningTableEditor extends React.Component {
     constructor(props) {
@@ -30,78 +32,60 @@ export default class DiningTableEditor extends React.Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         const content = this.buildContent();
-        const side = this.buildSide();
-        let editorMode = iGet(data, "diningTableEditing.editorMode");
+        const side = <div/>//this.buildSide();
+        let tab = data.diningTableEditing.tab;
 
         return <Row grow>
-            <Column>{content}</Column>
-            <Column sm="4">
+            <Column>
                 <Row>
                     <Column>
                         <Button text="Opzioni tavolo"
-                                active={editorMode === DiningTableEditorMode.DATA}
-                                commitAction={() => DiningTablesEditorActions.beginDataEditing()}
+                                active={tab === DiningTableEditorTabs.DATA}
+                                commitAction={() => DiningTablesEditorActions.selectTab(DiningTableEditorTabs.DATA)}
                                 fill
                         />
                     </Column>
                     <Column>
                         <Button text="Gestione comande"
-                                active={editorMode === DiningTableEditorMode.ORDINATIONS}
-                                commitAction={() => DiningTablesEditorActions.beginOrdinationsEditing()}
+                                active={tab === DiningTableEditorTabs.ORDINATIONS}
+                                commitAction={() => DiningTablesEditorActions.selectTab(DiningTableEditorTabs.ORDINATIONS)}
                                 fill
                         />
                     </Column>
                     <Column>
                         <Button text="Gestione conti"
-                                active={editorMode === DiningTableEditorMode.BILLS}
-                                commitAction={() => DiningTablesEditorActions.beginBillsEditing()}
+                                active={tab === DiningTableEditorTabs.BILLS}
+                                commitAction={() => DiningTablesEditorActions.selectTab(DiningTableEditorTabs.BILLS)}
                                 fill
                         />
                     </Column>
                 </Row>
-                <Row grow topSpaced>
-                    <Column>
-                        {side}
-                    </Column>
+                <Row>
+                    <Column>{content}</Column>
                 </Row>
             </Column>
         </Row>
     }
 
     buildContent() {
-        let data = this.props.data;
-        let editorMode = iGet(data, "diningTableEditing.editorMode");
+        let data = this.props;
+        let tab = data.diningTableEditing.tab;
 
-        switch (editorMode) {
-            case DiningTableEditorMode.ORDINATIONS:
-                return this.buildOrdinationsContent();
-            case DiningTableEditorMode.DATA:
-                return <DiningTableReview data={data}/>;
-            case DiningTableEditorMode.BILLS:
-                return this.buildBillsContent();
+        switch (tab) {
+            case DiningTableEditorTabs.ORDINATIONS:
+                return <OrdinationsSection {...data}/>;
+            case DiningTableEditorTabs.DATA:
+                return <DiningTableDataEditor {...data}/>;
+            case DiningTableEditorTabs.BILLS:
+                return <BillsSection {...data}/>;
         }
-    }
-
-    buildOrdinationsContent() {
-        let data = this.props.data;
-        let ordinationsEditorStatus = iGet(data, "ordinationEditing.status");
-
-        switch (ordinationsEditorStatus) {
-            case EditorMode.SURFING:
-                return <DiningTableReview data={data}/>;
-            case EditorMode.CREATING:
-                return <OrdinationEditor data={data} actionsProvider={OrdinationsCreatorActions}/>;
-            case EditorMode.EDITING:
-                return <OrdinationEditor data={data} actionsProvider={OrdinationsEditorActions}/>;
-        }
-
-        return <div/>;
     }
 
     buildBillsContent() {
-        let data = this.props.data;
+        return <div/>;
+        let data = this.props;
         const closingFeature = data.get('tableClosingFeature');
 
         if (closingFeature.get('isEditing')()) {
@@ -112,15 +96,15 @@ export default class DiningTableEditor extends React.Component {
     }
 
     buildSide() {
-        let data = this.props.data;
-        let editorMode = iGet(data, "diningTableEditing.editorMode");
+        let data = this.props;
+        let tab = data.diningTableEditing.tab;
 
-        switch (editorMode) {
-            case DiningTableEditorMode.ORDINATIONS:
+        switch (tab) {
+            case DiningTableEditorTabs.ORDINATIONS:
                 return this.buildOrdinationSide();
-            case DiningTableEditorMode.DATA:
+            case DiningTableEditorTabs.DATA:
                 return this.buildReviewSide();
-            case DiningTableEditorMode.BILLS:
+            case DiningTableEditorTabs.BILLS:
                 return this.buildBillSide();
         }
 
@@ -128,125 +112,9 @@ export default class DiningTableEditor extends React.Component {
 
     }
 
-    buildOrdinationSide() {
-        let data = this.props.data;
-        let table = iGet(data, "diningTableEditing.diningTable");
-        let ordination = iGet(data, "ordinationEditing.ordination");
-        let status = iGet(data, "ordinationEditing.status");
-
-        if (ordination && status === EditorMode.EDITING) {
-            const isDeleting = iGet(data, "ordinationEditing.deletingOrdination");
-            return DiningTableEditor.buildOrdinationButtons(table, ordination, isDeleting);
-        }else{
-            const page = iGet(data, "ordinationEditing.page");
-            const ordinations = table.get('ordinations');
-            return DiningTableEditor.buildOrdinationsList(ordinations.sort(OrdinationsUtils.ordinationDateSorter), page);
-        }
-    }
-
-    static buildOrdinationsList(ordinations, page) {
-        return <Row grow>
-            <Column>
-                <Row>
-                    <Column>
-                        <Button
-                            text="Nuova comanda"
-                            icon="plus"
-                            size="lg"
-                            type="success"
-                            commitAction={() => OrdinationsCreatorActions.beginOrdinationCreation()}
-                            textRows="5"
-                        />
-                    </Column>
-                </Row>
-                <Row ofList grow>
-                    <Column>
-                        <SelectInput
-                            id={ordination => ordination.get("uuid")}
-                            onSelectPage={page => OrdinationsEditorActions.selectOrdinationPage(page)}
-                            onSelect={ordination => OrdinationsEditorActions.beginOrdinationEditing(ordination)}
-                            onDeselect={OrdinationsEditorActions.abortOrdinationEditing}
-                            selected={null}
-                            page={page}
-                            rows={6}
-                            cols={1}
-                            options={ordinations}
-                            renderer={ordination => OrdinationsUtils.renderOrdination(ordination)}
-                        />
-                    </Column>
-                </Row>
-            </Column>
-        </Row>;
-    }
-
-    static buildOrdinationButtons(table, ordination, isDeleting) {
-        return <Row>
-            <Column>
-                <Row>
-                    <Column auto>
-                        <Button
-                            text="Torna ad elenco comande"
-                            icon="level-up"
-                            size="lg"
-                            commitAction={() => OrdinationsEditorActions.abortOrdinationEditing()}
-                            fullHeight/>
-                    </Column>
-                </Row>
-                <Row ofList>
-                    <Column>
-                        <Button
-                            text="Modifica comanda"
-                            icon="pencil"
-                            size="lg"
-                            type="warning"
-                            commitAction={() => OrdersActions.beginOrdersEditing(ordination.get('orders'))}
-                            fullHeight/>
-                    </Column>
-                </Row>
-                <Row ofList>
-                    <Column>
-                        <Button text="Stampa comanda"
-                                icon="print"
-                                size="lg"
-                                type={ordination && ordination.get('dirty') ? "warning" : "secondary"}
-                                commitAction={() => OrdinationsEditorActions.printOrdination(ordination.get('uuid'))}
-                                fullHeight/>
-                    </Column>
-                </Row>
-                <Row ofList>
-                    <Column>
-                        <Button
-                            text="Annullamento comanda"
-                            icon="times-circle"
-                            type="danger"
-                            size="lg"
-                            commitAction={() => OrdinationsEditorActions.abortOrdination(ordination.get('uuid'))}
-                            fullHeight/>
-                    </Column>
-                </Row>
-                <Row ofList>
-                    <Column>
-                        <Button text="Elimina comanda"
-                                icon="trash"
-                                type="danger"
-                                size="lg"
-                                commitAction={() => OrdinationsEditorActions.beginOrdinationDeletion()}
-                                fullHeight/>
-                    </Column>
-                </Row>
-                <ConfirmModal
-                    visible={isDeleting}
-                    message="Elminare la comanda e tutti gli ordini associati?"
-                    abortType="secondary"
-                    confirmType="danger"
-                    abortAction={() => OrdinationsEditorActions.abortOrdinationDeletion()}
-                    confirmAction={() => OrdinationsEditorActions.deleteOrdination(table.get('uuid'), ordination.get('uuid'))}/>
-            </Column>
-        </Row>
-    }
 
     buildReviewSide() {
-        let data = this.props.data;
+        let data = this.props;
 
         let waiters = iGet(data, "waiters");
         let tables = iGet(data, "tables");
@@ -333,23 +201,23 @@ export default class DiningTableEditor extends React.Component {
         </Row>;
     }
 
-    getClosingMessage(table){
-        if(DiningTablesUtils.isTableCloseable(table)){
+    getClosingMessage(table) {
+        if (DiningTablesUtils.isTableCloseable(table)) {
             return "Chiudere il tavolo?";
-        }else{
+        } else {
             return "Chiudere il tavolo? Vi sono conti non ancora contabilizzati";
         }
     }
 
     buildBillSide() {
-        const data = this.props.data;
+        const data = this.props;
         const editingFeature = iGet(data, "diningTableEditing");
         const closingFeature = iGet(data, "tableClosingFeature");
         let bill = closingFeature.get('bill');
         let sideContent;
         if (closingFeature.get('isEditing')()) {
             sideContent = DiningTableEditor.buildBillButtons(data);
-        }else{
+        } else {
             sideContent = DiningTableEditor.buildBillsList(data);
         }
         return <Row>
@@ -363,7 +231,7 @@ export default class DiningTableEditor extends React.Component {
         </Row>
     }
 
-    static buildBillsList(data){
+    static buildBillsList(data) {
         const editingFeature = data.get('diningTableEditing');
         const closingFeature = data.get('tableClosingFeature');
         const bills = iGet(editingFeature, 'diningTable.bills');
@@ -480,13 +348,13 @@ export default class DiningTableEditor extends React.Component {
     }
 
     isCurrentBillEditable() {
-        let data = this.props.data;
+        let data = this.props;
         let bill = iGet(data, "tableClosingFeature.bill");
         return bill && !bill.get('progressive');
     }
 
     static confirmBill(editingFeature, closingFeature) {
-        if (closingFeature.get('isCreating')()){
+        if (closingFeature.get('isCreating')()) {
             DiningTablesClosingActions.createBill(iGet(editingFeature, 'diningTable.uuid'), closingFeature.get('bill'));
         } else if (closingFeature.get('isEditing')()) {
             DiningTablesClosingActions.updateBill(iGet(editingFeature, 'diningTable.uuid'), closingFeature.get('bill'));
@@ -498,7 +366,7 @@ export default class DiningTableEditor extends React.Component {
     }
 
     otherOpenTables() {
-        let data = this.props.data;
+        let data = this.props;
         let table = iGet(data, "diningTableEditing.diningTable");
 
         return data.get('evening').get('diningTables')

@@ -12,7 +12,7 @@ export default class ApplicationTextInput extends Component {
     }
 
     confirmTextValue() {
-        let data = this.props.data;
+        let data = this.props;
         let callback = data.callback;
         if (callback) {
             callback(data.value);
@@ -21,23 +21,23 @@ export default class ApplicationTextInput extends Component {
     }
 
     isValid() {
-        let data = this.props.data;
+        let data = this.props;
         let value = data.value;
         return !data.checker || data.checker(value);
     }
 
     componentDidUpdate() {
-        if (this.props.data.visible) {
+        if (this.props.visible) {
             let textInput = global.$('#app-text-input');
             setTimeout(() => {
-                textInput[0].setSelectionRange(this.props.data.caret, this.props.data.caret);
+                textInput[0].setSelectionRange(this.props.caret, this.props.caret);
                 textInput[0].focus();
             }, 100);
         }
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         return <PopupContainer
             id="app-text-input"
             visible={data.visible}

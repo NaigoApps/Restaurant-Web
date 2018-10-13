@@ -1,113 +1,74 @@
-import AbstractStore from "../../stores/RootFeatureStore";
-import dispatcher from "../../dispatcher/SimpleDispatcher";
-import customersStore from "../../stores/generic/CustomersStore";
-import {CustomersCreatorActionTypes} from "./CustomerCreatorActions";
-import EditorMode from "../../utils/EditorMode";
-import {CustomersEditorActionTypes} from "./CustomersEditorActions";
-import {findByUuid} from "../../utils/Utils";
+import AbstractStore from "../../stores/AbstractStore";
+import {Utils} from "../../utils/Utils";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
 import {ApplicationActionTypes} from "../../actions/ApplicationActions";
 import applicationStore from "../../stores/ApplicationStore";
 import {DataActionTypes} from "../../actions/DataActions";
-
-const {fromJS, Map} = require('immutable');
+import dataStore from "../../stores/DataStore";
+import Customer from "../../model/Customer";
+import CustomersPageActions from "./CustomersPageActions";
+import EditorMode from "../../utils/EditorMode";
 
 const EVT_CUSTOMERS_PAGE_STORE_CHANGED = "EVT_CUSTOMERS_PAGE_STORE_CHANGED";
 
 class CustomersPageStore extends AbstractStore {
 
     constructor() {
-        super(EVT_CUSTOMERS_PAGE_STORE_CHANGED);
-        this.page = 0;
-        this.customer = null;
-        this.editorStatus = EditorMode.SURFING;
+        super("customers", EVT_CUSTOMERS_PAGE_STORE_CHANGED, applicationStore, dataStore);
+        this.initEditor();
+        this.navigator = {
+            page: 0
+        };
     }
 
-    handleCompletedAction(action) {
-        let changed = true;
-        dispatcher.waitFor([customersStore.getToken(), applicationStore.getToken()]);
-        switch (action.type) {
-            case ApplicationActionTypes.LOAD_SETTINGS:
-            case ApplicationActionTypes.STORE_SETTINGS:
-            case DataActionTypes.LOAD_CUSTOMERS:
-                break;
-            case CustomersEditorActionTypes.UPDATE_EDITING_CUSTOMER:
-            case CustomersCreatorActionTypes.CREATE_CUSTOMER:
-                this.customer = action.body.get('uuid');
-                this.editorStatus = EditorMode.EDITING;
-                break;
-            case CustomersCreatorActionTypes.ABORT_CUSTOMER_CREATION:
-            case CustomersEditorActionTypes.DESELECT_EDITING_CUSTOMER:
-            case CustomersEditorActionTypes.DELETE_EDITING_CUSTOMER:
-            case ApplicationActionTypes.GO_TO_PAGE:
-                this.customer = null;
-                this.editorStatus = EditorMode.SURFING;
-                break;
-            case CustomersEditorActionTypes.SELECT_EDITING_CUSTOMER:
-                this.customer = action.body;
-                this.editorStatus = EditorMode.EDITING;
-                break;
-            case CustomersEditorActionTypes.SELECT_EDITING_CUSTOMER_PAGE:
-                this.page = action.body;
-                break;
-            case CustomersCreatorActionTypes.BEGIN_CUSTOMER_CREATION:
-                this.customer = EntitiesUtils.newCustomer();
-                this.editorStatus = EditorMode.CREATING;
-                break;
-            case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_NAME:
-                this.customer = this.customer.set('name', action.body);
-                break;
-            case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_SURNAME:
-                this.customer = this.customer.set('surname', action.body);
-                break;
-            case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_CF:
-                this.customer = this.customer.set('cf', action.body);
-                break;
-            case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_PIVA:
-                this.customer = this.customer.set('piva', action.body);
-                break;
-            case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_ADDRESS:
-                this.customer = this.customer.set('address', action.body);
-                break;
-            case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_CAP:
-                this.customer = this.customer.set('cap', action.body);
-                break;
-            case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_CITY:
-                this.customer = this.customer.set('city', action.body);
-                break;
-            case CustomersCreatorActionTypes.SET_CREATING_CUSTOMER_DISTRICT:
-                this.customer = this.customer.set('district', action.body);
-                break;
-            default:
-                changed = false;
-                break;
+    getActionsClass() {
+        return CustomersPageActions;
+    }
+
+    initEditor(customer, creating) {
+        this.editor = {
+            mode: null,
+            customer: null
+        };
+        if (customer) {
+            this.editor.mode = creating ? EditorMode.CREATING : EditorMode.EDITING;
+            this.editor.customer = customer;
         }
-        return changed;
     }
 
-    getState() {
-        let customers = customersStore.getCustomers().getPayload();
-        let result = Map({
-            customer: this.getSelectedCustomer(),
-            page: this.page,
-            editorStatus: this.editorStatus,
+    getActionCompletedHandlers() {
+        const handlers = {};
 
-            customers: customers,
+        handlers[CustomersPageActions.SELECT_CUSTOMER_NAVIGATOR_PAGE] = (page) => this.navigator.page = page;
+        handlers[CustomersPageActions.SELECT_EDITING_CUSTOMER] = (customer) => this.initEditor(customer, false);
+        handlers[CustomersPageActions.BEGIN_CUSTOMER_CREATION] = () =>
+            this.initEditor(new Customer(EntitiesUtils.newCustomer(), dataStore.getPool()), true);
+        handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_NAME] = (name) => this.editor.customer.name = name;
+        handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_SURNAME] = (surname) => this.editor.customer.surname = surname;
+        handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_CF] = (cf) => this.editor.customer.cf = cf;
+        handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_PIVA] = (piva) => this.editor.customer.piva = piva;
+        handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_ADDRESS] = (address) => this.editor.customer.address = address;
+        handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_CITY] = (city) => this.editor.customer.city = city;
+        handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_DISTRICT] = (district) => this.editor.customer.district = district;
+        handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_CAP] = (cap) => this.editor.customer.cap = cap;
+        handlers[CustomersPageActions.CREATE_CUSTOMER] = (customer) =>
+            this.initEditor(new Customer(customer, dataStore.getPool()), false);
+        handlers[CustomersPageActions.UPDATE_EDITING_CUSTOMER] = (customer) =>
+            this.initEditor(new Customer(customer, dataStore.getPool()), false);
 
-            settings: applicationStore.getSettings()
-        });
+        handlers[CustomersPageActions.DELETE_EDITING_CUSTOMER] = () => this.initEditor();
+
+        handlers[ApplicationActionTypes.LOAD_SETTINGS] = () => Utils.nop();
+        handlers[DataActionTypes.LOAD_CUSTOMERS] = () => Utils.nop();
+
+        return handlers;
+    }
+
+    buildState() {
         return {
-            data: result
-        }
-    }
-
-    getSelectedCustomer() {
-        if (this.editorStatus === EditorMode.EDITING) {
-            return findByUuid(customersStore.getCustomers().getPayload(), this.customer);
-        } else if (this.editorStatus === EditorMode.CREATING) {
-            return this.customer;
-        }
-        return null;
+            editor: this.editor,
+            navigator: this.navigator,
+        };
     }
 
 }

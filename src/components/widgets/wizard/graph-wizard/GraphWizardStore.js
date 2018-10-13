@@ -1,4 +1,4 @@
-import AbstractStore from "../../../../stores/RootFeatureStore";
+import AbstractStore from "../../../../stores/AbstractStore";
 
 const {Map} = require('immutable');
 

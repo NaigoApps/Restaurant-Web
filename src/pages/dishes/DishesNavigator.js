@@ -8,7 +8,8 @@ import RoundButton from "../../widgets/RoundButton";
 import DishStatus from "../../model/DishStatus";
 import SelectEditor from "../../components/widgets/inputs/SelectEditor";
 import Button from "../../widgets/Button";
-import Text from "../../widgets/Text";
+import Color from "../../utils/Color";
+import {EntitiesUtils} from "../../utils/EntitiesUtils";
 
 export default class DishesNavigator extends Component {
 
@@ -17,7 +18,7 @@ export default class DishesNavigator extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
 
         return [
             <Row key="cat" topSpaced>
@@ -26,7 +27,8 @@ export default class DishesNavigator extends Component {
                         multiSelect: true,
                         label: "Categorie visualizzate",
                         value: data.visibleCategories,
-                        values: data.categories,
+                        values: data.data.categories,
+                        comparator: EntitiesUtils.nameComparator,
                         rows: 4,
                         columns: 4,
                         color: category => category.color,
@@ -49,8 +51,8 @@ export default class DishesNavigator extends Component {
                         cols={StoresUtils.option(data, "dishesColumns", 3)}
                         options={data.visibleDishes}
                         page={data.navigator.page}
-                        color={dish => dish.category.color}
-                        renderer={dish => dish.name}
+                        color={dish => dish ? dish.category.color : Color.black}
+                        renderer={dish => dish ? dish.name : "?"}
                         colorRenderer={dish => DishesNavigator.color(dish)}
                         onSelectPage={index => DishesPageActions.selectDishPage(index)}
                         onSelect={category => DishesPageActions.selectDish(category)}
@@ -70,11 +72,13 @@ export default class DishesNavigator extends Component {
     }
 
     static color(dish) {
-        if (dish.status === DishStatus.SUSPENDED) {
-            return "warning";
-        }
-        if (dish.status === DishStatus.REMOVED) {
-            return "danger";
+        if (dish) {
+            if (dish.status === DishStatus.SUSPENDED) {
+                return "warning";
+            }
+            if (dish.status === DishStatus.REMOVED) {
+                return "danger";
+            }
         }
         return "secondary";
     }

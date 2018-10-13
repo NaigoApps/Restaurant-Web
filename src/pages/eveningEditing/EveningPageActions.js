@@ -1,30 +1,27 @@
-import waitersActions from "../../generic/WaitersActions";
-import phasesActions from "../../actions/PhasesActions";
-import additionsActions from "../../generic/AdditionsActions";
-import customersPageActions from "../customers/CustomersPageActions";
-import asyncActionBuilder from "../../actions/RequestBuilder";
-import {EveningEditingActionTypes} from "./EveningEditorActions";
 import {DataActions} from "../../actions/DataActions";
 import {SettingsPageActions} from "../settings/SettingsPageActions";
 
 class EveningPageActions {
 
-    initEveningPage(){
-        this.retrieveSelectedEvening();
+    initEveningPage() {
+        this.initializeEvening();
 
-        waitersActions.retrieveWaiters();
-        phasesActions.retrievePhases();
-        additionsActions.retrieveAdditions();
+        DataActions.loadWaiters();
+        DataActions.loadPhases();
+        DataActions.loadAdditions();
+        DataActions.loadCustomers();
         DataActions.loadRestaurantTables();
-        customersPageActions.initCustomersPage();
-
         DataActions.loadDishes();
         DataActions.loadCategories();
+
         SettingsPageActions.loadSettings();
     }
 
-    retrieveSelectedEvening() {
-        asyncActionBuilder.get(EveningEditingActionTypes.GET_SELECTED, 'evenings/selected');
+    initializeEvening() {
+        DataActions.loadDiningTables();
+        DataActions.loadOrdinations();
+        DataActions.loadOrders();
+        DataActions.loadBills();
     }
 }
 

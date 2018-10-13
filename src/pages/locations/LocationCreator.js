@@ -12,7 +12,7 @@ export default class LocationCreator extends React.Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
         const editor = data.editor;
 
         const actions = LocationCreator.buildActions(data);
@@ -51,7 +51,7 @@ export default class LocationCreator extends React.Component {
         actions.push(<SelectEditor options={{
             label: "Stampante",
             value: location.printer,
-            values: data.printers,
+            values: data.data.printers,
             isValid: printer => !!printer,
             renderer: printer => printer.name,
             callback: printer => LocationsPageActions.setEditorPrinter(printer)

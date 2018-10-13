@@ -21,23 +21,23 @@ export default class LocationsPage extends ViewController {
     }
 
     render() {
-        let pageContent = LocationsPage.makePageContent(this.state.data);
+        let pageContent = LocationsPage.makePageContent(this.state);
         return (
-            <Page title="Postazioni">
-                <LocationsNav data={this.state.data}/>
+            <Page title="Postazioni" {...this.state.general}>
+                <LocationsNav {...this.state}/>
                 {pageContent}
             </Page>
         )
     }
 
-    static makePageContent(state) {
-        const editor = state.editor;
+    static makePageContent(data) {
+        const editor = data.editor;
         if (editor.mode === EditorMode.EDITING) {
-            return <LocationEditor data={state}/>
+            return <LocationEditor {...data}/>
         } else if (editor.mode === EditorMode.CREATING) {
-            return <LocationCreator data={state}/>
+            return <LocationCreator {...data}/>
         } else {
-            return <LocationsNavigator data={state}/>
+            return <LocationsNavigator {...data}/>
         }
     }
 }

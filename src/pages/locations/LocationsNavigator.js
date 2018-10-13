@@ -13,7 +13,7 @@ export default class LocationsNavigator extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
 
         return [
             <Row key="list" topSpaced>
@@ -22,7 +22,7 @@ export default class LocationsNavigator extends Component {
                         bordered
                         rows={StoresUtils.option(data, "locationsRows", 3)}
                         cols={StoresUtils.option(data, "locationsColumns", 3)}
-                        options={data.locations}
+                        options={data.data.locations}
                         page={data.navigator.page}
                         renderer={location => location.name}
                         onSelectPage={index => LocationsPageActions.selectLocationNavigatorPage(index)}

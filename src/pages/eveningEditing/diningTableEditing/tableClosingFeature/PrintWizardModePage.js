@@ -10,7 +10,7 @@ export default class PrintWizardModePage extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
         const closingFeature = data.get('tableClosingFeature');
         const printWizard = closingFeature.get('printWizard');
 

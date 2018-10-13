@@ -16,12 +16,24 @@ export default class Addition extends BaseEntity {
         return this._name;
     }
 
+    set name(name) {
+        this._name = name;
+    }
+
     get price() {
         return this._price;
     }
 
+    set price(price) {
+        this._price = price;
+    }
+
     get generic() {
         return this._generic;
+    }
+
+    set generic(generic) {
+        this._generic = generic;
     }
 
     toDto() {
@@ -29,5 +41,6 @@ export default class Addition extends BaseEntity {
         result.name = this._name;
         result.price = this._price;
         result.generic = this._generic;
+        return result;
     }
 }

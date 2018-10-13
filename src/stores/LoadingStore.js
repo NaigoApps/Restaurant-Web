@@ -1,12 +1,12 @@
-import SubFeatureStore from "./SubFeatureStore";
 import applicationStore from "./ApplicationStore";
 import StoresUtils from "../pages/StoresUtils";
+import AbstractStore from "./AbstractStore";
 
 const EVT_LOADING_STORE_CHANGED = "EVT_LOADING_STORE_CHANGED";
 
-class LoadingStore extends SubFeatureStore {
+class LoadingStore extends AbstractStore {
     constructor() {
-        super(applicationStore, "loading");
+        super("loading", EVT_LOADING_STORE_CHANGED);
         this.inProgress = [];
     }
 

@@ -1,7 +1,5 @@
 import {ACT_UPDATE_ENTITY} from "../../actions/DataActions";
-import dispatcher from "../../dispatcher/SimpleDispatcher";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
-import {uuid} from "../../utils/Utils";
 
 const {fromJS, List} = require('immutable');
 

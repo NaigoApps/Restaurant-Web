@@ -3,6 +3,7 @@ import Icon from "./Icon";
 import Row from "./Row";
 import Column from "./Column";
 import Text from "./Text";
+import Color from "../utils/Color";
 
 /**
  * Expects:
@@ -86,7 +87,11 @@ export default class Button extends Component {
                 </Row>;
             }
         } else if (text) {
-            content = <Text color={this.props.color || "#000000"}>{text}</Text>;
+            let color = this.props.color || Color.black;
+            if(this.props.active){
+                color = Color.white;
+            }
+            content = <Text color={color}>{text}</Text>;
         } else if (icon) {
             content = <Icon name={icon}/>
         } else {

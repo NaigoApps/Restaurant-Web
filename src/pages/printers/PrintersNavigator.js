@@ -13,16 +13,16 @@ export default class PrintersNavigator extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const props = this.props;
 
         return [<Row key="list" topSpaced>
             <Column>
                 <SelectInput
                     bordered
-                    rows={StoresUtils.option(data, "printersRows", 3)}
-                    cols={StoresUtils.option(data, "printersColumns", 3)}
-                    options={data.printers}
-                    page={data.navigator.page}
+                    rows={StoresUtils.option(props, "printersRows", 3)}
+                    cols={StoresUtils.option(props, "printersColumns", 3)}
+                    options={props.data.printers}
+                    page={props.navigator.page}
                     renderer={printer => printer.name}
                     onSelectPage={index => PrintersPageActions.selectPrinterNavigatorPage(index)}
                     onSelect={printer => PrintersPageActions.selectPrinter(printer)}

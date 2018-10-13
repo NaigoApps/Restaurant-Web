@@ -64,7 +64,7 @@ export class CategoriesPageActions {
     }
 
     static updateCategoryColor(uuid, value) {
-        requestBuilder.put(this.UPDATE_EDITING_CATEGORY, 'categories/' + uuid + '/color', value);
+        requestBuilder.put(this.UPDATE_EDITING_CATEGORY, 'categories/' + uuid + '/color', value.toRGBInt());
     }
 
     static updateCategoryAdditions(uuid, values) {

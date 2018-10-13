@@ -9,7 +9,10 @@ export default class BaseEntity {
     }
 
     getEntity(uuid) {
-        return this._pool[uuid] || null;
+        if(this._pool) {
+            return this._pool[uuid];
+        }
+        return null;
     }
 
     getEntities(uuids) {
@@ -20,5 +23,19 @@ export default class BaseEntity {
         return {
             uuid: this._uuid
         }
+    }
+
+    static equals(e1, e2){
+        if(!e1 && !e2){
+            return true;
+        }
+        if(!e1 && e2 || e1 && !e2){
+            return false;
+        }
+        return e1.equals(e2);
+    }
+
+    equals(entity){
+        return this._uuid === entity._uuid;
     }
 }

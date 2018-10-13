@@ -1,62 +1,74 @@
-import React, {Component} from 'react';
-import EveningSelectionForm from "./eveningSelector/EveningSelector";
-import {COMPONENTS, TYPES} from "../../components/editors/EntityEditor";
+import React from 'react';
 import {beautifyDate} from "../../components/widgets/inputs/DateInput";
 import Page from "../Page";
 import eveningPageStore from "./EveningPageStore";
 import eveningPageActions from "./EveningPageActions";
-import EveningEditor from "./EveningEditor";
 import EveningNav from "./EveningNav";
+import ViewController from "../../widgets/ViewController";
+import EditorMode from "../../utils/EditorMode";
+import DiningTableCreator from "./diningTableEditing/DiningTableCreator";
+import Row from "../../widgets/Row";
+import Column from "../../widgets/Column";
+import DiningTableEditor from "./diningTableEditing/DiningTableEditor";
+import DiningTablesCRUD from "./DiningTablesCRUD";
 
-export default class EveningPage extends Component {
+export default class EveningPage extends ViewController {
     constructor(props) {
-        super(props);
-
-        this.state = eveningPageStore.getState();
-
-        this.updateState = this.updateState.bind(this);
+        super(props, eveningPageStore);
     }
 
     componentDidMount() {
-        eveningPageStore.addChangeListener(this.updateState);
-
-        eveningPageActions.initEveningPage();
+        super.componentDidMount();
+        setTimeout(() => eveningPageActions.initEveningPage());
     }
-
-    updateState(state) {
-        this.setState(state);
-    }
-
-    componentWillUnmount() {
-        eveningPageStore.removeChangeListener(this.updateState);
-    }
-
 
     render() {
-        let pageContent = EveningPage.makePageContent(this.state.data);
-        let title = EveningPage.makeTitle(this.state.data);
+        let pageContent = EveningPage.makePageContent(this.state);
+        let pageActions = EveningPage.makePageActions(this.state);
+        let title = EveningPage.makeTitle(this.state);
 
         return (
-            <Page title={title}>
-                <EveningNav data={this.state.data}/>
-                {pageContent}
+            <Page title={title} {...this.state.general}>
+                <EveningNav {...this.state}/>
+                <Row topSpaced grow>
+                    <Column sm="9">
+                        {pageContent}
+                    </Column>
+                    <Column sm="3">
+                        {pageActions}
+                    </Column>
+                </Row>
             </Page>
         );
     }
 
     static makeTitle(state) {
         let title = "Gestione serata";
-        if (state.get('evening')) {
-            title += " " + beautifyDate(state.get('evening').get('day'));
+        if (state.evening) {
+            title += " " + beautifyDate(state.evening.day);
         }
         return title;
     }
 
     static makePageContent(state) {
-        if (state.get('evening')) {
-            return <EveningEditor data={state}/>;
+        if(state.data.evening) {
+            return <DiningTablesCRUD tables={state.data.evening.tables} page={state.tablesListPage}/>;
+        }
+        return <div/>;
+    }
+
+    static makePageActions(state){
+        return <div/>;
+    }
+
+    static makeDiningTablePageContent(state) {
+        const editor = state.diningTableEditing.editor;
+        if (editor.mode === EditorMode.EDITING) {
+            return <DiningTableEditor {...state}/>;
+        } else if (editor.mode === EditorMode.CREATING) {
+            return <DiningTableCreator {...state}/>;
         } else {
-            return <EveningSelectionForm data={state.get('eveningSelector')}/>;
+            return <div/>;
         }
     }
 }

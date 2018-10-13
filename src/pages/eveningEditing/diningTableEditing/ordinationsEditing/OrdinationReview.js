@@ -12,8 +12,8 @@ export default class OrdinationReview extends React.Component {
     }
 
     renderOrder(group) {
-        let dishes = this.props.data.get('dishes');
-        let additions = this.props.data.get('additions');
+        let dishes = this.props.get('dishes');
+        let additions = this.props.get('additions');
         let result = OrdinationsUtils.renderImplodedOrder(group, dishes, additions);
 
         return <Row key={uuid() + group.get('groupId')}>
@@ -24,14 +24,14 @@ export default class OrdinationReview extends React.Component {
     }
 
     renderOrders(orders) {
-        let phaseOrders = OrdinationsUtils.makePhaseMap(orders, this.props.data.get('phases'));
+        let phaseOrders = OrdinationsUtils.makePhaseMap(orders, this.props.get('phases'));
         let phasesComponents = [];
         phaseOrders.forEach((orders, phase) => {
             orders = OrdinationsUtils.implode(orders);
-            orders = OrdinationsUtils.sortByDish(orders, this.props.data.get('dishes'), this.props.data.get('additions'));
+            orders = OrdinationsUtils.sortByDish(orders, this.props.get('dishes'), this.props.get('additions'));
             phasesComponents.push(<Row key={"phase_" + phase}>
                 <Column>
-                    <b>{findByUuid(this.props.data.get('phases'), phase).get('name')}</b>
+                    <b>{findByUuid(this.props.get('phases'), phase).get('name')}</b>
                 </Column>
             </Row>);
 
@@ -49,7 +49,7 @@ export default class OrdinationReview extends React.Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         let ordination = iGet(data, "ordinationEditing.ordination");
         let orders = ordination.get("orders");
         return <Row grow>

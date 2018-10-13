@@ -1,29 +1,54 @@
 import asyncActionBuilder from '../../actions/RequestBuilder';
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 
-const {fromJS, Map} = require('immutable');
+export default class EveningEditorActions {
 
-export const ACT_UPDATE_EVENING = "ACT_UPDATE_EVENING";
+    static GET_SELECTED = "GET_SELECTED";
+    static DESELECT_EVENING = "DESELECT_EVENING";
+    static CONFIRM_COVER_CHARGE_EDITING = "CONFIRM_COVER_CHARGE_EDITING";
 
-export const EveningEditingActionTypes = {
-    GET_SELECTED: "GET_SELECTED",
-    DESELECT: "DESELECT",
-    CONFIRM_COVER_CHARGE_EDITING: "CONFIRM_COVER_CHARGE_EDITING",
-};
+    static SELECT_DINING_TABLE = "SELECT_DINING_TABLE";
+    static SELECT_DINING_TABLE_PAGE = "SELECT_DINING_TABLE_PAGE";
 
-export const EveningEditorActions = {
+    static SHOW_EVENING_REVIEW = "SHOW_EVENING_REVIEW";
+    static LOAD_EVENING_TABLES = "LOAD_EVENING_TABLES";
 
-    getSelectedEvening: () => asyncActionBuilder.get(
-        EveningEditingActionTypes.GET_SELECTED,
-        "evenings/selected"),
+    static getSelectedEvening() {
+        asyncActionBuilder.get(
+            this.GET_SELECTED,
+            "evenings/selected");
+    }
 
-    deselectEvening: () => dispatcher.fireEnd(EveningEditingActionTypes.DESELECT),
+    static selectPage(page) {
+        dispatcher.fireEnd(this.SELECT_DINING_TABLE_PAGE, page);
+    }
+
+    static selectDiningTable(table) {
+        dispatcher.fireEnd(this.SELECT_DINING_TABLE, table);
+    }
+
+    static deselectEvening() {
+        dispatcher.fireEnd(this.DESELECT_EVENING);
+    }
+
+    static showReview() {
+        dispatcher.fireEnd(this.SHOW_EVENING_REVIEW);
+    }
+
+    static showTables(){
+        asyncActionBuilder.get(
+            this.LOAD_EVENING_TABLES,
+            'dining-tables'
+        );
+    }
 
     //COVER CHARGE EDITING
-    confirmCoverCharge: (uuid, value) => asyncActionBuilder.put(
-        EveningEditingActionTypes.CONFIRM_COVER_CHARGE_EDITING,
-        'evenings/' + uuid + "/coverCharge",
-        value
-    ),
+    static confirmCoverCharge(uuid, value) {
+        asyncActionBuilder.put(
+            this.CONFIRM_COVER_CHARGE_EDITING,
+            'evenings/' + uuid + "/coverCharge",
+            value
+        );
+    }
 
-};
+}

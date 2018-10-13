@@ -1,17 +1,29 @@
 import {uuid} from "./Utils";
 import DishStatus from "../model/DishStatus";
+import {formatDate} from "../components/widgets/inputs/DateInput";
 
 const {fromJS} = require("immutable");
 
 export const NEW_CUSTOMER_UUID = "new-customer-uuid";
 
 export class EntitiesUtils {
-    static nameComparator(e1, e2){
+    static nameComparator(e1, e2) {
         return e1.name.localeCompare(e2.name);
     }
 
+    static defaultComparator(property){
+        return (e1, e2) => {
+            if (e1[property] < e2[property]) {
+                return -1
+            } else if (e1[property] > e2[property]) {
+                return +1;
+            }
+            return 0;
+        }
+    }
+
     static newDiningTable() {
-        return fromJS({
+        return {
             coverCharges: 0,
             waiter: null,
             table: null,
@@ -19,31 +31,31 @@ export class EntitiesUtils {
             bills: [],
             openingTime: null,
             status: "APERTO"
-        });
+        }
     }
 
     static newOrdination() {
-        return fromJS({
+        return {
             orders: []
-        });
+        };
     }
 
     static newBill() {
-        return fromJS({
+        return {
             orders: [],
             total: 0,
             coverCharges: 0
-        });
+        };
     }
 
     static newOrder(dish, phase) {
-        return fromJS({
+        return {
             uuid: uuid(),
             dish: dish.get('uuid'),
             price: dish.get('price'),
             phase: phase,
             additions: []
-        });
+        };
     }
 
     static duplicateOrder(order) {
@@ -51,7 +63,7 @@ export class EntitiesUtils {
     }
 
     static newCustomer() {
-        return fromJS({
+        return {
             uuid: NEW_CUSTOMER_UUID,
             name: "",
             surname: "",
@@ -61,7 +73,7 @@ export class EntitiesUtils {
             city: "",
             cap: "",
             district: "",
-        });
+        };
     }
 
     static newPrinter() {
@@ -73,10 +85,10 @@ export class EntitiesUtils {
     }
 
     static newLocation() {
-        return fromJS({
+        return {
             name: "",
             printer: ""
-        });
+        }
     }
 
     static newRestaurantTable() {
@@ -85,13 +97,13 @@ export class EntitiesUtils {
         });
     }
 
-    static newWaiter(){
-        return fromJS({
+    static newWaiter() {
+        return {
             name: "",
             surname: "",
             cf: "",
             status: ""
-        });
+        }
     }
 
     static newCategory() {
@@ -115,17 +127,21 @@ export class EntitiesUtils {
     }
 
     static newAddition() {
-        return fromJS({
+        return {
             name: "",
             price: 0,
             generic: false
-        });
+        };
     }
 
     static renderCustomer(customer) {
         if (customer) {
-            return customer.get('surname') + " " + customer.get('name');
+            return customer.surname + " " + customer.name;
         }
         return "?";
+    }
+
+    static renderEvening(evening){
+        return "Riepilogo " + formatDate(evening.day);
     }
 }

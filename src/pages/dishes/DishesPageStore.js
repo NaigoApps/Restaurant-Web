@@ -1,4 +1,4 @@
-import RootFeatureStore from "../../stores/RootFeatureStore";
+import AbstractStore from "../../stores/AbstractStore";
 import EditorMode from "../../utils/EditorMode";
 import {DishesPageActions} from "./DishesPageActions";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
@@ -11,10 +11,10 @@ import {Utils} from "../../utils/Utils";
 
 const EVT_MENU_PAGE_STORE_CHANGED = "EVT_MENU_PAGE_STORE_CHANGED";
 
-class DishesPageStore extends RootFeatureStore {
+class DishesPageStore extends AbstractStore {
 
     constructor() {
-        super(EVT_MENU_PAGE_STORE_CHANGED);
+        super("dishes", EVT_MENU_PAGE_STORE_CHANGED, applicationStore, dataStore);
         this.categories = [];
         this.initEditor();
         this.navigator = {
@@ -22,25 +22,20 @@ class DishesPageStore extends RootFeatureStore {
         }
     }
 
-    getStoreDependencies() {
-        return [dataStore, applicationStore];
+    getActionsClass() {
+        return DishesPageActions;
     }
 
-    getState() {
+    buildState() {
         return {
-            data: {
-                categories: dataStore.getEntities(Topics.CATEGORIES),
-                visibleCategories: this.categories,
-                visibleDishes: this.categories.map(cat => cat.dishes).reduce((a, b) => a.concat(b), []).sort(EntitiesUtils.nameComparator),
-                dishStatuses: dataStore.getEntities(Topics.DISH_STATUSES),
-                locations: dataStore.getEntities(Topics.LOCATIONS),
-                additions: dataStore.getEntities(Topics.ADDITIONS),
+            visibleCategories: this.categories,
+            visibleDishes: this.categories
+                .map(cat => cat.dishes)
+                .reduce((a, b) => a.concat(b), [])
+                .sort(EntitiesUtils.nameComparator),
 
-                editor: this.editor,
-                navigator: this.navigator,
-
-                settings: applicationStore.getSettings()
-            }
+            editor: this.editor,
+            navigator: this.navigator,
         };
     }
 
@@ -55,7 +50,7 @@ class DishesPageStore extends RootFeatureStore {
         }
     }
 
-    getCompletionHandlers() {
+    getActionCompletedHandlers() {
         const handlers = {};
 
         handlers[DishesPageActions.BEGIN_DISH_CREATION] = () =>
@@ -65,10 +60,10 @@ class DishesPageStore extends RootFeatureStore {
         handlers[DishesPageActions.SET_DISH_EDITOR_PRICE] = (value) => this.editor.dish.price = value;
         handlers[DishesPageActions.SET_DISH_EDITOR_CATEGORY] = (value) => this.editor.dish.category = value;
         handlers[DishesPageActions.CREATE_DISH] = (dish) =>
-            this.initEditor(Dish.create(dish.toJS(), dataStore.getPool()));
+            this.initEditor(Dish.create(dish, dataStore.getPool()));
         handlers[DishesPageActions.SELECT_EDITING_DISH] = (dish) => this.initEditor(dish);
         handlers[DishesPageActions.UPDATE_EDITING_DISH] = (dish) =>
-            this.initEditor(Dish.create(dish.toJS(), dataStore.getPool()));
+            this.initEditor(Dish.create(dish, dataStore.getPool()));
         handlers[DishesPageActions.DELETE_EDITING_DISH] = () =>
             this.initEditor();
         handlers[DishesPageActions.SELECT_EDITING_DISH_PAGE] = (page) => this.navigator.page = page;
@@ -76,8 +71,10 @@ class DishesPageStore extends RootFeatureStore {
         handlers[DishesPageActions.SHOW_CATEGORIES] = (cats) => this.categories = cats;
         handlers[DishesPageActions.SHOW_ALL_CATEGORIES] = (value) => this.categories = value ? dataStore.getEntities(Topics.CATEGORIES) : [];
 
+        handlers[DataActionTypes.LOAD_CATEGORIES] = () => this.categories = dataStore.getEntities(Topics.CATEGORIES);
+
         handlers[ApplicationActionTypes.LOAD_SETTINGS] = () => Utils.nop();
-        handlers[DataActionTypes.LOAD_CATEGORIES] = () => Utils.nop();
+        // handlers[DataActionTypes.LOAD_CATEGORIES] = () => Utils.nop();
         handlers[DataActionTypes.LOAD_LOCATIONS] = () => Utils.nop();
         handlers[DataActionTypes.LOAD_ADDITIONS] = () => Utils.nop();
 

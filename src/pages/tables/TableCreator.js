@@ -11,7 +11,7 @@ export default class TableCreator extends React.Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
         const editor = data.editor;
 
         const components = TableCreator.buildComponents(data);

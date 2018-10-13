@@ -1,11 +1,9 @@
 import React, {Component} from 'react';
-import {distribute, uuid} from "../../../utils/Utils";
 import Row from "../../../widgets/Row";
-import ColumnSpace from "../../../widgets/ColumnSpace";
+import Color from "../../../utils/Color";
+import FlatButton from "../../../widgets/FlatButton";
 import Column from "../../../widgets/Column";
-import Button from "../../../widgets/Button";
-import ButtonGroup from "../../../widgets/ButtonGroup";
-import ColorButton from "../../../widgets/ColorButton";
+import {ApplicationActions} from "../../../actions/ApplicationActions";
 
 /**
  * Events:
@@ -43,74 +41,71 @@ export default class ColorInput extends Component {
 
     render() {
 
-        const hueSpinner = ColorInput.buildHueSpinner(this.props.options.value);
-        const satSpinner = ColorInput.buildSatSpinner(this.props.options.value);
-        const lighSpinner = ColorInput.buildLigSpinner(this.props.options.value);
-
-        const colors = this.props.options;
-
-        const rows = this.props.rows || 3;
-        const cols = this.props.cols || 3;
-        const pageSize = rows * cols;
-
-        let optionsList;
-        let pageButtons;
-
-        optionsList = distribute(colors, pageSize);
-
-        let currentPage = Math.min(this.props.page, optionsList.size - 1);
-
-        pageButtons = this.buildPageButtons(optionsList, currentPage);
-
-        optionsList = optionsList.get(currentPage);
-        optionsList = distribute(optionsList, cols);
-        optionsList = optionsList.map((row, rowIndex) => {
-            let buttons = row.map(option => {
-                return (
-                    <Column key={option}>
-                        <ColorButton
-                            active={this.isSelected(option)}
-                            color={option}
-                            commitAction={() => this.select(option)}
-                        />
-                    </Column>
-                );
-            });
-
-            while (buttons.size < cols) {
-                buttons = buttons.push(<ColumnSpace key={buttons.size}/>);
-            }
-
-            return <Row key={rowIndex} ofList={rowIndex > 0}>{buttons}</Row>
-        });
-
-        while (optionsList.size < rows) {
-            optionsList = optionsList.push(
-                <Row key={optionsList.size + uuid()} grow ofList>
-                    <ColumnSpace/>
-                </Row>);
-        }
+        const hueSpinner = ColorInput.buildHueSpinner(this.props.selected);
+        const satSpinner = ColorInput.buildSatSpinner(this.props.selected);
+        const lighSpinner = ColorInput.buildLigSpinner(this.props.selected);
 
         return <Row>
-            <Column bordered={this.props.bordered}>
-                <Row>
-                    <Column>
-                        {optionsList}
-                    </Column>
-                </Row>
-                {pageButtons}
+            <Column>
+                <Row topSpaced>{hueSpinner}</Row>
+                <Row topSpaced>{satSpinner}</Row>
+                <Row topSpaced>{lighSpinner}</Row>
+            </Column>
+            <Column auto align="stretch">
+                <FlatButton color={this.props.selected || Color.white} fill/>
             </Column>
         </Row>;
     }
 
-    static buildHueSpinner(value){
-        const hue = value.hue;
-
-        const buttons = [];
-
-        for(let i = 0;i < 360;i+=20){
-            buttons.push(<Button />)
+    static buildHueSpinner(color) {
+        if(color) {
+            console.log(color.red);
+            console.log(color.green);
+            console.log(color.blue);
         }
+        const buttons = [];
+        for (let i = 0; i < 10; i++) {
+            buttons.push(<Column key={i}>
+                <FlatButton
+                    active={color && this.similar(color.hue, i / 10)}
+                    color={Color.fromHSL(i / 10, 1, 0.5)}
+                    commitAction={() => ApplicationActions.colorInputSelect(i / 10, 1, 0.5)}
+                />
+            </Column>)
+        }
+        return buttons;
     }
 
+    static buildSatSpinner(color) {
+        const buttons = [];
+
+        for (let i = 0; i <= 10; i++) {
+            buttons.push(<Column key={i}>
+                <FlatButton
+                    active={color && this.similar(color.saturation, i / 10)}
+                    color={Color.fromHSL(color ? color.hue : 0, i / 10, 0.5)}
+                    commitAction={() => ApplicationActions.colorInputSelect(color.hue, i / 10, 0.5)}/>
+            </Column>)
+        }
+        return buttons;
+    }
+
+    static buildLigSpinner(color) {
+        const buttons = [];
+
+        for (let i = 0; i <= 10; i++) {
+            buttons.push(<Column key={i}>
+                <FlatButton
+                    active={color && this.similar(color.lightness, i / 10)}
+                    color={Color.fromHSL(color ? color.hue : 0, color ? color.saturation : 0, i / 10)}
+                    commitAction={() => ApplicationActions.colorInputSelect(color.hue, color.saturation, i / 10)}/>
+            </Column>)
+        }
+        return buttons;
+    }
+
+    static similar(a, b, eps) {
+        const delta = eps !== undefined ? eps : 0.01;
+        return Math.abs(a - b) < delta;
+    }
 }

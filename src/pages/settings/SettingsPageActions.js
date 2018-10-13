@@ -1,7 +1,6 @@
 import {DataActions} from "../../actions/DataActions";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 import {ApplicationActionTypes} from "../../actions/ApplicationActions";
-import {PrintersPageActions} from "../printers/PrintersPageActions";
 
 export class SettingsPageActions {
     static initSettingsPage() {

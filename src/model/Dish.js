@@ -7,6 +7,9 @@ export default class Dish extends BaseEntity {
         this._price = dto.price;
         this._description = dto.description;
         this._categoryId = dto.category;
+        if(this.category){
+            this.category.addDish(this);
+        }
         this._status = dto.status;
     }
 
@@ -42,5 +45,26 @@ export default class Dish extends BaseEntity {
 
     get status() {
         return this._status;
+    }
+
+
+    set name(name) {
+        this._name = name;
+    }
+
+    set price(price) {
+        this._price = price;
+    }
+
+    set description(description) {
+        this._description = description;
+    }
+
+    set category(category) {
+        this._categoryId = category.uuid;
+    }
+
+    set status(status) {
+        this._status = status;
     }
 }

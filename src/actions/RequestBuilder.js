@@ -1,7 +1,5 @@
 import dispatcher from "../dispatcher/SimpleDispatcher";
 
-const {fromJS} = require('immutable');
-
 class RequestBuilder {
 
     constructor() {
@@ -34,8 +32,8 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result));
-                            resolve(fromJS(result));
+                            dispatcher.fireEnd(action, result);
+                            resolve(result);
                         });
                     } else {
                         response.text().then((result) => {
@@ -76,8 +74,8 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result));
-                            resolve(fromJS(result));
+                            dispatcher.fireEnd(action, result);
+                            resolve(result);
                         });
                     } else {
                         response.text().then((result) => {
@@ -122,8 +120,8 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result));
-                            resolve(fromJS(result));
+                            dispatcher.fireEnd(action, result);
+                            resolve(result);
                         });
                     } else {
                         response.text().then((result) => {
@@ -165,8 +163,8 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, fromJS(result));
-                            resolve(fromJS(result));
+                            dispatcher.fireEnd(action, result);
+                            resolve(result);
                         });
                     } else {
                         response.text().then((result) => {

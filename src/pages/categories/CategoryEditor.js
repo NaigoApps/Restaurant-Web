@@ -13,20 +13,29 @@ export default class CategoryEditor extends React.Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
         let category = data.editor.category;
 
         let actions = CategoryEditor.buildActions(data);
 
         return <Row topSpaced grow>
             <Column>
-                <EntityEditor
-                    entity={category}
-                    valid={category.name && category.location}
-                    deleteMessage="Eliminazione categoria"
-                    deleteMethod={(cat) => CategoriesPageActions.deleteCategory(cat)}>
-                    {actions}
-                </EntityEditor>
+                <Row>
+                    <Column>
+                        <h3 className="text-center">{category.name}</h3>
+                    </Column>
+                </Row>
+                <Row grow>
+                    <Column>
+                        <EntityEditor
+                            entity={category}
+                            valid={category.name && category.location}
+                            deleteMessage="Eliminazione categoria"
+                            deleteMethod={(cat) => CategoriesPageActions.deleteCategory(cat)}>
+                            {actions}
+                        </EntityEditor>
+                    </Column>
+                </Row>
             </Column>
         </Row>;
     }
@@ -62,7 +71,7 @@ export default class CategoryEditor extends React.Component {
         return <SelectEditor options={{
             label: "Postazione",
             value: location,
-            values: data.locations,
+            values: data.data.locations,
             isValid: location => !!location,
             renderer: location => location.name,
             callback: location => CategoriesPageActions.updateCategoryLocation(data.editor.category.uuid, location)
@@ -79,7 +88,7 @@ export default class CategoryEditor extends React.Component {
 
     static buildAdditionsEditor(data) {
         const category = data.editor.category;
-        const availableAdditions = data.additions
+        const availableAdditions = data.data.additions
             .filter(addition => !addition.generic || category.additions.includes(addition));
 
         return <SelectEditor

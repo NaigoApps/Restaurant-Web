@@ -12,9 +12,9 @@ export default class OrdinationOrdersCrudList extends React.Component {
     }
 
     renderGroup(ordersGroup) {
-        let data = this.props.data;
+        let data = this.props;
         let selectedOrder = iGet(data, "ordersEditing.selectedOrder");
-        let result = OrdinationsUtils.renderImplodedOrder(ordersGroup, this.props.data.get('dishes'), this.props.data.get('additions'));
+        let result = OrdinationsUtils.renderImplodedOrder(ordersGroup, this.props.get('dishes'), this.props.get('additions'));
         let price = OrdinationsUtils.formatPrice(ordersGroup.get('price'));
 
         return <Row key={uuid()} topSpaced>
@@ -35,7 +35,7 @@ export default class OrdinationOrdersCrudList extends React.Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         let orders = this.props.orders;
 
         let usedOrders = OrdinationsUtils.implode(orders);

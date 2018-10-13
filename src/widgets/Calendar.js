@@ -6,6 +6,7 @@ import CalendarButton from "./CalendarButton";
 import {distribute, iGet} from "../utils/Utils";
 import SelectEditor from "../components/widgets/inputs/SelectEditor";
 import IntegerEditor from "../components/widgets/inputs/IntegerEditor";
+import EveningSelectorActions from "../pages/eveningEditing/eveningSelection/EveningSelectorActions";
 
 /**
  * Expects:
@@ -35,13 +36,10 @@ export default class Calendar extends Component {
     }
 
     render() {
-        let monthActionsProvider = this.props.monthActionsProvider;
-        let yearActionsProvider = this.props.yearActionsProvider;
         let day = 1;
-        let data = this.props.data;
-        let month = data.get('month');
-        let year = data.get('year');
-        console.log(year);
+        let data = this.props;
+        let month = data.month;
+        let year = data.year;
         let current = new Date(year, month, day);
 
         while (current.getDay() !== 1) {
@@ -67,8 +65,6 @@ export default class Calendar extends Component {
 
         let rows = distribute(dates, 7);
 
-        let editorYear = iGet(data, "yearEditor.value")
-
         return (
             <Row>
                 <Column>
@@ -82,7 +78,7 @@ export default class Calendar extends Component {
                                     id: value => MONTHS.indexOf(value),
                                     values: MONTHS,
                                     value: month,
-                                    callback: result => monthActionsProvider.confirmMonth(result)
+                                    callback: result => this.props.confirmMonth(result)
                                 }}
                             />
                         </Column>
@@ -95,7 +91,7 @@ export default class Calendar extends Component {
                                     value: year,
                                     min: 1999,
                                     max: 2100,
-                                    callback: result => yearActionsProvider.confirmYear(result)
+                                    callback: result => this.props.confirmYear(result)
                                 }}
                             />
                         </Column>

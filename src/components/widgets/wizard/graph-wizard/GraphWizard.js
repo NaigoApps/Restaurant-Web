@@ -30,7 +30,7 @@ export default class GraphWizard extends Component {
     }
 
     confirmAction() {
-        this.props.commitAction(this.state.data);
+        this.props.commitAction(this.state);
     }
 
     abortAction() {
@@ -51,7 +51,7 @@ export default class GraphWizard extends Component {
         const pageName = this.props.page;
 
         let pages = React.Children.map(this.props.children, (child) => React.cloneElement(child, {
-            wizardData: this.state.data,
+            wizardData: this.state,
             wizardId: this.state.uuid,
             refreshPulse: this.state.refreshPulse
         }));
@@ -63,7 +63,7 @@ export default class GraphWizard extends Component {
                 text={child.props.name}
                 active={pageName === child.props.identifier}
                 commitAction={() => this.props.onMovePage(child.props.identifier)}
-                disabled={child.props.canEnter ? !child.props.canEnter(this.state.data) : false}
+                disabled={child.props.canEnter ? !child.props.canEnter(this.state) : false}
             />;
         });
 
@@ -120,7 +120,7 @@ export default class GraphWizard extends Component {
         return <Button
             text={this.props.confirmText || "Conferma"}
             type="success"
-            disabled={this.props.isValid && !this.props.isValid(this.state.data)}
+            disabled={this.props.isValid && !this.props.isValid(this.state)}
             commitAction={this.confirmAction.bind(this)}/>;
     }
 

@@ -1,17 +1,20 @@
 import {ApplicationActionTypes} from "../actions/ApplicationActions";
 import StoresUtils from "../pages/StoresUtils";
-import RootFeatureStore from "./RootFeatureStore";
 import {DataActionTypes} from "../actions/DataActions";
 import {Utils} from "../utils/Utils";
-
-const {Map, fromJS} = require('immutable');
+import AbstractStore from "./AbstractStore";
+import loadingStore from "./LoadingStore";
+import errorsStore from "./ErrorsStore";
+import EveningSelectorActions from "../pages/eveningEditing/eveningSelection/EveningSelectorActions";
+import {Pages} from "../App";
+import EveningEditorActions from "../pages/eveningEditing/EveningEditorActions";
 
 export const EVT_APPLICATION_STORE_CHANGED = "EVT_APPLICATION_STORE_CHANGED";
 
-class ApplicationStore extends RootFeatureStore {
+class ApplicationStore extends AbstractStore {
 
     constructor() {
-        super(EVT_APPLICATION_STORE_CHANGED);
+        super("general", EVT_APPLICATION_STORE_CHANGED, loadingStore, errorsStore);
         this.isFullScreen = false;
         this.currentPage = null;
         this.floatInput = {};
@@ -24,7 +27,11 @@ class ApplicationStore extends RootFeatureStore {
         this.fiscalPrinter = null;
     }
 
-    getCompletionHandlers() {
+    getActionsClass() {
+        return ApplicationActionTypes;
+    }
+
+    getActionCompletedHandlers() {
         const handlers = {};
 
         handlers[ApplicationActionTypes.TOGGLE_FULL_SCREEN] = () => this.isFullScreen = !this.isFullScreen;
@@ -32,6 +39,8 @@ class ApplicationStore extends RootFeatureStore {
         handlers[ApplicationActionTypes.DISMISS_FULL_SCREEN] = () => this.isFullScreen = false;
 
         handlers[ApplicationActionTypes.GO_TO_PAGE] = (page) => this.currentPage = page;
+        handlers[EveningSelectorActions.CHOOSE] = () => this.currentPage = Pages.EVENINGS;
+        handlers[EveningEditorActions.DESELECT_EVENING] = () => this.currentPage = Pages.EVENING_SELECTION;
 
         handlers[ApplicationActionTypes.SHOW_TEXT_INPUT] = (options) => this.textInput = StoresUtils.initTextInput(options);
         handlers[ApplicationActionTypes.TEXT_INPUT_CHAR] = (char) => StoresUtils.textChar(this.textInput, char);
@@ -55,7 +64,7 @@ class ApplicationStore extends RootFeatureStore {
         handlers[ApplicationActionTypes.HIDE_SELECT_INPUT] = () => StoresUtils.resetSelectInput(this.selectInput);
 
         handlers[ApplicationActionTypes.SHOW_COLOR_INPUT] = (options) => this.colorInput = StoresUtils.initColorInput(options);
-        handlers[ApplicationActionTypes.COLOR_INPUT_SELECT] = (value) => StoresUtils.colorInputSelect(this.colorInput, value);
+        handlers[ApplicationActionTypes.COLOR_INPUT_SELECT] = (color) => StoresUtils.colorInputSelect(this.colorInput, color);
         handlers[ApplicationActionTypes.COLOR_INPUT_DESELECT] = (value) => StoresUtils.colorInputDeselect(this.colorInput, value);
         handlers[ApplicationActionTypes.COLOR_INPUT_PAGE_CHANGE] = (page) => StoresUtils.colorPageChange(this.colorInput, page);
         handlers[ApplicationActionTypes.HIDE_COLOR_INPUT] = () => StoresUtils.resetColorInput(this.colorInput);
@@ -68,8 +77,8 @@ class ApplicationStore extends RootFeatureStore {
         return handlers;
     }
 
-    storeSettings(settings){
-        this.settings = settings ? settings.toJS() : {};
+    storeSettings(settings) {
+        this.settings = settings || {};
         if (this.settings.clientSettings) {
             this.settings.clientSettings = JSON.parse(this.settings.clientSettings);
             // UTSettings.user = this.settings.clientSettings.utUser;
@@ -79,13 +88,15 @@ class ApplicationStore extends RootFeatureStore {
     buildState() {
         return {
             fullScreen: this.isFullScreen,
+
             currentPage: this.currentPage,
-            keyboardVisible: this.keyboardVisible,
+
             floatInput: this.floatInput,
             textInput: this.textInput,
             integerInput: this.integerInput,
             selectInput: this.selectInput,
             colorInput: this.colorInput,
+
             settings: this.settings
         };
     }

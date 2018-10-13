@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import HomePage from "./pages/HomePage";
 import ConfigurationPage from "./pages/ConfigurationPage";
 import PrintersPage from "./pages/printers/PrintersPage";
@@ -10,7 +10,7 @@ import AdditionsPage from "./pages/additions/AdditionsPage";
 import CustomersPage from "./pages/customers/CustomersPage";
 import EveningPage from "./pages/eveningEditing/EveningPage";
 import applicationStore from "./stores/ApplicationStore";
-import eveningSelectorStore from "./pages/eveningEditing/eveningSelector/EveningSelectorStore";
+import eveningSelectorStore from "./pages/eveningEditing/eveningSelection/EveningSelectorStore";
 import diningTableEditingStore from "./pages/eveningEditing/diningTableEditing/DiningTableEditorStore";
 import ordinationEditingStore
     from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationEditingStore";
@@ -21,50 +21,50 @@ import tableClosingFeatureStore
 import SettingsPage from "./pages/settings/SettingsPage";
 import loadingStore from "./stores/LoadingStore";
 import DishesPage from "./pages/dishes/DishesPage";
+import ViewController from "./widgets/ViewController";
+import EveningSelectionPage from "./pages/eveningEditing/eveningSelection/EveningSelectionPage";
 
-const {Map} = require('immutable');
+export class Pages {
+    static HOME = "HOME";
+    static CONFIGURATION = "CONFIGURATION";
+    static SETTINGS = "SETTINGS";
+    static PRINTERS = "PRINTERS";
+    static LOCATIONS = "LOCATIONS";
+    static TABLES = "TABLES";
+    static WAITERS = "WAITERS";
+    static CATEGORIES = "CATEGORIES";
+    static DISHES = "DISHES";
+    static ADDITIONS = "ADDITIONS";
+    static CUSTOMERS = "CUSTOMERS";
+    static EVENING_SELECTION = "EVENING_SELECTION";
+    static EVENINGS = "EVENINGS";
+}
 
-export const HOME = "HOME";
-export const CONFIGURATION = "CONFIGURATION";
-export const SETTINGS = "SETTINGS";
-export const PRINTERS = "PRINTERS";
-export const LOCATIONS = "LOCATIONS";
-export const TABLES = "TABLES";
-export const WAITERS = "WAITERS";
-export const CATEGORIES = "CATEGORIES";
-export const DISHES = "DISHES";
-export const ADDITIONS = "ADDITIONS";
-export const CUSTOMERS = "CUSTOMERS";
-export const EVENINGS = "EVENINGS";
 
-let pages = {
-    HOME: <HomePage/>,
-    CONFIGURATION: <ConfigurationPage/>,
-    SETTINGS: <SettingsPage/>,
-    PRINTERS: <PrintersPage/>,
-    LOCATIONS: <LocationsPage/>,
-    TABLES: <TablesPage/>,
-    WAITERS: <WaitersPage/>,
-    CATEGORIES: <CategoriesPage/>,
-    DISHES: <DishesPage/>,
-    ADDITIONS: <AdditionsPage/>,
-    CUSTOMERS: <CustomersPage/>,
-    EVENINGS: <EveningPage/>
-};
+let pages = {};
+pages[Pages.HOME] = <HomePage/>;
+pages[Pages.CONFIGURATION] = <ConfigurationPage/>;
+pages[Pages.SETTINGS] = <SettingsPage/>;
+pages[Pages.PRINTERS] = <PrintersPage/>;
+pages[Pages.LOCATIONS] = <LocationsPage/>;
+pages[Pages.TABLES] = <TablesPage/>;
+pages[Pages.WAITERS] = <WaitersPage/>;
+pages[Pages.CATEGORIES] = <CategoriesPage/>;
+pages[Pages.DISHES] = <DishesPage/>;
+pages[Pages.ADDITIONS] = <AdditionsPage/>;
+pages[Pages.CUSTOMERS] = <CustomersPage/>;
+pages[Pages.EVENING_SELECTION] = <EveningSelectionPage/>;
+pages[Pages.EVENINGS] = <EveningPage/>;
 
-class App extends Component {
+class App extends ViewController {
 
     constructor(props) {
-        super(props);
-        this.state = applicationStore.getState();
-
+        super(props, applicationStore);
         this.requireModules();
-
-        this.updateState = this.updateState.bind(this);
     }
 
     static catch(store) {
-        console.log("Catching " + store.getFeatureName());
+        console.log("Catching " + store.storeName);
     }
 
     requireModules() {
@@ -77,20 +77,8 @@ class App extends Component {
         App.catch(tableClosingFeatureStore);
     }
 
-    componentDidMount() {
-        applicationStore.addChangeListener(this.updateState);
-    }
-
-    updateState(state) {
-        this.setState(state);
-    }
-
-    componentWillUnmount() {
-        applicationStore.removeChangeListener(this.updateState);
-    }
-
     render() {
-        let page = pages[this.state.data.currentPage];
+        let page = pages[this.state.currentPage];
         return page || <HomePage/>;
     }
 }

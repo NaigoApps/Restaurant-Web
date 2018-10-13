@@ -5,12 +5,23 @@ import ColumnSpace from "../../../widgets/ColumnSpace";
 import Column from "../../../widgets/Column";
 import Button from "../../../widgets/Button";
 import ButtonGroup from "../../../widgets/ButtonGroup";
+import Color from "../../../utils/Color";
+import DiningTablesUtils from "../../../pages/eveningEditing/tables/DiningTablesUtils";
+import DiningTablesEditorActions from "../../../pages/eveningEditing/diningTableEditing/DiningTablesEditorActions";
+import RenderingData from "./RenderingData";
+import TextButton from "../../../widgets/TextButton";
 
 /**
- * Events:
- * - onSelectPage
- * - onSelect
- * - onDeselect
+ rows: int
+ cols: int
+ page: int
+ options: array
+ renderer: function object => string
+ colorRenderer: function object =>
+
+ onSelect
+ onDeselect
+ onSelectPage
  */
 
 export default class SelectInput extends Component {
@@ -48,15 +59,21 @@ export default class SelectInput extends Component {
     }
 
     renderOption(option) {
+        let renderingData;
         if (this.props.renderer) {
-            return this.props.renderer(option);
+            renderingData = this.props.renderer(option);
+            if(renderingData instanceof RenderingData){
+                return renderingData;
+            }
+            renderingData = new RenderingData(renderingData, null, null);
+        }else{
+            renderingData = new RenderingData(option, null, null);
         }
-        return option;
+        return renderingData;
     }
 
     render() {
         const entities = this.props.options;
-        const colorRenderer = this.props.colorRenderer;
 
         const rows = this.props.rows || 3;
         const cols = this.props.cols || 3;
@@ -67,30 +84,39 @@ export default class SelectInput extends Component {
 
         optionsList = distribute(entities, pageSize);
 
-        let currentPage = Math.min(this.props.page, optionsList.size - 1);
+        let currentPage = Math.min(this.props.page, optionsList.length - 1);
 
         pageButtons = this.buildPageButtons(optionsList, currentPage);
 
-        optionsList = optionsList.get(currentPage);
+        optionsList = optionsList[currentPage];
         optionsList = distribute(optionsList, cols);
         optionsList = optionsList.map((row, rowIndex) => {
             let buttons = row.map(option => {
-                const color = this.props.color ? this.props.color(option) : "#000000";
+                //Fixme color, type in button should be removed
+                const color = this.props.color ? this.props.color(option) : Color.black;
+                const bg = this.props.colorRenderer ? this.props.colorRenderer(option) : "secondary";
+                const renderData = this.renderOption(option);
+                if(!renderData.color){
+                    renderData.color = color;
+                }
+                if(!renderData.backgroundColor){
+                    renderData.backgroundColor = bg;
+                }
                 return (
                     <Column key={uuid()}>
-                        <Button
+                        <TextButton
                             active={this.isSelected(this.id(option))}
-                            color={color}
-                            text={this.renderOption(option)}
-                            type={colorRenderer ? colorRenderer(option) : "secondary"}
+                            color={renderData.color}
+                            backgroundColor={renderData.backgroundColor}
+                            text={renderData.text}
                             commitAction={() => this.select(option)}
                         />
                     </Column>
                 );
             });
 
-            while (buttons.size < cols) {
-                buttons = buttons.push(<ColumnSpace key={buttons.size}/>);
+            while (buttons.length < cols) {
+                buttons.push(<ColumnSpace key={buttons.length}/>);
             }
 
             return <Row key={rowIndex} ofList={rowIndex > 0}>{buttons}</Row>
@@ -116,7 +142,7 @@ export default class SelectInput extends Component {
     }
 
     buildPageButtons(groups, currentPage) {
-        if (groups.size > 1 || this.props.alwaysShowPages) {
+        if (groups.length > 1 || this.props.alwaysShowPages) {
             let btns = [];
             groups.forEach((group, index) => {
                 btns.push(

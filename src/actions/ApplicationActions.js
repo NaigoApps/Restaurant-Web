@@ -1,5 +1,6 @@
 import dispatcher from "../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "./RequestBuilder";
+import Color from "../utils/Color";
 
 export const ApplicationActionTypes = {
     DISMISS_FULL_SCREEN: "DISMISS_FULL_SCREEN",
@@ -79,7 +80,7 @@ export class ApplicationActions {
 
     static showColorInput = (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_COLOR_INPUT, options);
     static hideColorInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_COLOR_INPUT);
-    static colorInputSelect = (value) => dispatcher.fireEnd(ApplicationActionTypes.COLOR_INPUT_SELECT, value);
+    static colorInputSelect = (h, s, l) => dispatcher.fireEnd(ApplicationActionTypes.COLOR_INPUT_SELECT, Color.fromHSL(h, s, l));
     static colorInputDeselect = (value) => dispatcher.fireEnd(ApplicationActionTypes.COLOR_INPUT_DESELECT, value);
     static colorInputPageChange = (value) => dispatcher.fireEnd(ApplicationActionTypes.COLOR_INPUT_PAGE_CHANGE, value);
 }

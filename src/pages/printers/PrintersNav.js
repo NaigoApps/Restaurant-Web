@@ -12,14 +12,14 @@ export default class PrintersNav extends Component {
     }
 
     render() {
-        let navContent = PrintersNav.makeNavContent(this.props.data);
+        let navContent = PrintersNav.makeNavContent(this.props);
         return <RestaurantNav>{navContent}</RestaurantNav>;
     }
 
-    static makeNavContent(data) {
+    static makeNavContent(props) {
         let elements = [];
 
-        let editor = data.editor;
+        let editor = props.editor;
 
         elements.push(<NavConfigurationButton key="home"/>);
 

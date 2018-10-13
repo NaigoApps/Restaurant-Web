@@ -12,7 +12,7 @@ export default class WaiterCreator extends React.Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
 
         const editor = data.editor;
         const waiter = editor.waiter;
@@ -85,7 +85,7 @@ export default class WaiterCreator extends React.Component {
         return <SelectEditor options={{
             label: "Stato",
             value: data.editor.waiter.status,
-            values: data.waiterStatuses,
+            values: data.data.waiterStatuses,
             isValid: status => !!status,
             callback: result => WaitersPageActions.setEditorStatus(result)
         }}/>;

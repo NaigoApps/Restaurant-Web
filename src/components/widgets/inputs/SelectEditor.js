@@ -4,6 +4,7 @@ import {ApplicationActions} from "../../../actions/ApplicationActions";
 import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
 import Text from "../../../widgets/Text";
+import Color from "../../../utils/Color";
 
 /**
  * Events:
@@ -17,7 +18,6 @@ import Text from "../../../widgets/Text";
  */
 
 export default class SelectEditor extends Component {
-export default class SelectEditor extends Component {
     constructor(props) {
         super(props);
     }
@@ -27,7 +27,7 @@ export default class SelectEditor extends Component {
     }
 
     static defaultColor(a) {
-        return "#000000";
+        return Color.black;
     }
 
     renderValue(value) {

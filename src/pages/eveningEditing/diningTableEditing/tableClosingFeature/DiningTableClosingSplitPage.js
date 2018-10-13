@@ -15,7 +15,7 @@ export default class DiningTableClosingSplitPage extends Component {
     }
 
     dishName(dishUuid) {
-        let dishes = this.props.data.get('dishes');
+        let dishes = this.props.get('dishes');
         if (dishes) {
             let dish = findByUuid(dishes, dishUuid);
             if (dish) {
@@ -26,7 +26,7 @@ export default class DiningTableClosingSplitPage extends Component {
     }
 
     buildDiningTableSummary() {
-        let data = this.props.data;
+        let data = this.props;
         let dishes = data.get('dishes');
         let additions = data.get('additions');
         let table = iGet(data, "diningTableEditing.diningTable");
@@ -105,7 +105,7 @@ export default class DiningTableClosingSplitPage extends Component {
     }
 
     buildInvoiceSummary() {
-        let data = this.props.data;
+        let data = this.props;
         let dishes = data.get('dishes');
         let additions = data.get('additions');
         let wizardData = iGet(data, "tableClosingFeature.closingWizard");

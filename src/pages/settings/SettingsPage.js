@@ -26,7 +26,7 @@ export default class SettingsPage extends ViewController {
     render() {
         let pageContent = this.makePageContent();
         return (
-            <Page title="Impostazioni">
+            <Page title="Impostazioni" {...this.state}>
                 <RestaurantNav/>
                 <Row topSpaced>
                     <Column>
@@ -38,7 +38,7 @@ export default class SettingsPage extends ViewController {
     }
 
     makePageContent() {
-        const settings = this.state.data.settings;
+        const settings = this.state.settings;
         const printers = dataStore.getEntities(Topics.PRINTERS);
         let options = [];
         if (settings) {
@@ -122,7 +122,7 @@ export default class SettingsPage extends ViewController {
     }
 
     makeIntegerOptions(label, property) {
-        const clientSettings = this.state.data.settings.clientSettings;
+        const clientSettings = this.state.settings.clientSettings;
         return {
             label: label,
             value: clientSettings[property] || null,

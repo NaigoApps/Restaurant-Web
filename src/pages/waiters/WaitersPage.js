@@ -21,10 +21,10 @@ export default class WaitersPage extends ViewController {
     }
 
     render() {
-        let pageContent = WaitersPage.makePageContent(this.state.data);
+        let pageContent = WaitersPage.makePageContent(this.state);
         return (
-            <Page title="Camerieri">
-                <WaitersNav data={this.state.data}/>
+            <Page title="Camerieri" {...this.state.general}>
+                <WaitersNav {...this.state}/>
                 {pageContent}
             </Page>
         )
@@ -33,11 +33,11 @@ export default class WaitersPage extends ViewController {
     static makePageContent(data) {
 
         if (data.editor.mode === EditorMode.EDITING) {
-            return <WaiterEditor data={data}/>
+            return <WaiterEditor {...data}/>
         } else if (data.editor.mode  === EditorMode.CREATING) {
-            return <WaiterCreator data={data}/>
+            return <WaiterCreator {...data}/>
         } else {
-            return <WaitersNavigator data={data}/>
+            return <WaitersNavigator {...data}/>
         }
     }
 }

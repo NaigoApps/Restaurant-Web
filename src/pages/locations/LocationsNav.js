@@ -12,7 +12,7 @@ export default class LocationsNav extends Component {
     }
 
     render() {
-        let navContent = LocationsNav.makeNavContent(this.props.data);
+        let navContent = LocationsNav.makeNavContent(this.props);
         return <RestaurantNav>{navContent}</RestaurantNav>;
     }
 

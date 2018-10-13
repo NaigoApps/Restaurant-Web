@@ -22,7 +22,7 @@ export default class DiningTableClosingModePage extends Component {
     }
 
     render() {
-        let quick = iGet(this.props.data, "tableClosingFeature.closingWizard.quick");
+        let quick = iGet(this.props, "tableClosingFeature.closingWizard.quick");
         return (
             <Row>
                 <Column>

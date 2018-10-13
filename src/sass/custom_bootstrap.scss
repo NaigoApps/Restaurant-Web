@@ -1,7 +1,4 @@
-//$theme-colors: (
-//        "secondary": #BBBBBB,
-//        "info": #9CDBE4
-//);
+@import "luminance";
 
 $theme-colors: (
         "primary": #0275d8,
@@ -12,16 +9,33 @@ $theme-colors: (
         "info": #5bc0de
 );
 
-.btn.btn-secondary {
-  border: 1px solid #ccc;
+@function luminance($color) {
+  $red: nth($luminance, red($color) + 1);
+  $green: nth($luminance, green($color) + 1);
+  $blue: nth($luminance, blue($color) + 1);
+
+  @return .2126 * $red + .7152 * $green + .0722 * $blue;
 }
 
-.btn.btn-warning {
-  color: white;
-}
+@each $color_name, $color_value in $theme-colors {
+  .btn.btn-#{$color_name}:hover {
+    border-color: lighten($color_value, 50%);
+    background-color: darken($color_value, 5%);
+  }
 
-.btn.btn-info {
-  color: white;
+  @if luminance($color_value) < 0.18 {
+    .btn.btn-#{$color_name} {
+      color: white;
+    }
+  } @else {
+    .btn.btn-#{$color_name} {
+      color: black;
+    }
+  }
+
+  .btn.btn-#{$color_name} {
+    border-color: darken($color_value, 20%);
+  }
 }
 
 .btn:disabled {

@@ -29,7 +29,7 @@ export default class OrderDishWizardPage extends Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         let orders = iGet(data, "ordersEditing.orders");
         let selectedCategory = iGet(data, "ordersEditing.selectedCategory");
 
@@ -106,7 +106,7 @@ export default class OrderDishWizardPage extends Component {
     }
 
     buildNav() {
-        let data = this.props.data;
+        let data = this.props;
         let selectedCategory = iGet(data, "ordersEditing.selectedCategory");
         let buttons = [];
         buttons.push(<NavElement
@@ -128,18 +128,18 @@ export default class OrderDishWizardPage extends Component {
     }
 
     findCategory(catUuid) {
-        return findByUuid(this.props.data.get('categories'), catUuid);
+        return findByUuid(this.props.get('categories'), catUuid);
     }
 
     findDish(dishUuid) {
-        return findByUuid(this.props.data.get('dishes'), dishUuid);
+        return findByUuid(this.props.get('dishes'), dishUuid);
     }
 
     buildCategoriesContent() {
-        let data = this.props.data;
+        let data = this.props;
         let selectedCategory = iGet(data, "ordersEditing.selectedCategory");
         let categoryPage = iGet(data, "ordersEditing.categoryPage");
-        let availableCategories = this.props.data.get('categories');
+        let availableCategories = this.props.get('categories');
         return <SelectInput
             rows={7}
             cols={3}
@@ -156,10 +156,10 @@ export default class OrderDishWizardPage extends Component {
     }
 
     buildDishesContent(categoryUuid) {
-        let data = this.props.data;
+        let data = this.props;
         let selectedDish = iGet(data, "ordersEditing.selectedDish");
         let dishPage = iGet(data, "ordersEditing.dishPage");
-        let availableDishes = this.props.data.get('dishes')
+        let availableDishes = this.props.get('dishes')
             .filter(dish => dish.get('status') === "ATTIVO")
             .filter(dish => dish.get('category') === categoryUuid);
         return <SelectInput

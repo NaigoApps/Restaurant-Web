@@ -12,7 +12,7 @@ export default class ApplicationIntegerInput extends Component {
     }
 
     confirmIntegerValue() {
-        let data = this.props.data;
+        let data = this.props;
         let callback = data.callback;
         if (callback) {
             callback(data.value);
@@ -21,7 +21,7 @@ export default class ApplicationIntegerInput extends Component {
     }
 
     isValid() {
-        let data = this.props.data;
+        let data = this.props;
         let value = data.value;
         let min = data.min;
         let max = data.max;
@@ -29,7 +29,7 @@ export default class ApplicationIntegerInput extends Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         return <PopupContainer
             id="app-int-input"
             visible={data.visible}

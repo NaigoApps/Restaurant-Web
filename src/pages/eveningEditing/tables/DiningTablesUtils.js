@@ -1,6 +1,7 @@
 import {findByUuid, iGet, stringEquals, uuid} from "../../../utils/Utils";
-import {beautifyTime} from "../../../components/widgets/inputs/DateInput";
-import OrdinationsUtils from "../OrdinationsUtils";
+import {beautifyTime, formatTime} from "../../../components/widgets/inputs/DateInput";
+import RenderingData from "../../../components/widgets/inputs/RenderingData";
+import DiningTableStatus from "../../../model/DiningTableStatus";
 
 const {fromJS, Map, List} = require('immutable');
 
@@ -152,20 +153,32 @@ export default class DiningTablesUtils {
         return groupsList;
     }
 
-    static renderDiningTable(diningTable, tables, waiters) {
-        let result = "Tavolo ";
-        if (diningTable) {
-            const table = findByUuid(tables, diningTable.get('table'));
-            const waiter = findByUuid(waiters, diningTable.get('waiter'));
-            result += table ? table.get('name') : "?";
-            if (diningTable.get('openingTime')) {
-                result += " (" + beautifyTime(diningTable.get('openingTime')) + ") ";
+    static renderDiningTable(table) {
+        let txt = "Tavolo ";
+        if (table) {
+            const table = table.table;
+            const waiter = table.waiter;
+            txt += table ? table.name : "?";
+            if (table.openingTime) {
+                txt += " (" + formatTime(table.openingTime) + ") ";
             } else {
-                result += " (?) "
+                txt += " (?) "
             }
-            result += waiter ? waiter.get('name') : "?";
+            txt += waiter ? waiter.name : "?";
         }
-        return result;
+        let bg;
+        switch (table.status){
+            case DiningTableStatus.OPEN:
+                bg = "danger";
+                break;
+            case DiningTableStatus.CLOSING:
+                bg = "warning";
+                break;
+            default:
+                bg = "secondary";
+                break;
+        }
+        return new RenderingData(txt, null, bg)
     }
 
     static getSelectedDiningTable(data) {
@@ -173,18 +186,18 @@ export default class DiningTablesUtils {
     }
 
     static renderBill(bill, customers) {
-        if(!bill.get('printTime')){
-            return "Conto generico n°" + bill.get('progressive');
+        if(!bill.printTime){
+            return "Conto generico n°" + bill.progressive;
         }
-        if (bill.get('customer')) {
-            let customer = findByUuid(customers, bill.get('customer'));
-            return "Fattura n°" + bill.get('progressive') + " di " + DiningTablesUtils.renderCustomer(customer);
+        if (bill.customer) {
+            let customer = findByUuid(customers, bill.customer);
+            return "Fattura n°" + bill.progressive + " di " + DiningTablesUtils.renderCustomer(customer);
         } else {
-            return "Ricevuta n°" + bill.get('progressive')
+            return "Ricevuta n°" + bill.progressive
         }
     }
 
     static renderCustomer(customer) {
-        return customer.get('name') + " " + customer.get('surname');
+        return customer.name + " " + customer.surname;
     }
 }

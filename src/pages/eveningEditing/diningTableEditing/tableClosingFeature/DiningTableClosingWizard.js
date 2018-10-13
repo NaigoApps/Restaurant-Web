@@ -2,7 +2,6 @@ import React from 'react';
 import Wizard from "../../../../components/widgets/wizard/Wizard";
 import DiningTableClosingModePage from "./DiningTableClosingModePage";
 import DiningTableClosingSplitPage from "./DiningTableClosingSplitPage";
-import DiningTablesUtils from "../../tables/DiningTablesUtils";
 import DiningTableClosingReviewPage from "./DiningTableClosingReviewPage";
 import {iGet} from "../../../../utils/Utils";
 import {DiningTablesClosingActions} from "./DiningTablesClosingActions";
@@ -17,13 +16,13 @@ export default class DiningTableClosingWizard extends React.Component {
     }
 
     confirmInvoice() {
-        let data = this.props.data;
+        let data = this.props;
         let bill = iGet(data, "tableClosingFeature.bill");
         this.props.confirmAction(bill);
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         let wizardData = iGet(data, "tableClosingFeature.closingWizard");
         let wizardPages = this.buildWizardPages();
         let page = wizardData.get('page');
@@ -42,7 +41,7 @@ export default class DiningTableClosingWizard extends React.Component {
     }
 
     buildWizardPages() {
-        let data = this.props.data;
+        let data = this.props;
         let wizardData = iGet(data, "tableClosingFeature.closingWizard");
         let pages = [];
         if (wizardData && wizardData.get('visible')) {

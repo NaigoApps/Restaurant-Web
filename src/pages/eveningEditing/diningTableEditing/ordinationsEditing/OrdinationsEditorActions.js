@@ -1,54 +1,94 @@
-import {ACT_UPDATE_ENTITY} from "../../../../actions/DataActions";
 import dispatcher from "../../../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../../../actions/RequestBuilder";
+import {OrdinationCreatorActionTypes} from "./OrdinationsCreatorActions";
 
-const {fromJS, List} = require('immutable');
+export const OrdinationEditorActionTypes = {};
 
-export const OrdinationEditorActionTypes = {
-    BEGIN_ORDINATION_EDITING: "BEGIN_ORDINATION_EDITING",
-    ABORT_ORDINATION_EDITING: "ABORT_ORDINATION_EDITING",
-    UPDATE_ORDERS: "UPDATE_ORDERS",
-    SELECT_ORDINATION_PAGE: "SELECT_ORDINATION_PAGE",
-    ABORT_ORDERS_EDITING: "ABORT_ORDERS_EDITING",
-    PRINT_ORDINATION: "PRINT_ORDINATION",
-    ABORT_ORDINATION: "ABORT_ORDINATION",
+export default class OrdinationsEditorActions {
+    static BEGIN_ORDINATION_CREATION = "BEGIN_ORDINATION_CREATION";
+    static ABORT_ORDINATION_CREATION = "ABORT_ORDINATION_CREATION";
+    static CREATE_ORDINATION = "CREATE_ORDINATION";
+    static BEGIN_ORDINATION_EDITING = "BEGIN_ORDINATION_EDITING";
+    static ABORT_ORDINATION_EDITING = "ABORT_ORDINATION_EDITING";
+    static UPDATE_ORDERS = "UPDATE_ORDERS";
+    static SELECT_ORDINATION_PAGE = "SELECT_ORDINATION_PAGE";
+    static ABORT_ORDERS_EDITING = "ABORT_ORDERS_EDITING";
+    static PRINT_ORDINATION = "PRINT_ORDINATION";
+    static ABORT_ORDINATION = "ABORT_ORDINATION";
 
-    BEGIN_ORDINATION_DELETION: "BEGIN_ORDINATION_DELETION",
-    ABORT_ORDINATION_DELETION: "ABORT_ORDINATION_DELETION",
-    DELETE_ORDINATION: "DELETE_ORDINATION",
-};
+    static BEGIN_ORDINATION_DELETION = "BEGIN_ORDINATION_DELETION";
+    static ABORT_ORDINATION_DELETION = "ABORT_ORDINATION_DELETION";
+    static DELETE_ORDINATION = "DELETE_ORDINATION";
 
-export const OrdinationsEditorActions = {
 
-    abortOrdinationEditing: () => dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDINATION_EDITING),
+    static beginOrdinationCreation() {
+        dispatcher.fireEnd(OrdinationCreatorActionTypes.BEGIN_ORDINATION_CREATION);
+    }
 
-    beginOrdinationEditing: (uuid) => dispatcher.fireEnd(OrdinationEditorActionTypes.BEGIN_ORDINATION_EDITING, uuid),
+    static abortOrdinationCreation() {
+        dispatcher.fireEnd(OrdinationCreatorActionTypes.ABORT_ORDINATION_CREATION);
+    }
 
-    selectOrdinationPage: (page) => dispatcher.fireEnd(OrdinationEditorActionTypes.SELECT_ORDINATION_PAGE, page),
+    static onConfirmOrders(table, ordination, orders) {
+        asyncActionBuilder.post(
+            OrdinationCreatorActionTypes.CREATE_ORDINATION,
+            'dining-tables/' + table + '/ordinations', orders);
+    }
 
-    onConfirmOrders: (tableUuid, ordinationUuid, orders) => asyncActionBuilder.put(
-        OrdinationEditorActionTypes.UPDATE_ORDERS,
-        'dining-tables/' + ordinationUuid + '/orders', orders),
+    static onAbortOrders() {
+        dispatcher.fireEnd(OrdinationCreatorActionTypes.ABORT_ORDINATION_CREATION);
+    }
 
-    onAbortOrders: () => dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDERS_EDITING),
+    static abortOrdinationEditing() {
+        dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDINATION_EDITING);
+    }
 
-    printOrdination: (uuid) => asyncActionBuilder.post(
-        OrdinationEditorActionTypes.PRINT_ORDINATION,
-        'printers/print',
-        uuid
-    ),
+    static beginOrdinationEditing(uuid) {
+        dispatcher.fireEnd(OrdinationEditorActionTypes.BEGIN_ORDINATION_EDITING, uuid);
+    }
 
-    abortOrdination: (uuid) => asyncActionBuilder.put(
-        OrdinationEditorActionTypes.ABORT_ORDINATION,
-        'ordinations/' + uuid + "/abort"
-    ),
+    static selectOrdinationPage(page) {
+        dispatcher.fireEnd(OrdinationEditorActionTypes.SELECT_ORDINATION_PAGE, page);
+    }
 
-    beginOrdinationDeletion: () => dispatcher.fireEnd(OrdinationEditorActionTypes.BEGIN_ORDINATION_DELETION),
-    abortOrdinationDeletion: () => dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDINATION_DELETION),
+    static onConfirmOrders(tableUuid, ordinationUuid, orders) {
+        asyncActionBuilder.put(
+            OrdinationEditorActionTypes.UPDATE_ORDERS,
+            'dining-tables/' + ordinationUuid + '/orders', orders);
+    }
 
-    deleteOrdination: (tabUuid, ordUuid) => asyncActionBuilder.remove(
-        OrdinationEditorActionTypes.DELETE_ORDINATION,
-        'dining-tables/' + tabUuid + "/ordinations",
-        ordUuid
-    )
+    static onAbortOrders() {
+        dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDERS_EDITING);
+    }
+
+    static printOrdination(uuid) {
+        asyncActionBuilder.post(
+            OrdinationEditorActionTypes.PRINT_ORDINATION,
+            'printers/print',
+            uuid
+        );
+    }
+
+    static abortOrdination(uuid) {
+        asyncActionBuilder.put(
+            OrdinationEditorActionTypes.ABORT_ORDINATION,
+            'ordinations/' + uuid + "/abort"
+        );
+    }
+
+    static beginOrdinationDeletion() {
+        dispatcher.fireEnd(OrdinationEditorActionTypes.BEGIN_ORDINATION_DELETION);
+    }
+
+    static abortOrdinationDeletion() {
+        dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDINATION_DELETION);
+    }
+
+    static deleteOrdination(tabUuid, ordUuid) {
+        asyncActionBuilder.remove(
+            OrdinationEditorActionTypes.DELETE_ORDINATION,
+            'dining-tables/' + tabUuid + "/ordinations",
+            ordUuid
+        );
+    }
 };

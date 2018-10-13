@@ -13,20 +13,30 @@ export default class CategoryCreator extends React.Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
         let category = data.editor.category;
 
         let actions = CategoryCreator.buildActions(data);
 
         return <Row topSpaced grow>
             <Column>
-                <EntityEditor
-                    entity={category}
-                    valid={category.name && category.location}
-                    abortMethod={() => CategoriesPageActions.selectCategory(null)}
-                    confirmMethod={(cat) => CategoriesPageActions.createCategory(cat)}>
-                    {actions}
-                </EntityEditor>
+
+                <Row>
+                    <Column>
+                        <h3 className="text-center">Creazione categoria</h3>
+                    </Column>
+                </Row>
+                <Row>
+                    <Column>
+                        <EntityEditor
+                            entity={category}
+                            valid={category.name && category.location}
+                            abortMethod={() => CategoriesPageActions.selectCategory(null)}
+                            confirmMethod={(cat) => CategoriesPageActions.createCategory(cat)}>
+                            {actions}
+                        </EntityEditor>
+                    </Column>
+                </Row>
             </Column>
         </Row>;
     }
@@ -61,7 +71,7 @@ export default class CategoryCreator extends React.Component {
         return <SelectEditor options={{
             label: "Postazione",
             value: location,
-            values: data.locations,
+            values: data.data.locations,
             isValid: location => !!location,
             renderer: location => location.name,
             callback: location => CategoriesPageActions.setEditorLocation(location)

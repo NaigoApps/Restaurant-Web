@@ -16,7 +16,7 @@ export default class OrdersEditor extends Component {
     }
 
     onWizardOk() {
-        let orders = iGet(this.props.data, "ordersEditing.orders");
+        let orders = iGet(this.props, "ordersEditing.orders");
         this.props.commitAction(orders);
     }
 
@@ -25,7 +25,7 @@ export default class OrdersEditor extends Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         let orders = iGet(data, "ordersEditing.orders");
 
         return <GraphWizard
@@ -47,27 +47,27 @@ export default class OrdersEditor extends Component {
                 identifier={OrdersWizardPages.DISHES_PAGE}
                 name="Inserimento piatti"
                 label={dish => dish.get('name')}
-                data={this.props.data}
+                data={this.props}
             />
 
             <OrderAdditionsWizardPage
                 identifier="additions"
                 name="Inserimento varianti e modifica"
                 label={add => add.get('name')}
-                data={this.props.data}/>
+                data={this.props}/>
 
         </GraphWizard>
 
     }
 
     renderWizardData(wData) {
-        let orders = this.props.data.get('editingOrders');
+        let orders = this.props.get('editingOrders');
         if (orders) {
             let sampleOrder = findByUuid(orders, wData["editing"]);
             if (sampleOrder) {
                 let price = OrdinationsUtils.formatPrice(sampleOrder.get('price'));
                 return "Ordine corrente: " +
-                    OrdinationsUtils.renderExplodedOrder(sampleOrder, this.props.data.get('dishes'), this.props.data.get('additions')) +
+                    OrdinationsUtils.renderExplodedOrder(sampleOrder, this.props.get('dishes'), this.props.get('additions')) +
                     " (" + price + ")";
             }
         }

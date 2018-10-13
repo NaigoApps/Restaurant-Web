@@ -3,7 +3,7 @@ import NavElement from "../../widgets/NavElement";
 import RestaurantNav from "../../components/RestaurantNav";
 import NavConfigurationButton from "../../widgets/NavConfigurationButton";
 import EditorMode from "../../utils/EditorMode";
-import {AdditionsEditorActions} from "./AdditionsEditorActions";
+import AdditionsPageActions from "./AdditionsPageActions";
 
 export default class AdditionsNav extends Component {
 
@@ -12,31 +12,31 @@ export default class AdditionsNav extends Component {
     }
 
     render() {
-        let navContent = AdditionsNav.makeNavContent(this.props.data);
+        let navContent = AdditionsNav.makeNavContent(this.props);
         return <RestaurantNav>{navContent}</RestaurantNav>;
     }
 
     static makeNavContent(data) {
         let elements = [];
 
-        const editorStatus = data.get('editorStatus');
-        const addition = data.get('addition');
+        const mode = data.editor.mode;
+        const addition = data.editor.addition;
 
         elements.push(<NavConfigurationButton key="home"/>);
 
         elements.push(<NavElement
             key="additions"
-            text="Varianti"
-            active={editorStatus === EditorMode.SURFING}
-            commitAction={() => AdditionsEditorActions.deselectAddition()}
+            text="Elenco varianti"
+            active={!addition}
+            commitAction={() => AdditionsPageActions.selectAddition()}
         />);
-        if (editorStatus === EditorMode.EDITING) {
+        if (mode === EditorMode.EDITING) {
             elements.push(<NavElement
                 key="selected"
-                text={addition.get('name')}
+                text={addition.name}
                 active={true}
             />);
-        } else if (editorStatus === EditorMode.CREATING) {
+        } else if (mode === EditorMode.CREATING) {
             elements.push(<NavElement
                 key="selected"
                 text={"Creazione variante"}

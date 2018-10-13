@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import {distribute, uuid} from "../utils/Utils";
 import Button from "./Button";
-import ButtonGroup from "./ButtonGroup";
 import LinesGroup from "./LinesGroup";
 
 const PAGE_SIZE = 10;

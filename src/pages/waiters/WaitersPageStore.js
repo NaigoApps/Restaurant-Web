@@ -1,4 +1,4 @@
-import AbstractStore from "../../stores/RootFeatureStore";
+import AbstractStore from "../../stores/AbstractStore";
 import EditorMode from "../../utils/EditorMode";
 import {Utils} from "../../utils/Utils";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
@@ -13,7 +13,7 @@ const EVT_WAITERS_PAGE_STORE_CHANGED = "EVT_WAITERS_PAGE_STORE_CHANGED";
 class WaitersPageStore extends AbstractStore {
 
     constructor() {
-        super(EVT_WAITERS_PAGE_STORE_CHANGED);
+        super("waiters", EVT_WAITERS_PAGE_STORE_CHANGED, applicationStore, dataStore);
         this.initEditor();
         this.navigator = {
             page: 0
@@ -31,11 +31,11 @@ class WaitersPageStore extends AbstractStore {
         }
     }
 
-    getStoreDependencies() {
-        return [dataStore, applicationStore];
+    getActionsClass(){
+        return WaitersPageActions;
     }
 
-    getCompletionHandlers() {
+    getActionCompletedHandlers() {
         const handlers = {};
         handlers[WaitersPageActions.BEGIN_WAITER_CREATION] = () =>
             this.initEditor(Waiter.create(EntitiesUtils.newWaiter(), dataStore.getPool()), true);
@@ -44,9 +44,9 @@ class WaitersPageStore extends AbstractStore {
         handlers[WaitersPageActions.SET_WAITER_EDITOR_CF] = (value) => this.editor.waiter.cf = value;
         handlers[WaitersPageActions.SET_WAITER_EDITOR_STATUS] = (value) => this.editor.waiter.status = value;
         handlers[WaitersPageActions.CREATE_WAITER] = (waiter) =>
-            this.initEditor(Waiter.create(waiter.toJS(), dataStore.getPool()));
+            this.initEditor(Waiter.create(waiter, dataStore.getPool()));
         handlers[WaitersPageActions.UPDATE_EDITING_WAITER] = (waiter) =>
-            this.initEditor(Waiter.create(waiter.toJS(), dataStore.getPool()));
+            this.initEditor(Waiter.create(waiter, dataStore.getPool()));
         handlers[WaitersPageActions.SELECT_EDITING_WAITER] = (waiter) => this.initEditor(waiter);
         handlers[WaitersPageActions.SELECT_WAITER_NAVIGATOR_PAGE] = (page) => this.navigator.page = page;
         handlers[WaitersPageActions.DELETE_EDITING_WAITER] = () => this.initEditor();
@@ -57,16 +57,10 @@ class WaitersPageStore extends AbstractStore {
         return handlers;
     }
 
-    getState() {
+    buildState() {
         return {
-            data: {
-                settings: applicationStore.getSettings(),
-                waiters: dataStore.getEntities(Topics.WAITERS),
-                waiterStatuses: dataStore.getEntities(Topics.WAITER_STATUSES),
-
-                editor: this.editor,
-                navigator: this.navigator
-            }
+            editor: this.editor,
+            navigator: this.navigator
         };
     }
 

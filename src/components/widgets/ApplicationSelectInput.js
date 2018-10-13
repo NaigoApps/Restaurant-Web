@@ -12,12 +12,12 @@ export default class ApplicationSelectInput extends Component {
     }
 
     canConfirm() {
-        let data = this.props.data;
+        let data = this.props;
         return data.isValid === undefined || data.isValid(data.value);
     }
 
     confirmSelectValue() {
-        let data = this.props.data;
+        let data = this.props;
         let callback = data.callback;
         if (callback) {
             callback(data.value);
@@ -26,7 +26,7 @@ export default class ApplicationSelectInput extends Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         return <PopupContainer
             id="app-select-input"
             visible={data.visible}

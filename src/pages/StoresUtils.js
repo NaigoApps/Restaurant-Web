@@ -1,6 +1,8 @@
 import {CANC} from "../utils/Characters";
 import {BACKSPACE, LEFT, RIGHT} from "../components/widgets/inputs/Keyboard";
 import {iGet, Utils} from "../utils/Utils";
+import Color from "../utils/Color";
+import EditorMode from "../utils/EditorMode";
 
 const {Map, List} = require('immutable');
 
@@ -76,8 +78,8 @@ export default class StoresUtils {
         };
     }
 
-    static colorInputSelect(editor, value) {
-        editor.value = value;
+    static colorInputSelect(editor, color) {
+        editor.value = color;
     }
 
     static colorInputDeselect(editor, value) {
@@ -291,8 +293,8 @@ export default class StoresUtils {
     }
 
     static option(data, optionName, def) {
-        if (data.settings) {
-            return data.settings.clientSettings[optionName] || def;
+        if (data.general.settings) {
+            return data.general.settings.clientSettings[optionName] || def;
         }
         return def;
     }
@@ -302,5 +304,17 @@ export default class StoresUtils {
             return iGet(data, "settings.clientSettings." + prop) || def;
         }
         return def;
+    }
+
+    static initEditor(entity, creating) {
+        const editor = {
+            mode: null,
+            entity: null,
+        };
+        if (entity) {
+            editor.mode = creating ? EditorMode.CREATING : EditorMode.EDITING;
+            editor.entity = entity;
+        }
+        return editor;
     }
 }

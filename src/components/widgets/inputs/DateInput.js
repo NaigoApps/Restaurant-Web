@@ -27,19 +27,38 @@ export function daysInMonth(month, year){
 export function formatDate(date) {
     let formattedDate = new Date(date);
     formattedDate.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-    return formattedDate.toJSON().slice(0, 10);
+    return beautifyDate(formattedDate.toJSON().slice(0, 10));
 }
 
-export function beautifyDate(date) {
-    if (date) {
-        return date.substr(8, 2) + "/" + date.substr(5, 2) + "/" + date.substr(0, 4);
+export function formatTime(date) {
+    let formattedDate = new Date(date);
+    formattedDate.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return beautifyTime(formattedDate.toJSON());
+}
+
+export function normalizeDate(date) {
+    let formattedDate = new Date(date);
+    formattedDate.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return standardizeDate(formattedDate.toJSON().slice(0, 10));
+}
+
+export function beautifyDate(strDate) {
+    if (strDate) {
+        return strDate.substr(8, 2) + "/" + strDate.substr(5, 2) + "/" + strDate.substr(0, 4);
     }
     return "";
 }
 
-export function beautifyTime(date) {
-    if (date) {
-        return date.substr(date.indexOf("T") + 1, 5);
+export function standardizeDate(strDate) {
+    if (strDate) {
+        return strDate.substr(0, 4) + "-" + strDate.substr(5, 2) + "-" + strDate.substr(8, 2);
+    }
+    return "";
+}
+
+export function beautifyTime(strDate) {
+    if (strDate) {
+        return strDate.substr(strDate.indexOf("T") + 1, 5);
     }
     return "";
 }

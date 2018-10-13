@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import KeyboardButton, {SIZES} from "./KeyboardButton";
-import KeyboardButtonSpace from "./KeyboardButtonSpace";
 import Row from "../../../widgets/Row";
 import Column from "../../../widgets/Column";
 

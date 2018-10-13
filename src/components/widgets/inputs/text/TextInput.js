@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import Column from "../../../../widgets/Column";
 import Row from "../../../../widgets/Row";
 import Keyboard, {BACKSPACE, DELETE, LEFT, RIGHT} from "../Keyboard";
-import {CANC} from "../../../../utils/Characters";
 
 const {Map} = require('immutable');
 

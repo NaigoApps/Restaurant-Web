@@ -27,9 +27,9 @@ export default class OrderAdditionsWizardPage extends Component {
     }
 
     canHaveAddition(dishUuid, additionUuid) {
-        let dish = findByUuid(this.props.data.get('dishes'), dishUuid);
+        let dish = findByUuid(this.props.get('dishes'), dishUuid);
         if (dish) {
-            let category = findByUuid(this.props.data.get('categories'), dish.get('category'));
+            let category = findByUuid(this.props.get('categories'), dish.get('category'));
             if (category) {
                 return category.get('additions').includes(additionUuid);
             }
@@ -38,7 +38,7 @@ export default class OrderAdditionsWizardPage extends Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         let orders = iGet(data, "ordersEditing.orders");
         let content = this.buildContent();
 
@@ -48,7 +48,7 @@ export default class OrderAdditionsWizardPage extends Component {
                     <Row grow>
                         <Column>
                             <OrdinationOrdersCrudList
-                                data={this.props.data}
+                                data={this.props}
                                 orders={orders}
                                 trashAction={grp => OrdersActions.removeGroup(grp)}
                                 commitAction={(grp) => OrdersActions.selectGroup(grp)}
@@ -64,7 +64,7 @@ export default class OrderAdditionsWizardPage extends Component {
     }
 
     buildContent() {
-        let data = this.props.data;
+        let data = this.props;
         let additionsPage = iGet(data, "ordersEditing.additionsPage");
         let availableAdditions = data.get('additions');
 
@@ -165,7 +165,7 @@ export default class OrderAdditionsWizardPage extends Component {
     }
 
     buildPriceContent() {
-        let data = this.props.data;
+        let data = this.props;
         let orders = iGet(data, "ordersEditing.orders");
         let selectedOrderUuid = iGet(data, "ordersEditing.selectedOrder");
         let selectedOrder = null;

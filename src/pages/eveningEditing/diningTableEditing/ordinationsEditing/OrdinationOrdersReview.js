@@ -12,8 +12,8 @@ export default class OrdinationOrdersReview extends React.Component {
     }
 
     renderOrder(group) {
-        let dishes = this.props.data.get('dishes');
-        let additions = this.props.data.get('additions');
+        let dishes = this.props.get('dishes');
+        let additions = this.props.get('additions');
         let result = OrdinationsUtils.renderImplodedOrder(group, dishes, additions);
 
         return <Row key={"order-" + uuid()}>
@@ -24,7 +24,7 @@ export default class OrdinationOrdersReview extends React.Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         let orders = this.props.orders;
 
         let phaseOrders = OrdinationsUtils.makePhaseMap(orders, data.get('phases'));

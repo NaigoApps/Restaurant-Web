@@ -1,14 +1,12 @@
 import eveningPageStore from "../../../EveningPageStore";
 import {OrdersActionTypes} from "./OrdersActions";
-import SubFeatureStore from "../../../../../stores/SubFeatureStore";
-import phasesStore from "../../../../../stores/generic/PhasesStore";
 import {EntitiesUtils} from "../../../../../utils/EntitiesUtils";
 import {findByUuid, findIndexByUuid} from "../../../../../utils/Utils";
 import {OrdinationCreatorActionTypes} from "../OrdinationsCreatorActions";
 import {AdditionPages} from "../../../../../components/widgets/wizard/graph-wizard/OrderAdditionsWizardPage";
 import OrdinationsUtils from "../../../OrdinationsUtils";
-import additionsStore from "../../../../../stores/generic/AdditionsStore";
 import dataStore, {Topics} from "../../../../../stores/DataStore";
+import AbstractStore from "../../../../../stores/AbstractStore";
 
 const {Map, List, fromJS} = require('immutable');
 
@@ -16,8 +14,9 @@ export const OrdersWizardPages = {
     DISHES_PAGE: 0,
 };
 
-class OrdersEditingStore extends SubFeatureStore {
+class OrdersEditingStore extends AbstractStore {
     constructor() {
+        //FIXME
         super(eveningPageStore, "ordersEditing");
         this.orders = null;
         this.wizardPage = null;
@@ -137,7 +136,7 @@ class OrdersEditingStore extends SubFeatureStore {
         this.wizardPage = OrdersWizardPages.DISHES_PAGE;
         this.selectedCategory = null;
         this.categoryPage = 0;
-        this.selectedPhase = phasesStore.getPhases().getPayload().get(0).get('uuid');
+        this.selectedPhase = //FIXME phasesStore.getPhases().getPayload().get(0).get('uuid');
         this.quantity = 1;
     }
 
@@ -168,7 +167,7 @@ class OrdersEditingStore extends SubFeatureStore {
 
             let additionIndex = order.get('additions').indexOf(addition);
 
-            let additionEntity = findByUuid(additionsStore.getAdditions().getPayload(), addition);
+            let additionEntity = dataStore.getEntity(addition);
 
             if (additionIndex !== -1) {
                 order = order.set('additions', order.get('additions').remove(additionIndex));

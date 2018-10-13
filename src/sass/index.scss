@@ -272,6 +272,7 @@ body {
 .btn-xl {
   padding: .75rem 1.5rem;
   font-size: 2.00rem;
+  line-height: 2.00rem;
   border-radius: .3rem;
 }
 
@@ -322,6 +323,13 @@ body {
   height: 6rem;
   width: 6rem;
   border-radius: 3rem;
+}
+
+.btn.round.btn-xl {
+  height: 12rem;
+  width: 12rem;
+  border-radius: 6rem;
+  padding: 0.5rem;
 }
 
 .boolean-check {

@@ -2,12 +2,11 @@ import React, {Component} from 'react';
 import {TYPES} from "../../components/editors/EntityEditor";
 import Row from "../../widgets/Row";
 import Column from "../../widgets/Column";
-import {CustomersEditorActions} from "./CustomersEditorActions";
-import {CustomersCreatorActions} from "./CustomerCreatorActions";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
 import SelectInput from "../../components/widgets/inputs/SelectInput";
 import StoresUtils from "../StoresUtils";
 import RoundButton from "../../widgets/RoundButton";
+import CustomersPageActions from "./CustomersPageActions";
 
 export default class CustomersNavigator extends Component {
 
@@ -16,21 +15,20 @@ export default class CustomersNavigator extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
 
         return [
             <Row key="list" topSpaced>
                 <Column>
                     <SelectInput
                         bordered
-                        rows={StoresUtils.settings(data, "customersRows", 3)}
-                        cols={StoresUtils.settings(data, "customersColumns", 3)}
-                        id={customer => customer.get('uuid')}
-                        options={data.get('customers')}
-                        page={data.get('page')}
+                        rows={StoresUtils.option(data, "customersRows", 3)}
+                        cols={StoresUtils.option(data, "customersColumns", 3)}
+                        options={data.data.customers}
+                        page={data.navigator.page}
                         renderer={customer => EntitiesUtils.renderCustomer(customer)}
-                        onSelectPage={index => CustomersEditorActions.selectCustomersPage(index)}
-                        onSelect={addition => CustomersEditorActions.selectCustomer(addition)}
+                        onSelectPage={index => CustomersPageActions.selectCustomerPage(index)}
+                        onSelect={customer => CustomersPageActions.selectCustomer(customer)}
                     />
                 </Column>
             </Row>,
@@ -40,7 +38,7 @@ export default class CustomersNavigator extends Component {
                                  icon="plus"
                                  text="Nuovo cliente"
                                  type="success"
-                                 commitAction={() => CustomersCreatorActions.beginCustomerCreation()}
+                                 commitAction={() => CustomersPageActions.beginCustomerCreation()}
                     />
                 </Column>
             </Row>];

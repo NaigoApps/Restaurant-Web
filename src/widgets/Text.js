@@ -1,6 +1,9 @@
 import React from "react";
 
-export default function Text(props){
-    const color = props.color ? props.color.toHexString() : "#000000";
-    return <span style={{color: color}}>{props.children}</span>;
+export default function Text(props) {
+    const style = {};
+    if (props.color) {
+        style.color = props.color.toHexString();
+    }
+    return <span style={style}>{props.children}</span>;
 }

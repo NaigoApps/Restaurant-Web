@@ -1,15 +1,8 @@
 import React, {Component} from 'react';
 import NavElement from "../../widgets/NavElement";
-import DiningTablesUtils from "./tables/DiningTablesUtils";
-import OrdinationsUtils from "./OrdinationsUtils";
-import {iGet} from "../../utils/Utils";
-import HiddenFloatEditor from "../../components/widgets/inputs/float/HiddenFloatEditor";
-import {OrdinationsEditorActions} from "./diningTableEditing/ordinationsEditing/OrdinationsEditorActions";
-import {EveningEditorActions} from "./EveningEditorActions";
-import EveningUtils from "./EveningUtils";
+import EveningEditorActions from "./EveningEditorActions";
 import RestaurantNav from "../../components/RestaurantNav";
-import {DiningTablesEditorActions} from "./diningTableEditing/DiningTablesEditorActions";
-import {ApplicationActions} from "../../actions/ApplicationActions";
+import {EntitiesUtils} from "../../utils/EntitiesUtils";
 
 export default class EveningNav extends Component {
     constructor(props) {
@@ -27,75 +20,98 @@ export default class EveningNav extends Component {
     }
 
     makeNav() {
-        let data = this.props.data;
+        let data = this.props;
         let pills = [];
 
-        let evening = data.get('evening');
+        let evening = data.data.evening;
 
         pills.push(<NavElement
             key="evening_selection"
-            text="Selezione serata"
-            active={!data.get('evening')}
-            commitAction={EveningEditorActions.deselectEvening}
+            icon="calendar"
+            active={!evening}
+            commitAction={() => EveningEditorActions.deselectEvening()}
         />);
 
         if (evening) {
             pills.push(<NavElement
                 key="evening_editor"
-                text={EveningUtils.renderEvening(evening)}
-                active={!iGet(data, "diningTableEditing.diningTable")}
-                commitAction={() => DiningTablesEditorActions.deselect()}
+                text={EntitiesUtils.renderEvening(evening)}
+                active={true}
+                commitAction={() => EveningEditorActions.showReview()}
             />);
 
-            if (iGet(data, 'diningTableEditing.diningTable')) {
-                let table = iGet(data, 'diningTableEditing.diningTable');
+            // const dtEditor = data.diningTableEditing.editor;
 
-                if(iGet(data, 'diningTableEditing.status'))
-                pills.push(<NavElement
-                    key="table_editor"
-                    text={DiningTablesUtils.renderDiningTable(table, data.get('tables'), data.get('waiters'))}
-                    active={!!table &&
-                    !iGet(data, 'ordinationEditing.ordination') &&
-                    !data.get('editingTableBills') &&
-                    !iGet(data, "diningTableEditing.editingData")}
-                    commitAction={OrdinationsEditorActions.abortOrdinationEditing}
-                />);
-
-                if (iGet(data, "diningTableEditing.editingData")) {
-                    pills.push(<NavElement
-                        key="table_data_editor"
-                        text="Modifica dati"
-                        active={iGet(data, "diningTableEditing.editingData")}
-                    />);
-                }
-
-                if (data.get('editingTableBills')) {
-                    pills.push(<NavElement
-                        key="table_bills_editor"
-                        text="Modifica conti"
-                        commitAction={DiningTablesEditorActions.deselectBill}
-                        active={data.get('editingTableBills') && !data.get('bill')}
-                    />);
-                }
-
-                if (data.get('bill')) {
-                    pills.push(<NavElement
-                        key="table_bill_editor"
-                        text={DiningTablesUtils.renderBill(data.get('bill'), this.props.data.get('customers'))}
-                        commitAction={DiningTablesEditorActions.deselectBill}
-                        active={data.get('editingTableBills')}
-                    />);
-                }
-
-                let ordination = iGet(data, 'ordinationEditing.ordination');
-                if (ordination) {
-                    pills.push(<NavElement
-                        key="ordination_editor"
-                        text={OrdinationsUtils.renderOrdination(ordination)}
-                        active={!!ordination}
-                    />);
-                }
-            }
+            // if(dtEditor.mode === EditorMode.EDITING){
+            //     const table = data.diningTableEditing.editor.entity;
+            //     pills.push(<NavElement
+            //         key="table_editor"
+            //         text={DiningTablesUtils.renderDiningTable(table)}
+            //         active={true}
+            //     />);
+            // }else if(dtEditor.mode === EditorMode.CREATING){
+            //     pills.push(<NavElement
+            //         key="table_creator"
+            //         text="Creazione tavolo"
+            //         active={true}
+            //     />);
+            // }else {
+            //     pills.push(<NavElement
+            //         key="tables_list"
+            //         text="Elenco tavoli"
+            //         active={true}
+            //     />);
+            // }
+            //
+            // if (data.diningTableEditing.editor.mode === EditorMode.EDITING) {
+            //     let table = data.diningTableEditing.editor.entity;
+            //
+            //     if (data.diningTableEditing.status)
+            //         pills.push(<NavElement
+            //             key="table_editor"
+            //             text={DiningTablesUtils.renderDiningTable(table, data.data.tables, data.data.waiters)}
+            //             active={!!table &&
+            //             !data.ordinationEditing.ordination &&
+            //             !data.editingTableBills &&
+            //             !data.diningTableEditing.editingData}
+            //             commitAction={OrdinationsEditorActions.abortOrdinationEditing}
+            //         />);
+            //
+            //     if (data.diningTableEditing.editingData) {
+            //         pills.push(<NavElement
+            //             key="table_data_editor"
+            //             text="Modifica dati"
+            //             active={data.diningTableEditing.editingData}
+            //         />);
+            //     }
+            //
+            //     if (data.editingTableBills) {
+            //         pills.push(<NavElement
+            //             key="table_bills_editor"
+            //             text="Modifica conti"
+            //             commitAction={DiningTablesEditorActions.deselectBill}
+            //             active={data.editingTableBills && !data.bill}
+            //         />);
+            //     }
+            //
+            //     if (data.bill) {
+            //         pills.push(<NavElement
+            //             key="table_bill_editor"
+            //             text={DiningTablesUtils.renderBill(data.bill, this.props.data.customers)}
+            //             commitAction={DiningTablesEditorActions.deselectBill}
+            //             active={data.editingTableBills}
+            //         />);
+            //     }
+            //
+            //     let ordination = data.ordinationEditing.ordination;
+            //     if (ordination) {
+            //         pills.push(<NavElement
+            //             key="ordination_editor"
+            //             text={OrdinationsUtils.renderOrdination(ordination)}
+            //             active={!!ordination}
+            //         />);
+            //     }
+            // }
 
         }
         return pills;

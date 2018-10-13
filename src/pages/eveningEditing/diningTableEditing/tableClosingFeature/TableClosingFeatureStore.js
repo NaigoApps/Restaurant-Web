@@ -1,13 +1,13 @@
 import DiningTablesUtils from "../../tables/DiningTablesUtils";
 import eveningPageStore from "../../EveningPageStore";
 import OrdinationsUtils from "../../OrdinationsUtils";
-import SubFeatureStore from "../../../../stores/SubFeatureStore";
 import {DiningTablesClosingActionTypes} from "./DiningTablesClosingActions";
 import diningTableEditingStore from "../DiningTableEditorStore";
 import {findByUuid, iGet} from "../../../../utils/Utils";
-import {DiningTablesEditorActionTypes} from "../DiningTablesEditorActions";
+import DiningTablesEditorActions from "../DiningTablesEditorActions";
 import {EntitiesUtils} from "../../../../utils/EntitiesUtils";
 import EditorMode from "../../../../utils/EditorMode";
+import AbstractStore from "../../../../stores/AbstractStore";
 
 const {Map, List, fromJS} = require('immutable');
 
@@ -20,9 +20,10 @@ export const DiningTableClosingWizardPages = {
     REVIEW_PAGE: "REVIEW_PAGE",
 };
 
-class TableClosingFeatureStore extends SubFeatureStore {
+class TableClosingFeatureStore extends AbstractStore {
 
     constructor() {
+        //FIXME
         super(eveningPageStore, "tableClosingFeature");
         this.init();
         this.editorStatus = EditorMode.SURFING;
@@ -79,9 +80,9 @@ class TableClosingFeatureStore extends SubFeatureStore {
         let changed = true;
 
         switch (action.type) {
-            case DiningTablesEditorActionTypes.BEGIN_ORDINATIONS_EDITING:
-            case DiningTablesEditorActionTypes.BEGIN_DATA_EDITING:
-            case DiningTablesEditorActionTypes.BEGIN_BILLS_EDITING:
+            case DiningTablesEditorActions.BEGIN_ORDINATIONS_EDITING:
+            case DiningTablesEditorActions.BEGIN_DATA_EDITING:
+            case DiningTablesEditorActions.BEGIN_BILLS_EDITING:
                 this.bill = null;
                 this.editorStatus = EditorMode.SURFING;
                 break;

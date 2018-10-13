@@ -1,4 +1,4 @@
-import AbstractStore from "../../stores/RootFeatureStore";
+import AbstractStore from "../../stores/AbstractStore";
 import {Utils} from "../../utils/Utils";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
 import {ApplicationActionTypes} from "../../actions/ApplicationActions";
@@ -14,7 +14,7 @@ const EVT_LOCATIONS_PAGE_STORE_CHANGED = "EVT_LOCATIONS_PAGE_STORE_CHANGED";
 class LocationsPageStore extends AbstractStore {
 
     constructor() {
-        super(EVT_LOCATIONS_PAGE_STORE_CHANGED);
+        super("locations", EVT_LOCATIONS_PAGE_STORE_CHANGED, applicationStore, dataStore);
         this.navigator = {
             page: 0
         };
@@ -24,11 +24,11 @@ class LocationsPageStore extends AbstractStore {
         };
     }
 
-    getStoreDependencies() {
-        return [dataStore, applicationStore];
+    getActionsClass() {
+        return LocationsPageActionTypes;
     }
 
-    getCompletionHandlers() {
+    getActionCompletedHandlers() {
         const handlers = {};
         handlers[LocationsPageActionTypes.SELECT_EDITING_LOCATION] = (location) => this.initEditor(location, false);
         handlers[LocationsPageActionTypes.SELECT_LOCATION_NAVIGATOR_PAGE] = (index) => this.navigator.page = index;
@@ -37,9 +37,9 @@ class LocationsPageStore extends AbstractStore {
         handlers[LocationsPageActionTypes.SET_LOCATION_EDITOR_NAME] = (name) => this.editor.location.name = name;
         handlers[LocationsPageActionTypes.SET_LOCATION_EDITOR_PRINTER] = (printer) => this.editor.location.printer = printer;
         handlers[LocationsPageActionTypes.CREATE_LOCATION] = (location) =>
-            this.initEditor(new Location(location.toJS(), dataStore.getPool()));
+            this.initEditor(new Location(location, dataStore.getPool()));
         handlers[LocationsPageActionTypes.UPDATE_EDITING_LOCATION] = (location) =>
-            this.initEditor(new Location(location.toJS(), dataStore.getPool()));
+            this.initEditor(new Location(location, dataStore.getPool()));
         handlers[LocationsPageActionTypes.DELETE_EDITING_LOCATION] = () => this.initEditor();
 
         handlers[DataActionTypes.LOAD_LOCATIONS] = () => Utils.nop();
@@ -59,16 +59,10 @@ class LocationsPageStore extends AbstractStore {
         }
     }
 
-    getState() {
+    buildState() {
         return {
-            data: {
-                locations: dataStore.getEntities(Topics.LOCATIONS),
-                printers: dataStore.getEntities(Topics.PRINTERS),
-
-                navigator: this.navigator,
-                editor: this.editor,
-                settings: applicationStore.getSettings()
-            }
+            navigator: this.navigator,
+            editor: this.editor,
         }
 
     }

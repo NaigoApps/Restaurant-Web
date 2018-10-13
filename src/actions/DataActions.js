@@ -51,50 +51,38 @@ export class DataActions {
         asyncActionBuilder.get(DataActionTypes.LOAD_DISHES, 'dishes/all');
     }
 
+    static loadCustomers(){
+        asyncActionBuilder.get(DataActionTypes.LOAD_CUSTOMERS, 'customers');
+    }
+
     static loadDishStatuses(){
         asyncActionBuilder.get(DataActionTypes.LOAD_DISH_STATUSES, 'dishes-statuses');
+    }
+
+    static loadPhases(){
+        asyncActionBuilder.get(DataActionTypes.LOAD_PHASES, 'phases');
+    }
+
+    static loadDiningTables(){
+        asyncActionBuilder.get(DataActionTypes.LOAD_DINING_TABLES, 'dining-tables');
+    }
+
+    static loadOrdinations(){
+        asyncActionBuilder.get(DataActionTypes.LOAD_ORDINATIONS, 'ordinations');
+    }
+
+    static loadOrders(){
+        asyncActionBuilder.get(DataActionTypes.LOAD_ORDERS, 'orders');
+    }
+
+    static loadBills(){
+        asyncActionBuilder.get(DataActionTypes.LOAD_BILLS, 'bills');
     }
 }
 
 
 //DiningTables
-
-export const ACT_BEGIN_DINING_TABLE_DATA_EDITING = "ACT_BEGIN_DINING_TABLE_DATA_EDITING";
-export const ACT_ABORT_DINING_TABLE_DATA_EDITING = "ACT_ABORT_DINING_TABLE_DATA_EDITING";
-
-export const ACT_BEGIN_DINING_TABLE_BILLS_EDITING = "ACT_BEGIN_DINING_TABLE_BILLS_EDITING";
-export const ACT_ABORT_DINING_TABLE_BILLS_EDITING = "ACT_ABORT_DINING_TABLE_BILLS_EDITING";
-
-export const ACT_DELETE_DINING_TABLE = "ACT_DELETE_DINING_TABLE";
-
-
-export const ACT_SELECT_BILL = "ACT_SELECT_BILL";
-export const ACT_DESELECT_BILL = "ACT_DESELECT_BILL";
-export const ACT_DELETE_BILL = "ACT_DELETE_BILL";
-
-//Ordinations
-export const ACT_CREATE_ORDINATION = "ACT_CREATE_ORDINATION";
 export const ACT_DELETE_ORDINATION = "ACT_DELETE_ORDINATION";
 export const ACT_UPDATE_ORDINATION = "ACT_UPDATE_ORDINATION";
 
-
-//Printers
-
-//PAGE
-export const ACT_PRINTERS_PAGE_SELECT_PAGE = "ACT_PRINTERS_PAGE_SELECT_PAGE";
-
-//CREATOR
-
-
-//Locations
-
-
-//FailedStore
 export const ACT_REMOVE_FAILED_ACTION = "ACT_REMOVE_FAILED_ACTION";
-
-export const ACT_CLEAR_ERROR_MESSAGES = "ACT_CLEAR_ERROR_MESSAGES";
-
-//Inputs
-export const ACT_FLOAT_INPUT_DIGIT = "ACT_FLOAT_INPUT_DIGIT";
-export const ACT_OPEN_EDITOR = "ACT_OPEN_EDITOR";
-export const ACT_CLOSE_EDITOR = "ACT_CLOSE_EDITOR";

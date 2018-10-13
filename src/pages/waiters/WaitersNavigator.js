@@ -14,7 +14,7 @@ export default class WaitersNavigator extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
 
         return [
             <Row key="list" topSpaced>
@@ -23,7 +23,7 @@ export default class WaitersNavigator extends Component {
                         bordered
                         rows={StoresUtils.option(data, 'waitersRows', 3)}
                         cols={StoresUtils.option(data, 'waitersColumns', 3)}
-                        options={data.waiters}
+                        options={data.data.waiters}
                         page={data.navigator.page}
                         renderer={waiter => waiter.name}
                         colorRenderer={waiter => WaitersNavigator.color(waiter)}

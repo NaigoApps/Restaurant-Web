@@ -21,10 +21,10 @@ export default class TablesPage extends ViewController {
     }
 
     render() {
-        let pageContent = TablesPage.makePageContent(this.state.data);
+        let pageContent = TablesPage.makePageContent(this.state);
         return (
-            <Page title="Tavoli">
-                <TablesNav data={this.state.data}/>
+            <Page title="Tavoli" {...this.state.general}>
+                <TablesNav {...this.state}/>
                 {pageContent}
             </Page>
         )
@@ -33,11 +33,11 @@ export default class TablesPage extends ViewController {
     static makePageContent(data) {
         const editor = data.editor;
         if (editor.mode === EditorMode.EDITING) {
-            return <TableEditor data={data}/>
+            return <TableEditor {...data}/>
         } else if (editor.mode === EditorMode.CREATING) {
-            return <TableCreator data={data}/>
+            return <TableCreator {...data}/>
         } else {
-            return <TablesNavigator data={data}/>
+            return <TablesNavigator {...data}/>
         }
     }
 }

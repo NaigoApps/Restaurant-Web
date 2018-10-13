@@ -32,7 +32,7 @@ export default class ColorButton extends Component {
             backgroundColor: this.props.color.toHexString(),
             color: this.props.color.foreground().toHexString(),
             padding: "5px"
-        }}>{text}</div>;
+        }}/>;
 
         const style = {};
         if(this.props.active){

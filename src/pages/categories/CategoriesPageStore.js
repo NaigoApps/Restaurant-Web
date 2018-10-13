@@ -1,9 +1,9 @@
-import RootFeatureStore from "../../stores/RootFeatureStore";
+import AbstractStore from "../../stores/AbstractStore";
 import EditorMode from "../../utils/EditorMode";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
 import {ApplicationActionTypes} from "../../actions/ApplicationActions";
 import applicationStore from "../../stores/ApplicationStore";
-import dataStore, {Topics} from "../../stores/DataStore";
+import dataStore from "../../stores/DataStore";
 import Category from "../../model/Category";
 import {Utils} from "../../utils/Utils";
 import {CategoriesPageActions} from "./CategoriesPageActions";
@@ -11,14 +11,18 @@ import {DataActionTypes} from "../../actions/DataActions";
 
 const EVT_CATEGORIES_PAGE_STORE_CHANGED = "EVT_CATEGORIES_PAGE_STORE_CHANGED";
 
-class CategoriesPageStore extends RootFeatureStore {
+class CategoriesPageStore extends AbstractStore {
 
     constructor() {
-        super(EVT_CATEGORIES_PAGE_STORE_CHANGED);
+        super("categories", EVT_CATEGORIES_PAGE_STORE_CHANGED, applicationStore, dataStore);
         this.initEditor();
         this.navigator = {
             page: 0
         }
+    }
+
+    getActionsClass() {
+        return CategoriesPageActions;
     }
 
     initEditor(category, creating) {
@@ -32,26 +36,14 @@ class CategoriesPageStore extends RootFeatureStore {
         }
     }
 
-    getState() {
+    buildState() {
         return {
-            data: {
-                categories: dataStore.getEntities(Topics.CATEGORIES),
-                locations: dataStore.getEntities(Topics.LOCATIONS),
-                additions: dataStore.getEntities(Topics.ADDITIONS),
-
-                editor: this.editor,
-                navigator: this.navigator,
-
-                settings: applicationStore.getSettings()
-            }
+            editor: this.editor,
+            navigator: this.navigator,
         }
     }
 
-    getStoreDependencies() {
-        return [dataStore, applicationStore];
-    }
-
-    getCompletionHandlers() {
+    getActionCompletedHandlers() {
         const handlers = {};
         handlers[CategoriesPageActions.BEGIN_CATEGORY_CREATION] = () =>
             this.initEditor(Category.create(EntitiesUtils.newCategory(), dataStore.getPool()), true);
@@ -59,10 +51,10 @@ class CategoriesPageStore extends RootFeatureStore {
         handlers[CategoriesPageActions.SET_CATEGORY_EDITOR_LOCATION] = (value) => this.editor.category.location = value;
         handlers[CategoriesPageActions.SET_CATEGORY_EDITOR_COLOR] = (value) => this.editor.category.color = value;
         handlers[CategoriesPageActions.CREATE_CATEGORY] = (cat) =>
-            this.initEditor(Category.create(cat.toJS(), dataStore.getPool()));
+            this.initEditor(Category.create(cat, dataStore.getPool()));
         handlers[CategoriesPageActions.SELECT_EDITING_CATEGORY] = (cat) => this.initEditor(cat);
         handlers[CategoriesPageActions.UPDATE_EDITING_CATEGORY] = (cat) =>
-            this.initEditor(Category.create(cat.toJS(), dataStore.getPool()));
+            this.initEditor(Category.create(cat, dataStore.getPool()));
         handlers[CategoriesPageActions.DELETE_EDITING_CATEGORY] = () =>
             this.initEditor();
         handlers[CategoriesPageActions.SELECT_EDITING_CATEGORY_PAGE] = (page) => this.navigator.page = page;

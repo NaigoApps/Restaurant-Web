@@ -1,7 +1,5 @@
 import {Dispatcher} from "flux";
 import {ACTION_COMPLETED, ACTION_ERROR, ACTION_FAILED, ACTION_STARTED} from "../actions/ActionPhases";
-import asyncActionBuilder from "../actions/RequestBuilder";
-import UTSettings from "../stores/generic/UTSettings";
 
 /*
 * Dispatcher sends actions to Stores

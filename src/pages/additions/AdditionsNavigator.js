@@ -2,10 +2,9 @@ import React, {Component} from 'react';
 import Row from "../../widgets/Row";
 import Column from "../../widgets/Column";
 import SelectInput from "../../components/widgets/inputs/SelectInput";
-import {AdditionsCreatorActions} from "./AdditionsCreatorActions";
-import {AdditionsEditorActions} from "./AdditionsEditorActions";
 import StoresUtils from "../StoresUtils";
 import RoundButton from "../../widgets/RoundButton";
+import AdditionsPageActions from "./AdditionsPageActions";
 
 export default class AdditionsNavigator extends Component {
 
@@ -14,21 +13,20 @@ export default class AdditionsNavigator extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
 
         return [
             <Row key="list" topSpaced>
                 <Column>
                     <SelectInput
                         bordered
-                        rows={StoresUtils.settings(data, "additionsRows", 3)}
-                        cols={StoresUtils.settings(data, "additionsColumns", 3)}
-                        id={addition => addition.get('uuid')}
-                        options={data.get('additions')}
-                        page={data.get('page')}
-                        renderer={addition => addition.get('name')}
-                        onSelectPage={index => AdditionsEditorActions.selectAdditionsPage(index)}
-                        onSelect={addition => AdditionsEditorActions.selectAddition(addition)}
+                        rows={StoresUtils.option(data, "additionsRows", 3)}
+                        cols={StoresUtils.option(data, "additionsColumns", 3)}
+                        options={data.data.additions}
+                        page={data.navigator.page}
+                        renderer={addition => addition.name}
+                        onSelectPage={index => AdditionsPageActions.selectAdditionsPage(index)}
+                        onSelect={addition => AdditionsPageActions.selectAddition(addition)}
                     />
                 </Column>
             </Row>,
@@ -38,7 +36,7 @@ export default class AdditionsNavigator extends Component {
                                  icon="plus"
                                  text="Nuova variante"
                                  type="success"
-                                 commitAction={() => AdditionsCreatorActions.beginAdditionCreation()}
+                                 commitAction={() => AdditionsPageActions.beginAdditionCreation()}
                     />
                 </Column>
             </Row>];

@@ -4,7 +4,6 @@ import {ApplicationActions} from "../../actions/ApplicationActions";
 import Row from "../../widgets/Row";
 import Column from "../../widgets/Column";
 import Button from "../../widgets/Button";
-import SelectInput from "./inputs/SelectInput";
 import ColorInput from "./inputs/ColorInput";
 
 export default class ApplicationColorInput extends Component {
@@ -13,12 +12,12 @@ export default class ApplicationColorInput extends Component {
     }
 
     canConfirm() {
-        let data = this.props.data;
+        let data = this.props;
         return data.isValid === undefined || data.isValid(data.value);
     }
 
     confirmSelectValue() {
-        let data = this.props.data;
+        let data = this.props;
         let callback = data.callback;
         if (callback) {
             callback(data.value);
@@ -27,7 +26,7 @@ export default class ApplicationColorInput extends Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         return <PopupContainer
             id="app-color-input"
             visible={data.visible}

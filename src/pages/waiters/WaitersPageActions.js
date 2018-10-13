@@ -1,4 +1,3 @@
-import {ApplicationActions} from "../../actions/ApplicationActions";
 import {DataActions} from "../../actions/DataActions";
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";

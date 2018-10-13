@@ -13,7 +13,7 @@ export default class TablesNavigator extends Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
 
         return [<Row key="list" topSpaced>
             <Column>
@@ -21,7 +21,7 @@ export default class TablesNavigator extends Component {
                     bordered
                     rows={StoresUtils.option(data, "tablesRows", 3)}
                     cols={StoresUtils.option(data, "tablesColumns", 3)}
-                    options={data.tables}
+                    options={data.data.tables}
                     page={data.navigator.page}
                     renderer={table => table.name}
                     onSelectPage={index => TablesPageActions.selectNavigatorPage(index)}

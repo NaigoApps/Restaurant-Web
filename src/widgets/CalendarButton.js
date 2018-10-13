@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import Icon from "./Icon";
-import DateInput, {daysInMonth, formatDate} from "../components/widgets/inputs/DateInput";
+import DateInput, {daysInMonth, formatDate, normalizeDate} from "../components/widgets/inputs/DateInput";
 import Button from "./Button";
-import GridButton from "./GridButton";
+import TextButton from "./TextButton";
 
 /**
  * Expects:
@@ -17,11 +16,11 @@ export default class CalendarButton extends Component {
 
     render() {
         return (
-            <Button
+            <TextButton
                 disabled={this.props.disabled}
                 active={this.props.active}
                 text={this.props.date.getDate() + "/" + (this.props.date.getMonth() + 1)}
-                commitAction={this.props.commitAction.bind(this, formatDate(this.props.date))}
+                commitAction={this.props.commitAction.bind(this, normalizeDate(this.props.date))}
             />
         );
     }

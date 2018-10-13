@@ -11,7 +11,7 @@ export default class BillPrintWizard extends React.Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
         const closingFeature = data.get('tableClosingFeature');
         const bill = closingFeature.get('bill');
         const printWizard = closingFeature.get('printWizard');
@@ -30,7 +30,7 @@ export default class BillPrintWizard extends React.Component {
     }
 
     buildWizardPages() {
-        const data = this.props.data;
+        const data = this.props;
         const closingFeature = data.get('tableClosingFeature');
         const customers = data.get('customers');
         const printWizard = closingFeature.get('printWizard');

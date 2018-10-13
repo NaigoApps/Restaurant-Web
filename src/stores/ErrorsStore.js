@@ -1,11 +1,11 @@
-import AbstractStore from "./RootFeatureStore";
-import {ACT_CLEAR_ERROR_MESSAGES} from "../actions/DataActions";
+import AbstractStore from "./AbstractStore";
+import ErrorActions from "./ErrorActions";
 
 const EVT_ERRORS_STORE_CHANGED = "EVT_ERRORS_STORE_CHANGED";
 
 class ErrorsStore extends AbstractStore {
     constructor() {
-        super(EVT_ERRORS_STORE_CHANGED);
+        super("error", EVT_ERRORS_STORE_CHANGED);
         this.lastMessage = null;
     }
 
@@ -14,17 +14,16 @@ class ErrorsStore extends AbstractStore {
         return true;
     }
 
-    handleCompletedAction(action){
-        let changed = true;
-        switch (action.type){
-            case ACT_CLEAR_ERROR_MESSAGES:
-                this.clearMessages();
-                break;
-            default:
-                changed = false;
-                break;
-        }
-        return changed;
+    getActionsClass(){
+        return ErrorActions;
+    }
+
+    getActionCompletedHandlers(){
+        const handlers = {};
+
+        handlers[ErrorActions.CLEAR_ERROR_MESSAGES] = () => this.clearMessages();
+
+        return handlers;
     }
 
     handleFailedAction(action) {
@@ -32,8 +31,10 @@ class ErrorsStore extends AbstractStore {
         return true;
     }
 
-    getMessage(){
-        return this.lastMessage;
+    buildState(){
+        return {
+            message: this.lastMessage
+        }
     }
 
     clearMessages(){

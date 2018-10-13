@@ -2,34 +2,48 @@ import EventEmitter from "events";
 import dispatcher from "../dispatcher/SimpleDispatcher";
 import StoresUtils from "../pages/StoresUtils";
 
-export default class RootFeatureStore extends EventEmitter {
+export default class AbstractStore extends EventEmitter {
 
-    constructor(changeEvent) {
+    constructor(storeName, changeEvent, ...children) {
         super();
         this.token = dispatcher.register(this.handleAction.bind(this));
+        this.storeName = storeName;
         this.changeEvent = changeEvent;
-        this.subFeatureStores = [];
+        this.children = children.slice();
+        this.actions = [];
         this.postConstruct();
     }
 
     postConstruct() {
-        this.completionHandlers = this.getCompletionHandlers();
+        this.actionCompletedHandlers = this.getActionCompletedHandlers();
+        const actionClass = this.getActionsClass();
+
+        if (actionClass === StoresUtils.ALL_ACTIONS) {
+            this.actions = StoresUtils.ALL_ACTIONS;
+        } else if (actionClass) {
+            this.actions = Reflect.ownKeys(actionClass)
+                .filter(propName => typeof Reflect.getOwnPropertyDescriptor(actionClass, propName).value === "string");
+        }
+    }
+
+    /**
+     * Subclasses may override this
+     * @returns {object} Class that contains action names. All string properties will be taken
+     */
+    getActionsClass() {
+        return null;
+    }
+
+    getActions() {
+        return this.actions;
     }
 
     /**
      * Subclasses may override this
      * @returns {object} Map of completion handlers
      */
-    getCompletionHandlers() {
+    getActionCompletedHandlers() {
         return {};
-    }
-
-    /**
-     * Subclasses may override this
-     * @returns {array} Array of stores to wait for
-     */
-    getStoreDependencies() {
-        return [];
     }
 
     getToken() {
@@ -44,24 +58,21 @@ export default class RootFeatureStore extends EventEmitter {
         this.removeListener(this.changeEvent, callback);
     }
 
-    addSubFeature(subFeatureStore) {
-        this.subFeatureStores.push(subFeatureStore);
-    }
-
     handleAction(action) {
         let changed = false;
 
-        dispatcher.waitFor(this.subFeatureStores.map(subFeature => subFeature.getToken()));
-
-        dispatcher.waitFor(this.getStoreDependencies().map(store => store.getToken()));
+        dispatcher.waitFor(this.children.map(child => child.getToken()));
 
         if (action.isCompleted()) {
-            if (this.completionHandlers[action.type]) {
-                this.completionHandlers[action.type](action.body);
+            if (this.actionCompletedHandlers[action.type]) {
+                this.actionCompletedHandlers[action.type](action.body);
                 changed = true;
             } else {
+                //FIXME Remove this
                 changed |= this.handleCompletedAction(action);
             }
+            this.children.forEach(store => changed |= AbstractStore.isActionUsedBy(store, action));
+
         } else if (action.isInProgress()) {
             changed |= this.handleStartedAction(action);
         } else if (action.isError()) {
@@ -70,31 +81,35 @@ export default class RootFeatureStore extends EventEmitter {
             changed |= this.handleFailedAction(action);
         }
 
-        this.subFeatureStores.forEach(store => {
-            if (store.getActions() === StoresUtils.ALL_ACTIONS || store.getActions().includes(action.type)) {
-                changed = true;
-            }
-        });
 
         if (changed) {
+            // console.warn(action.type + " USED BY " + this.constructor.name);
             this.emit(this.changeEvent, this.getState());
         }
     }
 
+    static isActionUsedBy(store, action) {
+        if (store.getActions() === StoresUtils.ALL_ACTIONS || store.getActions().includes(action.type)) {
+            return true;
+        }
+        let used = false;
+        store.children.forEach(child => used |= AbstractStore.isActionUsedBy(child, action));
+        return used;
+    }
+
     buildState() {
         console.warn("No buildState() method definition in " + this.constructor.name);
+        return {};
     }
 
     getState() {
         let data = this.buildState();
 
-        this.subFeatureStores.forEach(store => {
-            data[store.getFeatureName()] = store.getState();
+        this.children.forEach(store => {
+            data[store.storeName] = store.getState();
         });
 
-        return {
-            data: data
-        }
+        return data;
     }
 
     handleCompletedAction(action) {
@@ -115,5 +130,9 @@ export default class RootFeatureStore extends EventEmitter {
     handleFailedAction(action) {
         // console.warn("No failed event handler");
         return false;
+    }
+
+    static assign(handlers, actions, func){
+        actions.forEach(action => handlers[action] = func)
     }
 }

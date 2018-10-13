@@ -1,58 +1,43 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Page from "../Page";
-import additionsPageStore from "./AdditionsPageStore";
 import additionsPageActions from "./AdditionsPageActions";
-import {AdditionsEditorActions} from "./AdditionsEditorActions";
 import AdditionEditor from "./AdditionEditor";
 import AdditionsNavigator from "./AdditionsNavigator";
-import {AdditionsCreatorActions} from "./AdditionsCreatorActions";
 import AdditionsNav from "./AdditionsNav";
 import EditorMode from "../../utils/EditorMode";
+import ViewController from "../../widgets/ViewController";
+import additionsPageStore from "./AdditionsPageStore";
+import AdditionCreator from "./AdditionCreator";
 
-const {Map} = require('immutable');
-
-export default class AdditionsPage extends Component {
+export default class AdditionsPage extends ViewController {
 
     constructor(props) {
-        super(props);
-        this.state = additionsPageStore.getState();
-
-        this.updateState = this.updateState.bind(this);
+        super(props, additionsPageStore);
     }
 
     componentDidMount() {
-        additionsPageStore.addChangeListener(this.updateState);
-
+        super.componentDidMount();
         additionsPageActions.initAdditionsPage();
     }
 
-    updateState(state) {
-        this.setState(state);
-    }
-
-    componentWillUnmount() {
-        additionsPageStore.removeChangeListener(this.updateState);
-    }
-
-
     render() {
-        let pageContent = AdditionsPage.makePageContent(this.state.data);
+        let pageContent = AdditionsPage.makePageContent(this.state);
         return (
-            <Page title="Varianti">
-                <AdditionsNav data={this.state.data}/>
+            <Page title="Varianti" {...this.state.general}>
+                <AdditionsNav {...this.state}/>
                 {pageContent}
             </Page>
         )
     }
 
-    static makePageContent(state) {
-        const editorStatus = state.get('editorStatus');
-        if (editorStatus === EditorMode.EDITING) {
-            return <AdditionEditor data={state} actionsProvider={AdditionsEditorActions}/>
-        } else if (editorStatus === EditorMode.CREATING) {
-            return <AdditionEditor data={state} actionsProvider={AdditionsCreatorActions}/>
+    static makePageContent(data) {
+        const editorMode = data.editor.mode;
+        if (editorMode === EditorMode.EDITING) {
+            return <AdditionEditor {...data}/>
+        } else if (editorMode === EditorMode.CREATING) {
+            return <AdditionCreator {...data}/>
         } else {
-            return <AdditionsNavigator data={state}/>
+            return <AdditionsNavigator {...data}/>
         }
     }
 

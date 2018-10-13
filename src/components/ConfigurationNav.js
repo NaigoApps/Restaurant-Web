@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import {SIZES} from "./RestaurantNav";
 import Row from "../widgets/Row";
 import Column from "../widgets/Column";
-import {ADDITIONS, CATEGORIES, CUSTOMERS, DISHES, LOCATIONS, PRINTERS, TABLES, WAITERS} from "../App";
 import Button from "../widgets/Button";
 import {ApplicationActions} from "../actions/ApplicationActions";
+import {Pages} from "../App";
 
 export default class ConfigurationNav extends Component {
 
@@ -35,7 +35,7 @@ export default class ConfigurationNav extends Component {
                             <Button
                                 icon="print"
                                 text="Stampanti"
-                                commitAction={() => this.goToPage(PRINTERS)}
+                                commitAction={() => this.goToPage(Pages.PRINTERS)}
                                 size="xl"
                                 fill vertical/>
                         </Column>
@@ -44,7 +44,7 @@ export default class ConfigurationNav extends Component {
                                 icon="print"
                                 text="Postazioni"
                                 size="xl"
-                                commitAction={() => this.goToPage(LOCATIONS)}
+                                commitAction={() => this.goToPage(Pages.LOCATIONS)}
                                 fill vertical/>
                         </Column>
                         <Column>
@@ -52,7 +52,7 @@ export default class ConfigurationNav extends Component {
                                 icon="sun-o"
                                 text="Tavoli"
                                 size="xl"
-                                commitAction={() => this.goToPage(TABLES)}
+                                commitAction={() => this.goToPage(Pages.TABLES)}
                                 fill vertical/>
                         </Column>
                         <Column>
@@ -60,7 +60,7 @@ export default class ConfigurationNav extends Component {
                                 icon="male"
                                 text="Camerieri"
                                 size="xl"
-                                commitAction={() => this.goToPage(WAITERS)}
+                                commitAction={() => this.goToPage(Pages.WAITERS)}
                                 fill vertical/>
                         </Column>
                     </Row>
@@ -70,7 +70,7 @@ export default class ConfigurationNav extends Component {
                                 icon="cutlery"
                                 text="Categorie"
                                 size="xl"
-                                commitAction={() => this.goToPage(CATEGORIES)}
+                                commitAction={() => this.goToPage(Pages.CATEGORIES)}
                                 fill vertical/>
                         </Column>
                         <Column>
@@ -78,7 +78,7 @@ export default class ConfigurationNav extends Component {
                                 icon="cutlery"
                                 text="Piatti"
                                 size="xl"
-                                commitAction={() => this.goToPage(DISHES)}
+                                commitAction={() => this.goToPage(Pages.DISHES)}
                                 fill vertical/>
                         </Column>
                         <Column>
@@ -86,7 +86,7 @@ export default class ConfigurationNav extends Component {
                                 icon="sliders"
                                 text="Varianti"
                                 size="xl"
-                                commitAction={() => this.goToPage(ADDITIONS)}
+                                commitAction={() => this.goToPage(Pages.ADDITIONS)}
                                 fill vertical/>
                         </Column>
                         <Column>
@@ -94,7 +94,7 @@ export default class ConfigurationNav extends Component {
                                 icon="male"
                                 text="Clienti"
                                 size="xl"
-                                commitAction={() => this.goToPage(CUSTOMERS)}
+                                commitAction={() => this.goToPage(Pages.CUSTOMERS)}
                                 fill vertical/>
                         </Column>
                     </Row>

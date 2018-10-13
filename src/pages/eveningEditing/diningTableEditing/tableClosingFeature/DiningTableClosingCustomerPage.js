@@ -13,9 +13,9 @@ export default class DiningTableClosingCustomerPage extends Component {
     }
 
     render() {
-        let wizardData = this.props.data.get('tableClosingFeature');
+        let wizardData = this.props.get('tableClosingFeature');
 
-        let customer = findByUuid(this.props.data.get('customers'), wizardData.get('customer'));
+        let customer = findByUuid(this.props.get('customers'), wizardData.get('customer'));
 
         return (
             <Row grow>
@@ -26,7 +26,7 @@ export default class DiningTableClosingCustomerPage extends Component {
                         rows={6}
                         page={iGet(wizardData, "customerPage")}
                         selected={iGet(wizardData, "customer")}
-                        options={this.props.data.get('customers')}
+                        options={this.props.get('customers')}
                         renderer={customer => EntitiesUtils.renderCustomer(customer)}
 
                         onSelect={uuid => DiningTablesClosingActions.selectInvoiceCustomer(uuid)}

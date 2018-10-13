@@ -12,7 +12,7 @@ export default class ApplicationFloatInput extends Component {
     }
 
     confirmFloatValue(){
-        let data = this.props.data;
+        let data = this.props;
         let callback = data.callback;
         if(callback) {
             callback(data.value);
@@ -21,7 +21,7 @@ export default class ApplicationFloatInput extends Component {
     }
 
     isValid() {
-        let data = this.props.data;
+        let data = this.props;
         let value = data.value;
         let min = data.min;
         let max = data.max;
@@ -29,7 +29,7 @@ export default class ApplicationFloatInput extends Component {
     }
 
     render() {
-        let data = this.props.data;
+        let data = this.props;
         return <PopupContainer
             id="app-float-input"
             blurCallback={() => ApplicationActions.hideFloatInput()}

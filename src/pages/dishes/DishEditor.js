@@ -13,20 +13,29 @@ export default class DishEditor extends React.Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
         const dish = data.editor.dish;
 
         const actions = DishEditor.buildActions(data);
 
         return <Row topSpaced>
             <Column>
-                <EntityEditor
-                    entity={dish}
-                    valid={!!dish.name && !!dish.category}
-                    deleteMessage="Eliminazione piatto"
-                    deleteMethod={dish => DishesPageActions.deleteDish(dish)}>
-                    {actions}
-                </EntityEditor>
+                <Row>
+                    <Column>
+                        <h3 className="text-center">Creazione piatto</h3>
+                    </Column>
+                </Row>
+                <Row>
+                    <Column>
+                        <EntityEditor
+                            entity={dish}
+                            valid={!!dish.name && !!dish.category}
+                            deleteMessage="Eliminazione piatto"
+                            deleteMethod={dish => DishesPageActions.deleteDish(dish)}>
+                            {actions}
+                        </EntityEditor>
+                    </Column>
+                </Row>
             </Column>
         </Row>;
     }
@@ -34,8 +43,8 @@ export default class DishEditor extends React.Component {
     static buildActions(data) {
         const actions = [];
         const dish = data.editor.dish;
-        const statuses = data.dishStatuses;
-        const categories = data.categories;
+        const statuses = data.data.dishStatuses;
+        const categories = data.data.categories;
         actions.push(DishEditor.buildNameEditor(dish));
         actions.push(DishEditor.buildDescriptionEditor(dish));
         actions.push(DishEditor.buildPriceEditor(dish));

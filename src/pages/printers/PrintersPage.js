@@ -21,23 +21,22 @@ export default class PrintersPage extends ViewController {
     }
 
     render() {
-        let pageContent = this.makePageContent();
+        let pageContent = PrintersPage.makePageContent(this.state);
         return (
-            <Page title="Stampanti">
-                <PrintersNav data={this.state.data}/>
+            <Page title="Stampanti" {...this.state.general}>
+                <PrintersNav {...this.state}/>
                 {pageContent}
             </Page>
         )
     }
 
-    makePageContent() {
-        let data = this.state.data;
-        if(data.editor.mode === EditorMode.CREATING){
-            return <PrinterCreator data={data}/>
-        }else if(data.editor.mode === EditorMode.EDITING){
-            return <PrinterEditor data={data}/>
-        }else{
-            return <PrintersNavigator data={data}/>
+    static makePageContent(data) {
+        if (data.editor.mode === EditorMode.CREATING) {
+            return <PrinterCreator {...data}/>
+        } else if (data.editor.mode === EditorMode.EDITING) {
+            return <PrinterEditor {...data}/>
+        } else {
+            return <PrintersNavigator {...data}/>
         }
     }
 

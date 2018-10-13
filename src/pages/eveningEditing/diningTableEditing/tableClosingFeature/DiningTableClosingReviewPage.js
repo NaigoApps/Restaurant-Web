@@ -16,7 +16,7 @@ export default class DiningTableClosingReviewPage extends Component {
     }
 
     buildInvoiceSummary() {
-        const data = this.props.data;
+        const data = this.props;
         let table = iGet(data, "diningTableEditing.diningTable");
         let dishes = data.get('dishes');
         let additions = data.get('additions');
@@ -47,7 +47,7 @@ export default class DiningTableClosingReviewPage extends Component {
                                     </Row>
                                     {
                                         orders.map(grp => {
-                                            let left = OrdinationsUtils.renderImplodedOrder(grp, data.get('dishes'), this.props.data.get('additions'));
+                                            let left = OrdinationsUtils.renderImplodedOrder(grp, data.get('dishes'), this.props.get('additions'));
                                             return (
                                                 <Row key={grp.get('groupId')} align="center">
                                                     <Column>
@@ -92,7 +92,7 @@ export default class DiningTableClosingReviewPage extends Component {
     }
 
     buildRefinedTotalView() {
-        const data = this.props.data;
+        const data = this.props;
         let wizardData = iGet(data, 'tableClosingFeature.closingWizard');
         let discount = iGet(wizardData, 'percent');
         let billsNumber = iGet(wizardData, 'split');
@@ -121,7 +121,7 @@ export default class DiningTableClosingReviewPage extends Component {
     }
 
     calculateDiscountedTotal() {
-        const data = this.props.data;
+        const data = this.props;
         let table = iGet(data, "diningTableEditing.diningTable");
         let wizardData = iGet(data, 'tableClosingFeature.closingWizard');
 
@@ -143,7 +143,7 @@ export default class DiningTableClosingReviewPage extends Component {
     }
 
     buildRefiningComponent() {
-        const data = this.props.data;
+        const data = this.props;
         const wizardData = iGet(data, 'tableClosingFeature.closingWizard');
         const billsNumber = wizardData.get('split');
         const singlePartTotal = iGet(data, 'tableClosingFeature.bill.total') / billsNumber;

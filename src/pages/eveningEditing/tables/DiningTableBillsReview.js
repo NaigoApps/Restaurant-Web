@@ -13,7 +13,7 @@ export default class DiningTableBillsReview extends React.Component {
     }
 
     render() {
-        let props = this.props.data;
+        let props = this.props;
         let orders = [];
         let evening = props.get('evening');
         let table = iGet(props, "diningTableEditing.diningTable");

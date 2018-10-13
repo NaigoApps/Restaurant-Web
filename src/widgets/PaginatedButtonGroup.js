@@ -14,7 +14,7 @@ export default class PaginatedButtonGroup extends Component {
     }
 
     componentWillReceiveProps(props) {
-        if(!collectionsEquals(props.data, this.props.data)){
+        if(!collectionsEquals(props, this.props)){
             this.setState({
                 page: 0
             });

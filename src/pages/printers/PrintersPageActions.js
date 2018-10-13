@@ -1,5 +1,4 @@
 import dispatcher from "../../dispatcher/SimpleDispatcher";
-import {ApplicationActions} from "../../actions/ApplicationActions";
 import asyncActionBuilder from "../../actions/RequestBuilder";
 import {DataActions} from "../../actions/DataActions";
 import {SettingsPageActions} from "../settings/SettingsPageActions";

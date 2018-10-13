@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Icon from "./Icon";
 import Row from "./Row";
 import Column from "./Column";
 

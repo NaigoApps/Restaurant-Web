@@ -1,5 +1,5 @@
 import {STATUSES} from "./LazyData";
-import RootFeatureStore from "./RootFeatureStore";
+import AbstractStore from "./AbstractStore";
 import Category from "../model/Category";
 import Location from "../model/Location";
 import Dish from "../model/Dish";
@@ -15,39 +15,50 @@ import {WaitersPageActions} from "../pages/waiters/WaitersPageActions";
 import Waiter from "../model/Waiter";
 import {CategoriesPageActions} from "../pages/categories/CategoriesPageActions";
 import {DishesPageActions} from "../pages/dishes/DishesPageActions";
+import AdditionsPageActions from "../pages/additions/AdditionsPageActions";
+import CustomersPageActions from "../pages/customers/CustomersPageActions";
+import Customer from "../model/Customer";
+import EveningSelectorActions from "../pages/eveningEditing/eveningSelection/EveningSelectorActions";
+import Evening from "../model/Evening";
+import EveningEditorActions from "../pages/eveningEditing/EveningEditorActions";
+import DiningTablesEditorActions from "../pages/eveningEditing/diningTableEditing/DiningTablesEditorActions";
+import DiningTable from "../model/DiningTable";
+import Phase from "../model/Phase";
+import {ApplicationActions, ApplicationActionTypes} from "../actions/ApplicationActions";
+import Page from "../pages/Page";
+import {Pages} from "../App";
 
 const EVT = "DATA_EVENT";
 
 export const Topics = {
-    CATEGORIES: "CATEGORIES",
-    DISHES: "DISHES",
-    ADDITIONS: "ADDITIONS",
-    LOCATIONS: "LOCATIONS",
-    RESTAURANT_TABLES: "RESTAURANT_TABLES",
-    DISH_STATUSES: "DISH_STATUSES",
-    PRINTERS: "PRINTERS",
-    PRINTER_SERVICES: "PRINTER_SERVICES",
-    WAITERS: "WAITERS",
-    WAITER_STATUSES: "WAITER_STATUSES"
+    CATEGORIES: "categories",
+    DISHES: "dishes",
+    ADDITIONS: "additions",
+    LOCATIONS: "locations",
+    RESTAURANT_TABLES: "tables",
+    DISH_STATUSES: "dishStatuses",
+    PRINTERS: "printers",
+    PRINTER_SERVICES: "services",
+    WAITERS: "waiters",
+    CUSTOMERS: "customers",
+    WAITER_STATUSES: "waiterStatuses",
+
+    EVENINGS: "evenings",
+    PHASES: "phases",
+    DINING_TABLES: "diningTables",
+    ORDINATIONS: "ordinations",
+    ORDERS: "orders",
 };
 
-class DataStore extends RootFeatureStore {
+class DataStore extends AbstractStore {
     constructor() {
-        super(EVT);
+        super("data", EVT);
         this.status = STATUSES.NOT_LOADED;
         this.pool = {};
-        this.topics = {
-            CATEGORIES: [],
-            LOCATIONS: [],
-            DISHES: [],
-            ADDITIONS: [],
-            DISH_STATUSES: [],
-            PRINTER_SERVICES: [],
-            PRINTERS: [],
-            RESTAURANT_TABLES: [],
-            WAITERS: [],
-            WAITER_STATUSES: []
-        };
+        this.topics = {};
+        Object.keys(Topics).forEach(topic => {
+            this.topics[Topics[topic]] = [];
+        });
     }
 
     clearData() {
@@ -71,9 +82,13 @@ class DataStore extends RootFeatureStore {
         return this.status === STATUSES.LOADING;
     }
 
-    replaceEntities(entities, converter, topic, comparator) {
+    clearTopic(topic) {
         this.topics[topic].forEach(e => delete this.pool[e.uuid]);
         this.topics[topic] = [];
+    }
+
+    replaceEntities(entities, converter, topic, comparator) {
+        this.clearTopic(topic);
 
         entities = entities.map(e => {
             return converter(e, this.pool)
@@ -82,7 +97,12 @@ class DataStore extends RootFeatureStore {
         entities.forEach(e => {
             this.pool[e.uuid] = e;
         });
-        this.topics[topic] = entities.sort(comparator);
+
+        this.topics[topic] = entities;
+
+        if (comparator) {
+            this.topics[topic].sort(comparator);
+        }
     }
 
     createEntity(entity, converter, topic, comparator) {
@@ -125,6 +145,24 @@ class DataStore extends RootFeatureStore {
         this.topics[Topics.PRINTER_SERVICES].sort((s1, s2) => s1.localeCompare(s2));
     }
 
+    getActionsClass() {
+        //FIXME Correct?
+        return DataActionTypes;
+    }
+
+    buildState() {
+        const state = {};
+        Object.keys(Topics).forEach(topic => {
+            state[Topics[topic]] = this.getEntities(Topics[topic]);
+        });
+        //The only exception
+        if (this.getEntities(Topics.EVENINGS).length === 1) {
+            state.evening = this.getEntities(Topics.EVENINGS)[0];
+        }
+        state.pool = this.pool;
+        return state;
+    }
+
     getEntities(topic) {
         return this.topics[topic].slice();
     }
@@ -133,91 +171,167 @@ class DataStore extends RootFeatureStore {
         return this.pool[uuid];
     }
 
+    getEvening() {
+        return this.topics[Topics.EVENINGS].length > 0 ? this.topics[Topics.EVENINGS][0] : null;
+    }
+
     getPool() {
         return this.pool;
     }
 
-    getCompletionHandlers() {
+    getActionCompletedHandlers() {
         const handlers = {};
         this.addLoadHandlers(handlers);
         this.addCategoryHandlers(handlers);
+        this.addAdditionHandlers(handlers);
         this.addDishHandlers(handlers);
         this.addPrinterHandlers(handlers);
         this.addLocationHandlers(handlers);
         this.addRTablesHandlers(handlers);
         this.addWaitersHandlers(handlers);
+        this.addCustomersHandlers(handlers);
+
+        this.addEveningHandlers(handlers);
+        this.addDiningTablesHandlers(handlers);
+        this.addPhasesHandlers(handlers);
         return handlers;
+    }
+
+    addPhasesHandlers(handlers) {
+        handlers[DataActionTypes.LOAD_PHASES] = (phases) =>
+            this.replaceEntities(phases, Phase.create, Topics.PHASES);
+        return handlers;
+    }
+
+    addEveningHandlers(handlers) {
+
+        handlers[ApplicationActionTypes.GO_TO_PAGE] = (page) => {
+            if(page === Pages.EVENING_SELECTION){
+                this.clearTopic(Topics.EVENINGS);
+            }
+        };
+
+        DataStore.assign(handlers, [
+                EveningSelectorActions.CHOOSE,
+                EveningEditorActions.GET_SELECTED,
+                DiningTablesEditorActions.MERGE_DINING_TABLE,
+                EveningEditorActions.CONFIRM_COVER_CHARGE_EDITING],
+            (evening) => this.replaceEntities([evening], Evening.create, Topics.EVENINGS));
+
+        handlers[EveningEditorActions.DESELECT_EVENING] = () => this.clearTopic(Topics.EVENINGS);
+        handlers[DiningTablesEditorActions.CREATE_DINING_TABLE] = (table) => this.getEvening().addTable(table);
+    }
+
+    addDiningTablesHandlers(handlers) {
+        handlers[EveningEditorActions.LOAD_EVENING_TABLES] = tables => {
+            this.replaceEntities(tables, DiningTable.create, Topics.DINING_TABLES, EntitiesUtils.defaultComparator("openingTime"))
+        };
+
+        handlers[EveningEditorActions.DESELECT_EVENING] = () => {
+            this.clearTopic(Topics.EVENINGS);
+            this.clearTopic(Topics.DINING_TABLES);
+        };
+
+        handlers[DiningTablesEditorActions.CREATE_DINING_TABLE] = (table) => {
+            this.createEntity(table, DiningTable.create, Topics.DINING_TABLES);
+        }
     }
 
     addLoadHandlers(handlers) {
         handlers[DataActionTypes.LOAD_ADDITIONS] = (adds) =>
-            this.replaceEntities(adds.toJS(), Addition.create, Topics.ADDITIONS, EntitiesUtils.nameComparator);
+            this.replaceEntities(adds, Addition.create, Topics.ADDITIONS, EntitiesUtils.nameComparator);
 
         handlers[DataActionTypes.LOAD_DISH_STATUSES] = (statuses) =>
-            this.receiveDishStatuses(statuses.toJS());
+            this.receiveDishStatuses(statuses);
         handlers[DataActionTypes.LOAD_PRINTER_SERVICES] = (services) =>
-            this.receivePrinterServices(services.toJS());
+            this.receivePrinterServices(services);
     }
 
     addDishHandlers(handlers) {
         handlers[DataActionTypes.LOAD_DISHES] = (dishes) =>
-            this.replaceEntities(dishes.toJS(), Dish.create, Topics.DISHES, EntitiesUtils.nameComparator);
+            this.replaceEntities(dishes, Dish.create, Topics.DISHES, EntitiesUtils.nameComparator);
+
         handlers[DishesPageActions.CREATE_DISH] = (dish) =>
-            this.createEntity(dish.toJS(), Dish.create, Topics.DISHES, EntitiesUtils.nameComparator);
+            this.createEntity(dish, Dish.create, Topics.DISHES, EntitiesUtils.nameComparator);
+
         handlers[DishesPageActions.UPDATE_EDITING_DISH] = (dishDTO) => {
-            const dish = this.updateEntity(dishDTO.toJS(), Dish.create, Topics.DISHES, EntitiesUtils.nameComparator);
             const categories = this.getEntities(Topics.CATEGORIES);
             categories.forEach(category => {
-                if(category.hasDish(dish)){
-                    category.removeDish(dish);
+                if (category.hasDishUuid(dishDTO.uuid)) {
+                    category.removeDishUuid(dishDTO.uuid);
                 }
             });
-            dish.category.addDish(dish);
+            this.updateEntity(dishDTO, Dish.create, Topics.DISHES, EntitiesUtils.nameComparator);
         };
-        handlers[DishesPageActions.DELETE_EDITING_DISH] = (uuid) =>
+        handlers[DishesPageActions.DELETE_EDITING_DISH] = (uuid) => {
+            const dish = this.getEntity(uuid);
+            dish.category.removeDish(dish);
             this.deleteEntity(uuid, Topics.DISHES);
+        }
     }
 
     addCategoryHandlers(handlers) {
         handlers[DataActionTypes.LOAD_CATEGORIES] = (categories) =>
-            this.replaceEntities(categories.toJS(), Category.create, Topics.CATEGORIES, EntitiesUtils.nameComparator);
+            this.replaceEntities(categories, Category.create, Topics.CATEGORIES, EntitiesUtils.nameComparator);
         handlers[CategoriesPageActions.CREATE_CATEGORY] = (category) =>
-            this.createEntity(category.toJS(), Category.create, Topics.CATEGORIES, EntitiesUtils.nameComparator);
+            this.createEntity(category, Category.create, Topics.CATEGORIES, EntitiesUtils.nameComparator);
         handlers[CategoriesPageActions.UPDATE_EDITING_CATEGORY] = (category) =>
-            this.updateEntity(category.toJS(), Category.create, Topics.CATEGORIES, EntitiesUtils.nameComparator);
+            this.updateEntity(category, Category.create, Topics.CATEGORIES, EntitiesUtils.nameComparator);
         handlers[CategoriesPageActions.DELETE_EDITING_CATEGORY] = (uuid) =>
             this.deleteEntity(uuid, Topics.CATEGORIES);
     }
 
+    addAdditionHandlers(handlers) {
+        handlers[DataActionTypes.LOAD_ADDITIONS] = (additions) =>
+            this.replaceEntities(additions, Addition.create, Topics.ADDITIONS, EntitiesUtils.nameComparator);
+        handlers[AdditionsPageActions.CREATE_ADDITION] = (addition) =>
+            this.createEntity(addition, Addition.create, Topics.ADDITIONS, EntitiesUtils.nameComparator);
+        handlers[AdditionsPageActions.UPDATE_EDITING_ADDITION] = (addition) =>
+            this.updateEntity(addition, Addition.create, Topics.ADDITIONS, EntitiesUtils.nameComparator);
+        handlers[AdditionsPageActions.DELETE_EDITING_ADDITION] = (uuid) =>
+            this.deleteEntity(uuid, Topics.ADDITIONS);
+    }
+
     addPrinterHandlers(handlers) {
         handlers[DataActionTypes.LOAD_PRINTERS] = (printers) =>
-            this.replaceEntities(printers.toJS(), Printer.create, Topics.PRINTERS, EntitiesUtils.nameComparator);
+            this.replaceEntities(printers, Printer.create, Topics.PRINTERS, EntitiesUtils.nameComparator);
         handlers[PrintersPageActionTypes.CREATE_PRINTER] = (printer) =>
-            this.createEntity(printer.toJS(), Printer.create, Topics.PRINTERS, EntitiesUtils.nameComparator);
+            this.createEntity(printer, Printer.create, Topics.PRINTERS, EntitiesUtils.nameComparator);
         handlers[PrintersPageActionTypes.UPDATE_EDITING_PRINTER] = (printer) =>
-            this.updateEntity(printer.toJS(), Printer.create, Topics.PRINTERS, EntitiesUtils.nameComparator);
+            this.updateEntity(printer, Printer.create, Topics.PRINTERS, EntitiesUtils.nameComparator);
         handlers[PrintersPageActionTypes.DELETE_EDITING_PRINTER] = (uuid) =>
             this.deleteEntity(uuid, Topics.PRINTERS);
     }
 
+    addCustomersHandlers(handlers) {
+        handlers[DataActionTypes.LOAD_CUSTOMERS] = (customers) =>
+            this.replaceEntities(customers, Customer.create, Topics.CUSTOMERS, EntitiesUtils.nameComparator);
+        handlers[CustomersPageActions.CREATE_CUSTOMER] = (customer) =>
+            this.createEntity(customer, Customer.create, Topics.CUSTOMERS, EntitiesUtils.nameComparator);
+        handlers[CustomersPageActions.UPDATE_EDITING_CUSTOMER] = (customer) =>
+            this.updateEntity(customer, Customer.create, Topics.CUSTOMERS, EntitiesUtils.nameComparator);
+        handlers[CustomersPageActions.DELETE_EDITING_CUSTOMER] = (uuid) =>
+            this.deleteEntity(uuid, Topics.CUSTOMERS);
+    }
+
     addLocationHandlers(handlers) {
         handlers[DataActionTypes.LOAD_LOCATIONS] = (locations) =>
-            this.replaceEntities(locations.toJS(), Location.create, Topics.LOCATIONS, EntitiesUtils.nameComparator);
+            this.replaceEntities(locations, Location.create, Topics.LOCATIONS, EntitiesUtils.nameComparator);
         handlers[LocationsPageActionTypes.CREATE_LOCATION] = (location) =>
-            this.createEntity(location.toJS(), Location.create, Topics.LOCATIONS, EntitiesUtils.nameComparator);
+            this.createEntity(location, Location.create, Topics.LOCATIONS, EntitiesUtils.nameComparator);
         handlers[LocationsPageActionTypes.UPDATE_EDITING_LOCATION] = (location) =>
-            this.updateEntity(location.toJS(), Location.create, Topics.LOCATIONS, EntitiesUtils.nameComparator);
+            this.updateEntity(location, Location.create, Topics.LOCATIONS, EntitiesUtils.nameComparator);
         handlers[LocationsPageActionTypes.DELETE_EDITING_LOCATION] = (uuid) =>
             this.deleteEntity(uuid, Topics.LOCATIONS);
     }
 
     addRTablesHandlers(handlers) {
         handlers[DataActionTypes.LOAD_RESTAURANT_TABLES] = (tables) =>
-            this.replaceEntities(tables.toJS(), RestaurantTable.create, Topics.RESTAURANT_TABLES, EntitiesUtils.nameComparator);
+            this.replaceEntities(tables, RestaurantTable.create, Topics.RESTAURANT_TABLES, EntitiesUtils.nameComparator);
         handlers[TablesPageActions.CREATE_R_TABLE] = (table) =>
-            this.createEntity(table.toJS(), RestaurantTable.create, Topics.RESTAURANT_TABLES, EntitiesUtils.nameComparator);
+            this.createEntity(table, RestaurantTable.create, Topics.RESTAURANT_TABLES, EntitiesUtils.nameComparator);
         handlers[TablesPageActions.UPDATE_R_TABLE] = (table) =>
-            this.updateEntity(table.toJS(), RestaurantTable.create, Topics.RESTAURANT_TABLES, EntitiesUtils.nameComparator);
+            this.updateEntity(table, RestaurantTable.create, Topics.RESTAURANT_TABLES, EntitiesUtils.nameComparator);
         handlers[TablesPageActions.DELETE_EDITING_R_TABLE] = (uuid) =>
             this.deleteEntity(uuid, Topics.RESTAURANT_TABLES);
     }
@@ -227,11 +341,11 @@ class DataStore extends RootFeatureStore {
             this.receiveWaiterStatuses(statuses);
 
         handlers[DataActionTypes.LOAD_WAITERS] = (waiters) =>
-            this.replaceEntities(waiters.toJS(), Waiter.create, Topics.WAITERS, EntitiesUtils.nameComparator);
+            this.replaceEntities(waiters, Waiter.create, Topics.WAITERS, EntitiesUtils.nameComparator);
         handlers[WaitersPageActions.CREATE_WAITER] = (waiter) =>
-            this.createEntity(waiter.toJS(), Waiter.create, Topics.WAITERS, EntitiesUtils.nameComparator);
+            this.createEntity(waiter, Waiter.create, Topics.WAITERS, EntitiesUtils.nameComparator);
         handlers[WaitersPageActions.UPDATE_EDITING_WAITER] = (waiter) =>
-            this.updateEntity(waiter.toJS(), Waiter.create, Topics.WAITERS, EntitiesUtils.nameComparator);
+            this.updateEntity(waiter, Waiter.create, Topics.WAITERS, EntitiesUtils.nameComparator);
         handlers[WaitersPageActions.DELETE_EDITING_WAITER] = (uuid) =>
             this.deleteEntity(uuid, Topics.WAITERS);
     }

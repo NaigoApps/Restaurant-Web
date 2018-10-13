@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {ApplicationActions} from "../actions/ApplicationActions";
 import Button from "../widgets/Button";
-import {HOME, SETTINGS} from "../App";
+import {HOME, Pages, SETTINGS} from "../App";
 import NavPills from "../widgets/NavPills";
 import Column from "../widgets/Column";
 import Row from "../widgets/Row";
@@ -20,7 +20,7 @@ class RestaurantNav extends Component {
 
     goHome() {
         ApplicationActions.dismissFullScreen();
-        ApplicationActions.goToPage(HOME)
+        ApplicationActions.goToPage(Pages.HOME)
     }
 
     render() {
@@ -44,7 +44,7 @@ class RestaurantNav extends Component {
                         <Column auto>
                             <Button
                                 icon="gears"
-                                commitAction={() => ApplicationActions.goToPage(SETTINGS)}
+                                commitAction={() => ApplicationActions.goToPage(Pages.SETTINGS)}
                                 highPadding
                             />
                         </Column>

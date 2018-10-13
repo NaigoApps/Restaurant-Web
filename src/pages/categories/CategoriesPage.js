@@ -20,10 +20,10 @@ export default class CategoriesPage extends ViewController {
     }
 
     render() {
-        let pageContent = CategoriesPage.makePageContent(this.state.data);
+        let pageContent = CategoriesPage.makePageContent(this.state);
         return (
-            <Page title="Menu">
-                <CategoriesNav data={this.state.data}/>
+            <Page title="Menu" {...this.state.general}>
+                <CategoriesNav {...this.state}/>
                 {pageContent}
             </Page>
         )
@@ -33,11 +33,11 @@ export default class CategoriesPage extends ViewController {
         const editor = data.editor;
 
         if (editor.mode === EditorMode.CREATING) {
-            return <CategoryCreator data={data}/>;
+            return <CategoryCreator {...data}/>;
         } else if (editor.mode === EditorMode.EDITING) {
-            return <CategoryEditor data={data}/>
+            return <CategoryEditor {...data}/>
         } else {
-            return <CategoriesNavigator data={data}/>;
+            return <CategoriesNavigator {...data}/>;
         }
     }
 }

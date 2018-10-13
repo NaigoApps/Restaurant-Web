@@ -1,7 +1,7 @@
 import {findByUuid, stringEquals, uuid} from "../../utils/Utils";
 import DiningTablesUtils from "./tables/DiningTablesUtils";
 import {beautifyTime, formatDate} from "../../components/widgets/inputs/DateInput";
-import StoresUtils from "../StoresUtils";
+
 const {fromJS, Map, OrderedMap, List} = require('immutable');
 
 export default class OrdinationsUtils {
@@ -164,7 +164,7 @@ export default class OrdinationsUtils {
     }
 
     static renderOrdination(ordination){
-        return "Comanda delle " + beautifyTime(ordination.get('creationTime'));
+        return "Comanda delle " + beautifyTime(ordination.creationTime);
     }
 
     static ordinationDateSorter(o1, o2){

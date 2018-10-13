@@ -23,6 +23,7 @@ export default class NavElement extends Component {
             <Column auto>
                 <Button
                     type={type || "secondary"}
+                    icon={this.props.icon}
                     text={text}
                     disabled={disabled}
                     active={active}

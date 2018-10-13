@@ -12,7 +12,7 @@ export default class PrinterCreator extends React.Component {
     }
 
     render() {
-        const data = this.props.data;
+        const data = this.props;
         const editor = data.editor;
 
         const components = PrinterCreator.buildComponents(data);
@@ -59,7 +59,7 @@ export default class PrinterCreator extends React.Component {
     static buildNameEditor(data) {
         return <SelectEditor options={{
             label: "Nome",
-            values: data.services,
+            values: data.data.services,
             value: data.editor.printer.name,
             isValid: name => !!name,
             callback: name => PrintersPageActions.setEditorName(name)

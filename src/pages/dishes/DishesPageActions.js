@@ -1,6 +1,5 @@
 import dispatcher from "../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../actions/RequestBuilder";
-import {ApplicationActions} from "../../actions/ApplicationActions";
 import {DataActions} from "../../actions/DataActions";
 import {SettingsPageActions} from "../settings/SettingsPageActions";
 
@@ -82,7 +81,7 @@ export class DishesPageActions {
     }
 
     static deleteDish(dish) {
-        asyncActionBuilder.remove(this.DELETE_EDITING_DISH, 'dishes', dish);
+        asyncActionBuilder.remove(this.DELETE_EDITING_DISH, 'dishes', dish.uuid);
     }
 
     static showCategories(cats){

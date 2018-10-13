@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import SwitchInput from "../../SwitchInput";
 import Button from "../../../../widgets/Button";
 import Column from "../../../../widgets/Column";
 import Row from "../../../../widgets/Row";

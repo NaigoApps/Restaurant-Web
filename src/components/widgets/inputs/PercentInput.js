@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import IntKeyPad from "../IntKeyPad";
 import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
-import KeyboardButton, {SIZES} from "./KeyboardButton";
 
 const {Map} = require('immutable');
 
