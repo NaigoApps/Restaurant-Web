@@ -23,7 +23,7 @@ export default class CategoriesNavigator extends Component {
                         rows={StoresUtils.option(data, "categoriesRows", 3)}
                         cols={StoresUtils.option(data, "categoriesColumns", 3)}
                         options={data.data.categories}
-                        page={data.navigator.page}
+                        page={data.page}
                         color={cat => cat.color}
                         renderer={category => category.name}
                         onSelectPage={index => CategoriesPageActions.selectNavigatorPage(index)}

@@ -102,13 +102,6 @@ export default class GraphWizard extends Component {
         </Modal>
     }
 
-    renderData() {
-        if (this.props.renderer) {
-            return this.props.renderer(this.initialWizardData());
-        }
-        return "";
-    }
-
     buildAbortButton() {
         return <Button
             text={this.props.abortText || "Annulla"}
@@ -120,7 +113,7 @@ export default class GraphWizard extends Component {
         return <Button
             text={this.props.confirmText || "Conferma"}
             type="success"
-            disabled={this.props.isValid && !this.props.isValid(this.state)}
+            disabled={this.props.isValid !== undefined && !this.props.isValid}
             commitAction={this.confirmAction.bind(this)}/>;
     }
 

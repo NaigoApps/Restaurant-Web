@@ -1,7 +1,8 @@
 import dispatcher from "../../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../../actions/RequestBuilder";
-import {SettingsPageActions} from "../../settings/SettingsPageActions";
-import {DataActions} from "../../../actions/DataActions";
+import eveningPageActions from "../EveningPageActions";
+import {ApplicationActions} from "../../../actions/ApplicationActions";
+import {Pages} from "../../../App";
 
 export default class EveningSelectorActions {
     static CONFIRM_MONTH = "CONFIRM_MONTH";
@@ -17,6 +18,10 @@ export default class EveningSelectorActions {
     }
 
     static chooseEvening(date) {
-        asyncActionBuilder.get(this.CHOOSE, 'evenings', {date: date});
+        asyncActionBuilder.get(this.CHOOSE, 'evenings', {date: date})
+            .then(() => {
+                ApplicationActions.goToPage(Pages.EVENINGS);
+                eveningPageActions.initEveningPage();
+            });
     }
 }

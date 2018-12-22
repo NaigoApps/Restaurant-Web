@@ -52,9 +52,9 @@ class CustomersPageStore extends AbstractStore {
         handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_DISTRICT] = (district) => this.editor.customer.district = district;
         handlers[CustomersPageActions.SET_CUSTOMER_EDITOR_CAP] = (cap) => this.editor.customer.cap = cap;
         handlers[CustomersPageActions.CREATE_CUSTOMER] = (customer) =>
-            this.initEditor(new Customer(customer, dataStore.getPool()), false);
+            this.initEditor(dataStore.getEntity(customer.uuid), false);
         handlers[CustomersPageActions.UPDATE_EDITING_CUSTOMER] = (customer) =>
-            this.initEditor(new Customer(customer, dataStore.getPool()), false);
+            this.initEditor(dataStore.getEntity(customer.uuid), false);
 
         handlers[CustomersPageActions.DELETE_EDITING_CUSTOMER] = () => this.initEditor();
 

@@ -31,15 +31,15 @@ export function collectionsEquals(l1, l2) {
     if (l1 === l2 || l1 && !l2 || l2 && !l1) {
         return false;
     }
-    if (l1.size !== l2.size) {
+    if (l1.length !== l2.length) {
         return false;
     }
     let ok = true;
     l1.forEach(element => {
-        ok &= l2.contains(element);
+        ok &= l2.includes(element);
     });
     l2.forEach(element => {
-        ok &= l1.contains(element);
+        ok &= l1.includes(element);
     });
     return ok;
 }
@@ -63,7 +63,7 @@ export function distribute(array, value) {
 }
 
 export function uuid() {
-    return Math.random().toString(16).slice(2);
+    return "UI_" + Math.random().toString(16).slice(2);
 }
 
 export class Utils {
@@ -73,22 +73,4 @@ export class Utils {
 
 export function iGet(map, namespace) {
     return map.getIn(namespace.split('.'));
-}
-
-export function iSet(map, namespace, value) {
-    return map.setIn(namespace.split('.'), value);
-}
-
-export function appendIntEditorChar(oldText, char) {
-    if (char === CANC) {
-        return "";
-    }
-    if (oldText === "0") {
-        oldText = "";
-    }
-    let newText = oldText + char;
-    if (!isNaN(parseInt(newText))) {
-        return newText;
-    }
-    return oldText;
 }

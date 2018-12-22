@@ -60,10 +60,10 @@ class DishesPageStore extends AbstractStore {
         handlers[DishesPageActions.SET_DISH_EDITOR_PRICE] = (value) => this.editor.dish.price = value;
         handlers[DishesPageActions.SET_DISH_EDITOR_CATEGORY] = (value) => this.editor.dish.category = value;
         handlers[DishesPageActions.CREATE_DISH] = (dish) =>
-            this.initEditor(Dish.create(dish, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(dish.uuid));
         handlers[DishesPageActions.SELECT_EDITING_DISH] = (dish) => this.initEditor(dish);
         handlers[DishesPageActions.UPDATE_EDITING_DISH] = (dish) =>
-            this.initEditor(Dish.create(dish, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(dish.uuid));
         handlers[DishesPageActions.DELETE_EDITING_DISH] = () =>
             this.initEditor();
         handlers[DishesPageActions.SELECT_EDITING_DISH_PAGE] = (page) => this.navigator.page = page;

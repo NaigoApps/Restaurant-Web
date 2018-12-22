@@ -8,11 +8,13 @@ import ViewController from "../../widgets/ViewController";
 import EditorMode from "../../utils/EditorMode";
 import PrinterCreator from "./PrinterCreator";
 import {PrintersPageActions} from "./PrintersPageActions";
+import applicationStore from "../../stores/ApplicationStore";
+import dataStore from "../../stores/DataStore";
 
 export default class PrintersPage extends ViewController {
 
     constructor(props) {
-        super(props, printersPageStore);
+        super(props, printersPageStore, applicationStore, dataStore);
     }
 
     componentDidMount() {
@@ -23,20 +25,20 @@ export default class PrintersPage extends ViewController {
     render() {
         let pageContent = PrintersPage.makePageContent(this.state);
         return (
-            <Page title="Stampanti" {...this.state.general}>
-                <PrintersNav {...this.state}/>
+            <Page title="Stampanti">
+                <PrintersNav {...this.state.printers}/>
                 {pageContent}
             </Page>
         )
     }
 
     static makePageContent(data) {
-        if (data.editor.mode === EditorMode.CREATING) {
-            return <PrinterCreator {...data}/>
-        } else if (data.editor.mode === EditorMode.EDITING) {
-            return <PrinterEditor {...data}/>
+        if (data.printers.editor.mode === EditorMode.CREATING) {
+            return <PrinterCreator {...data.printers} data={data.data}/>
+        } else if (data.printers.editor.mode === EditorMode.EDITING) {
+            return <PrinterEditor {...data.printers} data={data.data}/>
         } else {
-            return <PrintersNavigator {...data}/>
+            return <PrintersNavigator general={data.general} data={data.data} page={data.printers.navigator.page}/>
         }
     }
 

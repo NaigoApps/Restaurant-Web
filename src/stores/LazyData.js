@@ -1,5 +1,3 @@
-const {Map} = require('immutable');
-
 export const STATUSES = {
     NOT_LOADED: 0,
     LOADING: 1,

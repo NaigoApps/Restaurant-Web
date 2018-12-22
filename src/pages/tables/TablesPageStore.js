@@ -35,11 +35,11 @@ class TablesPageStore extends AbstractStore {
             this.initEditor(new RestaurantTable(EntitiesUtils.newRestaurantTable(), dataStore.getPool()), true);
         handlers[TablesPageActions.SET_R_TABLE_EDITOR_NAME] = (name) => this.editor.table.name = name;
         handlers[TablesPageActions.CREATE_R_TABLE] = (table) =>
-            this.initEditor(new RestaurantTable(table, dataStore.getPool()), false);
+            this.initEditor(dataStore.getEntity(table.uuid), false);
         handlers[TablesPageActions.DELETE_EDITING_R_TABLE] = () => this.initEditor();
         handlers[TablesPageActions.SELECT_R_TABLE_PAGE] = (page) => this.navigator.page = page;
         handlers[TablesPageActions.UPDATE_R_TABLE] = (table) =>
-            this.initEditor(new RestaurantTable(table, dataStore.getPool()), false);
+            this.initEditor(dataStore.getEntity(table.uuid), false);
 
         handlers[ApplicationActionTypes.LOAD_SETTINGS] = () => Utils.nop();
         handlers[DataActionTypes.LOAD_RESTAURANT_TABLES] = () => Utils.nop();

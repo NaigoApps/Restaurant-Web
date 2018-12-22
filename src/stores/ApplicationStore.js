@@ -8,6 +8,7 @@ import errorsStore from "./ErrorsStore";
 import EveningSelectorActions from "../pages/eveningEditing/eveningSelection/EveningSelectorActions";
 import {Pages} from "../App";
 import EveningEditorActions from "../pages/eveningEditing/EveningEditorActions";
+import * as screenfull from "screenfull";
 
 export const EVT_APPLICATION_STORE_CHANGED = "EVT_APPLICATION_STORE_CHANGED";
 
@@ -19,6 +20,7 @@ class ApplicationStore extends AbstractStore {
         this.currentPage = null;
         this.floatInput = {};
         this.integerInput = {};
+        this.percentInput = {};
         this.selectInput = {};
         this.textInput = {};
         this.colorInput = {};
@@ -34,12 +36,28 @@ class ApplicationStore extends AbstractStore {
     getActionCompletedHandlers() {
         const handlers = {};
 
-        handlers[ApplicationActionTypes.TOGGLE_FULL_SCREEN] = () => this.isFullScreen = !this.isFullScreen;
-        handlers[ApplicationActionTypes.REQUEST_FULL_SCREEN] = () => this.isFullScreen = true;
-        handlers[ApplicationActionTypes.DISMISS_FULL_SCREEN] = () => this.isFullScreen = false;
+        handlers[ApplicationActionTypes.TOGGLE_FULL_SCREEN] = () => {
+            this.isFullScreen = !this.isFullScreen;
+            if (this.isFullScreen) {
+                if (screenfull.enabled) {
+                    screenfull.request();
+                }
+            } else {
+                screenfull.exit();
+            }
+        };
+        handlers[ApplicationActionTypes.REQUEST_FULL_SCREEN] = () => {
+            this.isFullScreen = true;
+            if (screenfull.enabled) {
+                screenfull.request();
+            }
+        };
+        handlers[ApplicationActionTypes.DISMISS_FULL_SCREEN] = () => {
+            this.isFullScreen = false;
+            screenfull.exit();
+        };
 
         handlers[ApplicationActionTypes.GO_TO_PAGE] = (page) => this.currentPage = page;
-        handlers[EveningSelectorActions.CHOOSE] = () => this.currentPage = Pages.EVENINGS;
         handlers[EveningEditorActions.DESELECT_EVENING] = () => this.currentPage = Pages.EVENING_SELECTION;
 
         handlers[ApplicationActionTypes.SHOW_TEXT_INPUT] = (options) => this.textInput = StoresUtils.initTextInput(options);
@@ -56,6 +74,11 @@ class ApplicationStore extends AbstractStore {
         handlers[ApplicationActionTypes.INTEGER_INPUT_CHAR] = (char) => StoresUtils.intChar(this.integerInput, char);
         handlers[ApplicationActionTypes.INTEGER_INPUT_CHANGE] = (data) => StoresUtils.intChange(this.integerInput, data);
         handlers[ApplicationActionTypes.HIDE_INTEGER_INPUT] = () => this.integerInput = StoresUtils.resetIntInput();
+
+        handlers[ApplicationActionTypes.SHOW_PERCENT_INPUT] = (options) => this.percentInput = StoresUtils.initPercentInput(options);
+        handlers[ApplicationActionTypes.PERCENT_INPUT_CHAR] = (char) => StoresUtils.percentChar(this.percentInput, char);
+        handlers[ApplicationActionTypes.PERCENT_INPUT_CHANGE] = (data) => StoresUtils.percentChange(this.percentInput, data);
+        handlers[ApplicationActionTypes.HIDE_PERCENT_INPUT] = () => this.percentInput = StoresUtils.resetPercentInput();
 
         handlers[ApplicationActionTypes.SHOW_SELECT_INPUT] = (options) => this.selectInput = StoresUtils.initSelectInput(options);
         handlers[ApplicationActionTypes.SELECT_INPUT_SELECT] = (value) => StoresUtils.selectInputSelect(this.selectInput, value);
@@ -94,6 +117,7 @@ class ApplicationStore extends AbstractStore {
             floatInput: this.floatInput,
             textInput: this.textInput,
             integerInput: this.integerInput,
+            percentInput: this.percentInput,
             selectInput: this.selectInput,
             colorInput: this.colorInput,
 

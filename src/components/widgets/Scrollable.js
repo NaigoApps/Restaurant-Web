@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {uuid} from "../../utils/Utils";
 import ScrollBar from "../../widgets/ScrollBar";
 import Column from "../../widgets/Column";
+import ColumnSeparator from "../../widgets/ColumnSeparator";
 
 export default class Scrollable extends Component {
     constructor(props) {
@@ -29,39 +30,16 @@ export default class Scrollable extends Component {
 
         let height = global.$("#" + this.state.uuid).height();
         let parentHeight = global.$("#" + this.state.uuid).parent().height();
-        // if (parentHeight < height) {
-        //     console.log("Parent: " + parentHeight + ", Son: " + height + ", DO need");
-        // } else {
-        //     console.log("Parent: " + parentHeight + ", Son: " + height + ", NO need");
-        // }
         this.setState({
             scrollbarNeeded: parentHeight < height
         });
-    }
-
-    updateScrollBar() {
-        let height = global.$("#" + this.state.uuid).height();
-        let parentHeight = global.$("#" + this.state.uuid).parent().height();
-        this.setState({
-            scrollbarNeeded: parentHeight < height
-        });
-    }
-
-    componentWillReceiveProps() {
-        this.updateScrollBar();
     }
 
     componentDidUpdate(prevProps, prevState) {
         let height = global.$("#" + this.state.uuid).height();
         let parentHeight = global.$("#" + this.state.uuid).parent().height();
-        // if (parentHeight < height) {
-        //     console.log("Parent: " + parentHeight + ", Son: " + height + ", DO need");
-        // } else {
-        //     console.log("Parent: " + parentHeight + ", Son: " + height + ", NO need");
-        // }
         if (prevState.scrollbarNeeded && height <= parentHeight ||
             !prevState.scrollbarNeeded && height > parentHeight) {
-            // console.log("Change scroll status");
             this.setState({
                 scrollbarNeeded: parentHeight < height,
                 percent: 0
@@ -69,7 +47,7 @@ export default class Scrollable extends Component {
         }
         if (prevProps.scrollPulse !== this.props.scrollPulse) {
             this.setState({
-                percent: 1
+                percent: this.props.position !== undefined ? this.props.position : 1
             });
         }
         this.updatePosition();
@@ -92,6 +70,7 @@ export default class Scrollable extends Component {
                     {this.props.children}
                 </div>
             </Column>
+            <ColumnSeparator hidden/>
             <Column auto>
                 <ScrollBar
                     visible={this.state.scrollbarNeeded}

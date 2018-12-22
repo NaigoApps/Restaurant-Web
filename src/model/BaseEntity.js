@@ -4,6 +4,10 @@ export default class BaseEntity {
         this._pool = pool;
     }
 
+    set uuid(uuid) {
+        this._uuid = uuid;
+    }
+
     get uuid() {
         return this._uuid;
     }
@@ -16,7 +20,9 @@ export default class BaseEntity {
     }
 
     getEntities(uuids) {
-        return uuids.map(uuid => this._pool[uuid]);
+        return uuids
+            .map(uuid => this._pool[uuid])
+            .filter(entity => !!entity);
     }
 
     toDto(){

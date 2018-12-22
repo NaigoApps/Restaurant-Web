@@ -58,6 +58,10 @@ export default class AbstractStore extends EventEmitter {
         this.removeListener(this.changeEvent, callback);
     }
 
+    waitFor(stores){
+
+    }
+
     handleAction(action) {
         let changed = false;
 
@@ -65,13 +69,13 @@ export default class AbstractStore extends EventEmitter {
 
         if (action.isCompleted()) {
             if (this.actionCompletedHandlers[action.type]) {
-                this.actionCompletedHandlers[action.type](action.body);
+                this.actionCompletedHandlers[action.type](action.body, action.request);
                 changed = true;
             } else {
                 //FIXME Remove this
                 changed |= this.handleCompletedAction(action);
             }
-            this.children.forEach(store => changed |= AbstractStore.isActionUsedBy(store, action));
+            // this.children.forEach(store => changed |= AbstractStore.isActionUsedBy(store, action));
 
         } else if (action.isInProgress()) {
             changed |= this.handleStartedAction(action);
@@ -88,14 +92,14 @@ export default class AbstractStore extends EventEmitter {
         }
     }
 
-    static isActionUsedBy(store, action) {
-        if (store.getActions() === StoresUtils.ALL_ACTIONS || store.getActions().includes(action.type)) {
-            return true;
-        }
-        let used = false;
-        store.children.forEach(child => used |= AbstractStore.isActionUsedBy(child, action));
-        return used;
-    }
+    // static isActionUsedBy(store, action) {
+    //     if (store.getActions() === StoresUtils.ALL_ACTIONS || store.getActions().includes(action.type)) {
+    //         return true;
+    //     }
+    //     let used = false;
+    //     store.children.forEach(child => used |= AbstractStore.isActionUsedBy(child, action));
+    //     return used;
+    // }
 
     buildState() {
         console.warn("No buildState() method definition in " + this.constructor.name);
@@ -103,13 +107,13 @@ export default class AbstractStore extends EventEmitter {
     }
 
     getState() {
-        let data = this.buildState();
+        // this.children.forEach(store => {
+        //     data[store.storeName] = store.getState();
+        // });
 
-        this.children.forEach(store => {
-            data[store.storeName] = store.getState();
-        });
-
-        return data;
+        const state = {};
+        state[this.storeName] = this.buildState();
+        return state;
     }
 
     handleCompletedAction(action) {

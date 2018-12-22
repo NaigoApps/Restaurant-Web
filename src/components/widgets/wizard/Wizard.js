@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import Button from "../../../widgets/Button";
-import Modal from "../../../widgets/modal/Modal";
 import Row from "../../../widgets/Row";
 import Column from "../../../widgets/Column";
-
-const {Map} = require('immutable');
+import PopupContainer from "../PopupContainer";
 
 export default class Wizard extends Component {
     constructor(props) {
@@ -14,14 +12,6 @@ export default class Wizard extends Component {
             refreshPulse: 0
         };
 
-    }
-
-    cssUpdate() {
-        this.setState(prevState => {
-            return {
-                refreshPulse: prevState.refreshPulse + 1
-            }
-        });
     }
 
     abort() {
@@ -57,22 +47,24 @@ export default class Wizard extends Component {
 
         let header = <div/>;
         if (currentPage && currentPage.props.title) {
-            header = <div className="modal-header">
-                <h5 className="modal-title">{currentPage.props.title}</h5>
-            </div>;
+            header = <Row>
+                <Column>
+                    <h5>{currentPage.props.title}</h5>
+                </Column>
+            </Row>;
         }
 
-        return <Modal visible={this.props.visible}
-                      lg={this.props.size === "lg"}
-                      onModalShown={() => this.cssUpdate()}
-                      onModalHidden={() => this.cssUpdate()}>
+        return <PopupContainer
+            id={this.props.id}
+            visible={this.props.visible}
+            size={this.props.size}>
             {header}
-            <div className="modal-body d-flex">
+            <Row grow>
                 <Column>
                     {currentPage}
                 </Column>
-            </div>
-            <div className="modal-footer">
+            </Row>
+            <Row>
                 <Column>
                     <Row justify="space-between">
                         {this.buildBackwardButton()}
@@ -84,8 +76,8 @@ export default class Wizard extends Component {
                         {this.buildForwardButton()}
                     </Row>
                 </Column>
-            </div>
-        </Modal>
+            </Row>
+        </PopupContainer>
     }
 
     canMoveBackward() {

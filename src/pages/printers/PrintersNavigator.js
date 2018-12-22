@@ -22,7 +22,7 @@ export default class PrintersNavigator extends Component {
                     rows={StoresUtils.option(props, "printersRows", 3)}
                     cols={StoresUtils.option(props, "printersColumns", 3)}
                     options={props.data.printers}
-                    page={props.navigator.page}
+                    page={props.page}
                     renderer={printer => printer.name}
                     onSelectPage={index => PrintersPageActions.selectPrinterNavigatorPage(index)}
                     onSelect={printer => PrintersPageActions.selectPrinter(printer)}

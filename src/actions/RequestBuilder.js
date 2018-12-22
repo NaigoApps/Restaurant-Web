@@ -74,12 +74,12 @@ class RequestBuilder {
                     let contentType = response.headers.get("content-type");
                     if (contentType && contentType.includes("application/json")) {
                         response.json().then((result) => {
-                            dispatcher.fireEnd(action, result);
+                            dispatcher.fireEnd(action, result, target);
                             resolve(result);
                         });
                     } else {
                         response.text().then((result) => {
-                            dispatcher.fireEnd(action, result);
+                            dispatcher.fireEnd(action, result, target);
                             resolve(result);
                         });
                     }

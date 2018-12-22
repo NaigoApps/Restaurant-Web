@@ -51,10 +51,10 @@ class CategoriesPageStore extends AbstractStore {
         handlers[CategoriesPageActions.SET_CATEGORY_EDITOR_LOCATION] = (value) => this.editor.category.location = value;
         handlers[CategoriesPageActions.SET_CATEGORY_EDITOR_COLOR] = (value) => this.editor.category.color = value;
         handlers[CategoriesPageActions.CREATE_CATEGORY] = (cat) =>
-            this.initEditor(Category.create(cat, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(cat.uuid));
         handlers[CategoriesPageActions.SELECT_EDITING_CATEGORY] = (cat) => this.initEditor(cat);
         handlers[CategoriesPageActions.UPDATE_EDITING_CATEGORY] = (cat) =>
-            this.initEditor(Category.create(cat, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(cat.uuid));
         handlers[CategoriesPageActions.DELETE_EDITING_CATEGORY] = () =>
             this.initEditor();
         handlers[CategoriesPageActions.SELECT_EDITING_CATEGORY_PAGE] = (page) => this.navigator.page = page;

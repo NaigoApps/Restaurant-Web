@@ -1,7 +1,6 @@
 export default class RenderingData{
-    constructor(text, color, bgColor){
+    constructor(text, bgColor){
         this._text = text;
-        this._color = color;
         this._bgColor = bgColor;
     }
 
@@ -12,14 +11,6 @@ export default class RenderingData{
 
     set text(value) {
         this._text = value;
-    }
-
-    get color() {
-        return this._color;
-    }
-
-    set color(value) {
-        this._color = value;
     }
 
     get backgroundColor() {

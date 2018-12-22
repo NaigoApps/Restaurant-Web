@@ -30,7 +30,8 @@ export default class ApplicationSelectInput extends Component {
         return <PopupContainer
             id="app-select-input"
             visible={data.visible}
-            blurCallback={() => ApplicationActions.hideSelectInput()}>
+            blurCallback={() => ApplicationActions.hideSelectInput()}
+            size="sm">
             <Row>
                 <Column>
                     <Row>

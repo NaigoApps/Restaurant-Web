@@ -23,12 +23,44 @@ $theme-colors: (
     background-color: darken($color_value, 5%);
   }
 
-  @if luminance($color_value) < 0.18 {
+  .bg-#{$color_name} {
+    background-color: $color_value;
+  }
+
+  @keyframes blink-#{$color_name} {
+    0% {
+      background-color: rgba(255, 255, 255, 0)
+    }
+    10% {
+      background-color: $color_value
+    }
+    100% {
+      background-color: rgba(255, 255, 255, 0)
+    }
+  }
+
+  .bg-blink-#{$color_name} {
+    background-color: rgba(255, 255, 255, 0);
+    animation-name: blink-#{$color_name};
+    animation-duration: 2s;
+    animation-delay: 0.5s;
+    animation-iteration-count: infinite;
+  }
+
+  @if luminance($color_value) < 0.9 {
     .btn.btn-#{$color_name} {
+      color: white;
+    }
+
+    .bg-#{$color_name} {
       color: white;
     }
   } @else {
     .btn.btn-#{$color_name} {
+      color: black;
+    }
+
+    .bg-#{$color_name} {
       color: black;
     }
   }

@@ -7,40 +7,34 @@ import IntegerEditor from "../../../components/widgets/inputs/IntegerEditor";
 import SelectEditor from "../../../components/widgets/inputs/SelectEditor";
 import DiningTableStatus from "../../../model/DiningTableStatus";
 import BaseEntity from "../../../model/BaseEntity";
+import RenderingData from "../../../components/widgets/inputs/RenderingData";
+import {ApplicationContext} from "../../../pages/Page";
 
-/**
- * evening
- * waiters
- * tables
- * table
- */
 export default class DiningTableCreator extends React.Component {
     constructor(props) {
         super(props);
     }
 
     render() {
+        return <ApplicationContext.Consumer>
+            {value => this.buildContent(value)}
+        </ApplicationContext.Consumer>
+    }
+
+    buildContent(general) {
 
         const table = this.props.table;
         const waiters = this.props.waiters;
         const tables = this.props.tables;
 
+        let coverChargesComponent = this.buildCoverChargesComponent(general);
+
+
         return <Row grow>
             <Column>
                 <Row grow>
                     <Column>
-                        <Row>
-                            <Column>
-                                <IntegerEditor
-                                    options={{
-                                        label: "Coperti",
-                                        value: table.coverCharges,
-                                        callback: ccs => DiningTablesEditorActions.setEditorCoverCharges(ccs),
-                                        min: 1
-                                    }}
-                                />
-                            </Column>
-                        </Row>
+                        {coverChargesComponent}
                         <Row ofList>
                             <Column>
                                 <SelectEditor
@@ -48,6 +42,7 @@ export default class DiningTableCreator extends React.Component {
                                         label: "Cameriere",
                                         values: waiters,
                                         renderer: w => w ? w.name : "",
+                                        isValid: waiter => !!waiter,
                                         value: table.waiter,
                                         callback: waiter => DiningTablesEditorActions.setEditorWaiter(waiter)
                                     }}
@@ -62,8 +57,8 @@ export default class DiningTableCreator extends React.Component {
                                         rows: 8,
                                         cols: 4,
                                         values: tables,
-                                        renderer: t => t ? t.name : "",
-                                        colorRenderer: t => this.renderDiningTableColor(t),
+                                        isValid: table => !!table,
+                                        renderer: t => this.renderDiningTable(t),
                                         value: table.table,
                                         callback: rTable => DiningTablesEditorActions.setEditorTable(rTable)
                                     }}
@@ -72,14 +67,22 @@ export default class DiningTableCreator extends React.Component {
                         </Row>
                     </Column>
                 </Row>
-                <Row justify="center" grow>
-                    <Column justify="center" align="center">
+                <Row justify="center">
+                    <Column align="end">
                         <RoundButton
                             icon="check"
                             type="success"
                             size="lg"
-                            disabled={!this.isValid()}
-                            commitAction={() => DiningTablesEditorActions.createDiningTable(table)}
+                            disabled={!this.isValid(general)}
+                            commitAction={() => DiningTablesEditorActions.doCreate(table)}
+                        />
+                    </Column>
+                    <Column align="start">
+                        <RoundButton
+                            icon="remove"
+                            type="danger"
+                            size="lg"
+                            commitAction={() => DiningTablesEditorActions.abortCreation()}
                         />
                     </Column>
                 </Row>
@@ -87,15 +90,33 @@ export default class DiningTableCreator extends React.Component {
         </Row>
     }
 
-    isValid() {
-        const table = this.props.table;
-        return table.waiter && table.table && table.coverCharges > 0;
+    buildCoverChargesComponent(general){
+        if(general.settings.coverCharges){
+            return <Row>
+                <Column>
+                    <IntegerEditor
+                        options={{
+                            label: "Coperti",
+                            value: this.props.table.coverCharges,
+                            callback: ccs => DiningTablesEditorActions.setEditorCoverCharges(ccs),
+                            min: 0
+                        }}
+                    />
+                </Column>
+            </Row>
+        }
+        return null;
     }
 
-    renderDiningTableColor(table) {
+    isValid(general) {
+        const table = this.props.table;
+        return table.waiter && table.table && (!general.coverCharges || table.coverCharges > 0);
+    }
+
+    renderDiningTable(table) {
         let diningTables = this.props.evening.tables;
         let color = "secondary";
-        diningTables.filter(dTable => BaseEntity.equals(dTable, table))
+        diningTables.filter(dTable => BaseEntity.equals(dTable.table, table))
             .forEach(dTable => {
                 if (dTable.status === DiningTableStatus.OPEN) {
                     color = "danger";
@@ -104,6 +125,6 @@ export default class DiningTableCreator extends React.Component {
                     color = "warning";
                 }
             });
-        return color;
+        return new RenderingData(table.name, color);
     }
 }

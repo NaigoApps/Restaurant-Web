@@ -1,10 +1,7 @@
 import {CANC} from "../utils/Characters";
 import {BACKSPACE, LEFT, RIGHT} from "../components/widgets/inputs/Keyboard";
-import {iGet, Utils} from "../utils/Utils";
-import Color from "../utils/Color";
+import {Utils} from "../utils/Utils";
 import EditorMode from "../utils/EditorMode";
-
-const {Map, List} = require('immutable');
 
 export default class StoresUtils {
 
@@ -148,6 +145,59 @@ export default class StoresUtils {
     }
 
     /*
+    PERCENT INPUT
+     */
+
+    static initPercentInput(options) {
+        return {
+            visible: true,
+            label: options.label,
+            text: options.value ? options.value.toString() : "",
+            value: options.value,
+            callback: options.callback,
+            hit: false
+        };
+    }
+
+    static percentChar(editor, char) {
+        let oldText = editor.text;
+        if (char === CANC) {
+            editor.text = "0";
+            editor.value = 0;
+            return;
+        }
+        if (oldText === "0" || !editor.hit) {
+            oldText = "";
+        }
+        editor.hit = true;
+        let newText = oldText + char;
+        const newValue = parseInt(newText);
+        if (!isNaN(newValue) && newValue >= 0 && newValue <= 100) {
+            editor.text = newText;
+            editor.value = newValue;
+        }
+    }
+
+    static percentChange(editor, text) {
+        const newValue = parseInt(text);
+        if (!isNaN(newValue) && newValue >= 0 && newValue <= 100) {
+            editor.text = text;
+            editor.hit = true;
+            editor.value = newValue;
+        }
+    }
+
+    static resetPercentInput() {
+        return {
+            visible: false,
+            label: "",
+            text: "",
+            value: 0,
+            callback: Utils.nop
+        };
+    }
+
+    /*
     FLOAT INPUT
      */
 
@@ -165,7 +215,7 @@ export default class StoresUtils {
     }
 
     static floatChar(editor, char) {
-        let oldText = editor.text
+        let oldText = editor.text;
         if (char === CANC) {
             editor.text = "";
             return;
@@ -199,33 +249,9 @@ export default class StoresUtils {
         };
     }
 
-    /*
-    PERCENT INPUT
+    /**
+     * TextInput
      */
-
-    static initPercentInput(initialValue) {
-        return Map({
-            text: initialValue ? initialValue.toString() : "",
-            value: initialValue
-        });
-    }
-
-    static percentChar(editor, char) {
-        let oldText = editor.get('text');
-        if (char === CANC) {
-            return editor.set('text', "");
-        }
-        if (oldText === "0") {
-            oldText = "";
-        }
-        let newText = oldText + char;
-        let newValue = parseInt(newText);
-        if (!isNaN(newValue) && newValue >= 0 && newValue <= 100) {
-            editor = editor.set('text', newText);
-            return editor.set('value', newValue);
-        }
-        return editor;
-    }
 
     static initTextInput(options) {
         return {
@@ -295,13 +321,6 @@ export default class StoresUtils {
     static option(data, optionName, def) {
         if (data.general.settings) {
             return data.general.settings.clientSettings[optionName] || def;
-        }
-        return def;
-    }
-
-    static settings(data, prop, def) {
-        if (data.get('settings')) {
-            return iGet(data, "settings.clientSettings." + prop) || def;
         }
         return def;
     }

@@ -3,8 +3,6 @@ import IntKeyPad from "../IntKeyPad";
 import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
 
-const {Map} = require('immutable');
-
 export default class PercentInput extends Component {
     constructor(props) {
         super(props);

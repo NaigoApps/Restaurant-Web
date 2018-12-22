@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Page from "./Page";
 import ConfigurationNav from "../components/ConfigurationNav";
 import RestaurantNav from "../components/RestaurantNav";
@@ -14,7 +14,7 @@ class ConfigurationPage extends ViewController {
 
     render() {
         return (
-            <Page title="Configurazione" {...this.state}>
+            <Page title="Configurazione">
                 <RestaurantNav>
                     <NavConfigurationButton active={true}/>
                 </RestaurantNav>

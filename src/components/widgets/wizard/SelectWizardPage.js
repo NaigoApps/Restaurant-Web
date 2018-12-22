@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import SelectInput from "../inputs/SelectInput";
+import ScrollableSelectInput from "../inputs/ScrollableSelectInput";
 
 export default class SelectWizardPage extends Component {
     constructor(props) {
@@ -9,18 +10,11 @@ export default class SelectWizardPage extends Component {
     render() {
 
         return (
-            <SelectInput
-                id={this.props.id}
-                rows={this.props.rows}
-                cols={this.props.cols}
-                selected={this.props.selected}
+            <ScrollableSelectInput
                 options={this.props.options}
+                selected={this.props.selected}
                 renderer={this.props.renderer}
-                colorRenderer={this.props.colorRenderer}
-                page={this.props.page}
                 onSelect={this.props.onSelect}
-                onDeselect={this.props.onDeselect}
-                onSelectPage={this.props.onSelectPage}
             />
         )
     }

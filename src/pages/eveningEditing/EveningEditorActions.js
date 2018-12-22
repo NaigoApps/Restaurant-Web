@@ -1,5 +1,8 @@
 import asyncActionBuilder from '../../actions/RequestBuilder';
 import dispatcher from "../../dispatcher/SimpleDispatcher";
+import eveningPageActions from "./EveningPageActions";
+import {ApplicationActions} from "../../actions/ApplicationActions";
+import {Pages} from "../../App";
 
 export default class EveningEditorActions {
 
@@ -11,12 +14,14 @@ export default class EveningEditorActions {
     static SELECT_DINING_TABLE_PAGE = "SELECT_DINING_TABLE_PAGE";
 
     static SHOW_EVENING_REVIEW = "SHOW_EVENING_REVIEW";
-    static LOAD_EVENING_TABLES = "LOAD_EVENING_TABLES";
 
     static getSelectedEvening() {
         asyncActionBuilder.get(
             this.GET_SELECTED,
-            "evenings/selected");
+            "evenings/selected")
+            .then(() => {
+                eveningPageActions.initEveningPage();
+            });
     }
 
     static selectPage(page) {
@@ -33,13 +38,6 @@ export default class EveningEditorActions {
 
     static showReview() {
         dispatcher.fireEnd(this.SHOW_EVENING_REVIEW);
-    }
-
-    static showTables(){
-        asyncActionBuilder.get(
-            this.LOAD_EVENING_TABLES,
-            'dining-tables'
-        );
     }
 
     //COVER CHARGE EDITING

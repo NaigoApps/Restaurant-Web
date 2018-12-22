@@ -11,10 +11,10 @@ export default class IntegerEditor extends Component {
 
     render() {
         let options = this.props.options;
-        let value = options.value !== null ? options.value.toString() : "";
+        let value = !!options.value ? options.value.toString() : "";
         let text = <Row>
             <Column auto justify="center"><span><b>{options.label}</b>:</span></Column>
-            <Column><span className="text-left">{value}{this.props.percent ? "%" : ""}</span></Column>
+            <Column><span className="text-left">{value}</span></Column>
         </Row>;
         return <Button
             disabled={this.props.disabled}

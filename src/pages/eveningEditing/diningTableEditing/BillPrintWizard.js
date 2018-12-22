@@ -1,9 +1,10 @@
 import React from 'react';
 import SelectWizardPage from "../../../components/widgets/wizard/SelectWizardPage";
 import DiningTablesUtils from "../tables/DiningTablesUtils";
-import {DiningTablesClosingActions} from "./tableClosingFeature/DiningTablesClosingActions";
+import DiningTablesClosingActions from "./tableClosingFeature/DiningTablesClosingActions";
 import PrintWizardModePage from "./tableClosingFeature/PrintWizardModePage";
 import Wizard from "../../../components/widgets/wizard/Wizard";
+import {DataContext} from "../EveningPage";
 
 export default class BillPrintWizard extends React.Component {
     constructor(props) {
@@ -11,54 +12,55 @@ export default class BillPrintWizard extends React.Component {
     }
 
     render() {
-        const data = this.props;
-        const closingFeature = data.get('tableClosingFeature');
-        const bill = closingFeature.get('bill');
-        const printWizard = closingFeature.get('printWizard');
+        return <DataContext.Consumer>
+            {value => this.buildWizard(value)}
+        </DataContext.Consumer>
+    }
 
+    buildWizard(data){
         return <Wizard
-            currentPage={printWizard.get('page')}
+            id="print-wizard"
+            currentPage={this.props.page}
             size={"sm"}
-            visible={printWizard.get('visible')}
+            visible={this.props.visible}
             message="Stampa conto"
-            backwardAction={() => DiningTablesClosingActions.setPrintWizardPage(printWizard.get('page') - 1)}
-            forwardAction={() => DiningTablesClosingActions.setPrintWizardPage(printWizard.get('page') + 1)}
-            confirmAction={() => DiningTablesClosingActions.printBill(bill.get('uuid'), printWizard.get('customer'), printWizard.get('generic'))}
+            backwardAction={() => DiningTablesClosingActions.setPrintWizardPage(this.props.page - 1)}
+            forwardAction={() => DiningTablesClosingActions.setPrintWizardPage(this.props.page + 1)}
+            confirmAction={() => this.printAction()}
             abortAction={() => DiningTablesClosingActions.abortBillPrinting()}>
-            {this.buildWizardPages()}
+            {this.buildWizardPages(data)}
         </Wizard>
     }
 
-    buildWizardPages() {
-        const data = this.props;
-        const closingFeature = data.get('tableClosingFeature');
-        const customers = data.get('customers');
-        const printWizard = closingFeature.get('printWizard');
-
+    buildWizardPages(data) {
         const pages = [];
         pages.push(<PrintWizardModePage
             key="type"
-            data={data}
+            isInvoice={this.props.isInvoice}
+            soft={this.props.soft}
+            generic={this.props.generic}
             isValid={true}
         />);
 
-        if (printWizard.get('isInvoice')) {
+        if (this.props.isInvoice) {
             pages.push(<SelectWizardPage
                 key="customer"
-                isValid={printWizard.get('customer')}
-                rows={5}
-                cols={3}
-                id={customer => customer.get('uuid')}
-                options={customers}
+                isValid={!!this.props.customer}
+                options={data.customers}
                 renderer={customer => DiningTablesUtils.renderCustomer(customer)}
-                selected={printWizard.get('customer')}
-                page={printWizard.get('customerPage')}
-                onSelect={uuid => DiningTablesClosingActions.selectInvoiceCustomer(uuid)}
-                onDeselect={() => DiningTablesClosingActions.selectInvoiceCustomer(null)}
-                onSelectPage={page => DiningTablesClosingActions.selectInvoiceCustomerPage(page)}
+                selected={this.props.customer}
+                onSelect={customer => DiningTablesClosingActions.selectInvoiceCustomer(customer)}
             />);
         }
 
         return pages;
+    }
+
+    printAction(){
+        if(this.props.soft){
+            DiningTablesClosingActions.printSoftBill(this.props.bill, this.props.generic);
+        }else{
+            DiningTablesClosingActions.printBill(this.props.bill, this.props.customer, this.props.generic);
+        }
     }
 }

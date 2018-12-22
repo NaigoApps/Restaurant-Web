@@ -2,16 +2,17 @@ import {Component} from "react";
 
 export default class ViewController extends Component{
 
-    constructor(props, store) {
+    constructor(props, ...stores) {
         super(props);
-        this.store = store;
-        this.state = this.store.getState();
+        this.stores = stores;
+        this.state = {};
+        this.stores.forEach(store => this.state = {...this.state, ...store.getState()});
 
         this.updateState = this.updateState.bind(this);
     }
 
     componentDidMount() {
-        this.store.addChangeListener(this.updateState);
+        this.stores.forEach(store => store.addChangeListener(this.updateState));
     }
 
     updateState(state) {
@@ -19,6 +20,6 @@ export default class ViewController extends Component{
     }
 
     componentWillUnmount() {
-        this.store.removeChangeListener(this.updateState);
+        this.stores.forEach(store => store.removeChangeListener(this.updateState));
     }
 }

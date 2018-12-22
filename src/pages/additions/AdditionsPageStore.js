@@ -46,10 +46,10 @@ class AdditionsPageStore extends AbstractStore {
         handlers[AdditionsPageActions.SET_ADDITION_EDITOR_GENERIC] = (value) => this.editor.addition.generic = value;
         handlers[AdditionsPageActions.SET_ADDITION_EDITOR_PRICE] = (value) => this.editor.addition.price = value;
         handlers[AdditionsPageActions.CREATE_ADDITION] = (add) =>
-            this.initEditor(Addition.create(add, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(add.uuid));
         handlers[AdditionsPageActions.SELECT_EDITING_ADDITION] = (add) => this.initEditor(add);
         handlers[AdditionsPageActions.UPDATE_EDITING_ADDITION] = (add) =>
-            this.initEditor(Addition.create(add, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(add.uuid));
         handlers[AdditionsPageActions.DELETE_EDITING_ADDITION] = () =>
             this.initEditor();
         handlers[AdditionsPageActions.SELECT_EDITING_ADDITION_PAGE] = (page) => this.navigator.page = page;

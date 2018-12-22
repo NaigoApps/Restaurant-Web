@@ -37,9 +37,9 @@ class PrintersPageStore extends AbstractStore {
         handlers[PrintersPageActionTypes.SET_PRINTER_EDITOR_NAME] = (name) => this.editor.printer.name = name;
         handlers[PrintersPageActionTypes.SET_PRINTER_EDITOR_LCS] = (lcs) => this.editor.printer.lineCharacters = lcs;
         handlers[PrintersPageActionTypes.CREATE_PRINTER] = (printer) =>
-            this.initEditor(new Printer(printer, dataStore.getPool()), false);
+            this.initEditor(dataStore.getEntity(printer.uuid), false);
         handlers[PrintersPageActionTypes.UPDATE_EDITING_PRINTER] = (printer) =>
-            this.initEditor(new Printer(printer, dataStore.getPool()), false);
+            this.initEditor(dataStore.getEntity(printer.uuid), false);
 
         handlers[PrintersPageActionTypes.DELETE_EDITING_PRINTER] = () => this.initEditor();
 

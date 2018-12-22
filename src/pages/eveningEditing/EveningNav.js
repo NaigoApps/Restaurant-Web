@@ -3,6 +3,9 @@ import NavElement from "../../widgets/NavElement";
 import EveningEditorActions from "./EveningEditorActions";
 import RestaurantNav from "../../components/RestaurantNav";
 import {EntitiesUtils} from "../../utils/EntitiesUtils";
+import DiningTablesEditorActions from "./diningTableEditing/DiningTablesEditorActions";
+import CRUDStatus from "../../utils/CRUDStatus";
+import DiningTablesUtils from "./tables/DiningTablesUtils";
 
 export default class EveningNav extends Component {
     constructor(props) {
@@ -36,32 +39,26 @@ export default class EveningNav extends Component {
             pills.push(<NavElement
                 key="evening_editor"
                 text={EntitiesUtils.renderEvening(evening)}
-                active={true}
-                commitAction={() => EveningEditorActions.showReview()}
+                active={!data.diningTableEditing.currentTable}
+                commitAction={() => DiningTablesEditorActions.deselect()}
             />);
 
-            // const dtEditor = data.diningTableEditing.editor;
+            const dtData = data.diningTableEditing;
 
-            // if(dtEditor.mode === EditorMode.EDITING){
-            //     const table = data.diningTableEditing.editor.entity;
-            //     pills.push(<NavElement
-            //         key="table_editor"
-            //         text={DiningTablesUtils.renderDiningTable(table)}
-            //         active={true}
-            //     />);
-            // }else if(dtEditor.mode === EditorMode.CREATING){
-            //     pills.push(<NavElement
-            //         key="table_creator"
-            //         text="Creazione tavolo"
-            //         active={true}
-            //     />);
-            // }else {
-            //     pills.push(<NavElement
-            //         key="tables_list"
-            //         text="Elenco tavoli"
-            //         active={true}
-            //     />);
-            // }
+            if(dtData.crudStatus === CRUDStatus.UPDATE || dtData.crudStatus === CRUDStatus.DELETE){
+                const table = dtData.currentTable;
+                pills.push(<NavElement
+                    key="table_editor"
+                    text={DiningTablesUtils.renderDiningTable(table).text}
+                    active={true}
+                />);
+            }else if(dtData.crudStatus === CRUDStatus.CREATE){
+                pills.push(<NavElement
+                    key="table_creator"
+                    text="Creazione tavolo"
+                    active={true}
+                />);
+            }
             //
             // if (data.diningTableEditing.editor.mode === EditorMode.EDITING) {
             //     let table = data.diningTableEditing.editor.entity;

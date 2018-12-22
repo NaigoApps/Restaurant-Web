@@ -44,9 +44,9 @@ class WaitersPageStore extends AbstractStore {
         handlers[WaitersPageActions.SET_WAITER_EDITOR_CF] = (value) => this.editor.waiter.cf = value;
         handlers[WaitersPageActions.SET_WAITER_EDITOR_STATUS] = (value) => this.editor.waiter.status = value;
         handlers[WaitersPageActions.CREATE_WAITER] = (waiter) =>
-            this.initEditor(Waiter.create(waiter, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(waiter.uuid));
         handlers[WaitersPageActions.UPDATE_EDITING_WAITER] = (waiter) =>
-            this.initEditor(Waiter.create(waiter, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(waiter.uuid));
         handlers[WaitersPageActions.SELECT_EDITING_WAITER] = (waiter) => this.initEditor(waiter);
         handlers[WaitersPageActions.SELECT_WAITER_NAVIGATOR_PAGE] = (page) => this.navigator.page = page;
         handlers[WaitersPageActions.DELETE_EDITING_WAITER] = () => this.initEditor();

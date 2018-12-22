@@ -7,7 +7,7 @@ export default class DiningTable extends BaseEntity {
         this._waiterId = dto.waiter;
         this._tableId = dto.table;
         this._eveningId = dto.evening;
-        if(this.evening){
+        if (this.evening) {
             this.evening.addTable(this);
         }
         this._ordinations = dto.ordinations.slice();
@@ -76,12 +76,59 @@ export default class DiningTable extends BaseEntity {
         this._eveningId = evening.uuid;
     }
 
+    addOrdination(ordination) {
+        if (ordination) {
+            const index = this._ordinations.indexOf(ordination.uuid);
+            if (index === -1) {
+                this._ordinations.push(ordination.uuid);
+            }
+            ordination.table = this;
+        }
+    }
+
+    removeOrdination(ordination) {
+        if (ordination) {
+            const index = this._ordinations.indexOf(ordination.uuid);
+            if (index !== -1) {
+                this._ordinations.splice(index, 1);
+                ordination.table = null;
+            }
+        }
+    }
+
     get ordinations() {
         return this.getEntities(this._ordinations);
     }
 
     get bills() {
         return this.getEntities(this._bills);
+    }
+
+    addBill(bill) {
+        if (bill) {
+            const index = this._bills.indexOf(bill.uuid);
+            if (index === -1) {
+                this._bills.push(bill.uuid);
+            }
+            bill.diningTable = this;
+        }
+    }
+
+    removeBill(bill) {
+        if (bill) {
+            const index = this._bills.indexOf(bill.uuid);
+            if (index !== -1) {
+                this._bills.splice(index, 1);
+                bill.table = null;
+            }
+        }
+    }
+
+    removeBillUuid(uuid) {
+        const index = this._bills.indexOf(uuid);
+        if (index !== -1) {
+            this._bills.splice(index, 1);
+        }
     }
 
     get openingTime() {
@@ -98,5 +145,49 @@ export default class DiningTable extends BaseEntity {
 
     set status(value) {
         this._status = value;
+    }
+
+    listOrders() {
+        const orders = [];
+        this.ordinations.forEach(ordination => {
+            if (ordination) {
+                orders.push(...ordination.orders);
+            }
+        });
+        return orders;
+    }
+
+    hasZeroPrices(){
+        for(let order of this.listOrders()){
+            if(order.price === 0){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    canBeClosed(){
+        let closedCcs = 0;
+        let closedOrders = 0;
+        this.bills.forEach(bill => {
+            closedCcs += bill.coverCharges;
+            closedOrders += bill.orders.length;
+        });
+        return closedCcs === this.coverCharges && closedOrders === this.listOrders().length;
+    }
+
+    listOpenedOrders(){
+        return this.listOrders()
+            .filter(order => !order.bill);
+    }
+
+    listOpenedCoverCharges(){
+        let ccs = this.coverCharges;
+        this.bills.forEach(bill => ccs -= bill.coverCharges);
+        return ccs;
+    }
+
+    getCoverChargesPrice(){
+        return this.coverCharges * this.evening.coverCharge;
     }
 }

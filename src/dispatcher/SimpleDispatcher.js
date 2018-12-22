@@ -13,10 +13,11 @@ import {ACTION_COMPLETED, ACTION_ERROR, ACTION_FAILED, ACTION_STARTED} from "../
 
 class SimpleDispatcher extends Dispatcher {
 
-    buildAction(phase, type, body) {
+    buildAction(phase, type, body, request) {
         return {
             phase: phase,
             type: type,
+            request: request,
             body: body,
             isCompleted: function () {
                 return this.phase === ACTION_COMPLETED;
@@ -34,16 +35,21 @@ class SimpleDispatcher extends Dispatcher {
     }
 
     fireStart(type, body) {
-        console.log(type + " -> STARTING");
+        // console.log(type + " -> STARTING");
         this.dispatch(this.buildAction(ACTION_STARTED, type, body));
-        console.log(type + " -> STARTED");
+        // console.log(type + " -> STARTED");
     }
 
-    fireEnd(type, body) {
+    fireEnd(type, body, request) {
+        if (type === undefined) {
+            console.error("UNDEFINED ACTION");
+        }
         console.log(type + " -> COMPLETING");
-        console.log(body);
+        console.log("Request: " + request);
+        console.log("Body: " + body);
         console.time(type);
-        this.dispatch(this.buildAction(ACTION_COMPLETED, type, body));
+        let actionBody;
+        this.dispatch(this.buildAction(ACTION_COMPLETED, type, body, request));
         // if(UTSettings.user){
         //     fetch(
         //         asyncActionBuilder.BASE_URL + "ut" + asyncActionBuilder.buildParams({

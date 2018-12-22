@@ -1,6 +1,9 @@
 import requestBuilder from "../../../actions/RequestBuilder";
 import dispatcher from "../../../dispatcher/SimpleDispatcher";
 import ActionsFactory from "../../../utils/ActionsFactory";
+import {DataActions} from "../../../actions/DataActions";
+
+console.log("DiningTablesEditorActions start " + ActionsFactory.actionId);
 
 export default class DiningTablesEditorActions {
     static CRUD = {
@@ -34,6 +37,10 @@ export default class DiningTablesEditorActions {
         CONFIRM: ActionsFactory.next(),
     };
 
+    static SHOW_ADVANCED = ActionsFactory.next();
+    static HIDE_ADVANCED = ActionsFactory.next();
+
+    static SELECT_PAGE = ActionsFactory.next();
     static SELECT_DINING_TABLE_TAB = "SELECT_DINING_TABLE_TAB";
     static PRINT_PARTIAL_BILL = "PRINT_PARTIAL_BILL";
 
@@ -57,14 +64,20 @@ export default class DiningTablesEditorActions {
         dispatcher.fireEnd(this.CRUD.ABORT_CREATION);
     }
 
-    static select(table){
-        dispatcher.fireEnd(this.CRUD.SELECT, table);
+    static selectPage(page) {
+        dispatcher.fireEnd(this.SELECT_PAGE, page);
     }
 
-    static updateCoverCharges(uuid, value) {
+    static select(table) {
+        dispatcher.fireEnd(this.CRUD.SELECT, table);
+        DataActions.loadOrdinations(table);
+        DataActions.loadBills(table);
+    }
+
+    static updateCoverCharges(table, value) {
         requestBuilder.put(
             this.CRUD.UPDATE.REMOTE.CCS,
-            'dining-tables/' + uuid + '/cover-charges',
+            'dining-tables/' + table.uuid + '/cover-charges',
             value.toString()
         );
     }
@@ -85,12 +98,12 @@ export default class DiningTablesEditorActions {
         );
     }
 
-    static deselect(){
+    static deselect() {
         dispatcher.fireEnd(this.CRUD.DESELECT);
     }
 
     static doCreate(table) {
-        requestBuilder.post(this.CRUD.CREATE, 'evenings/tables', table.toDto());
+        requestBuilder.post(this.CRUD.CREATE, 'dining-tables', table.toDto());
     }
 
     static beginDeletion() {
@@ -101,20 +114,25 @@ export default class DiningTablesEditorActions {
         dispatcher.fireEnd(this.CRUD.ABORT_DELETION);
     }
 
-    static doDelete(tabUuid) {
-        requestBuilder.remove(
-            this.CRUD.DELETE,
-            'evenings/diningTables/',
-            tabUuid
-        );
+    static doDelete(table) {
+        requestBuilder.remove(this.CRUD.DELETE, 'dining-tables/' + table.uuid)
+            .then(DataActions.loadDiningTables());
+    }
+
+    static showAdvanced() {
+        dispatcher.fireEnd(this.SHOW_ADVANCED);
+    }
+
+    static hideAdvanced() {
+        dispatcher.fireEnd(this.HIDE_ADVANCED);
     }
 
     static beginMerge() {
         dispatcher.fireEnd(this.MERGE.BEGIN);
     }
 
-    static selectMergeTarget(uuid) {
-        dispatcher.fireEnd(this.MERGE.SELECT_TARGET, uuid);
+    static selectMergeTarget(table) {
+        dispatcher.fireEnd(this.MERGE.SELECT_TARGET, table);
     }
 
     static selectMergePage(page) {
@@ -128,13 +146,16 @@ export default class DiningTablesEditorActions {
     static confirmMerge(src, dest) {
         requestBuilder.post(
             this.MERGE.CONFIRM,
-            'evenings/tables/merge/' + src,
-            dest
-        );
+            'dining-tables/' + src.uuid + '/merge/' + dest.uuid,
+            src.toDto()
+        ).then(() => {
+            DataActions.loadOrdinations(dest);
+            DataActions.loadBills(dest);
+        });
     }
 
 
-    static selectTab(tab){
+    static selectTab(tab) {
         dispatcher.fireEnd(this.SELECT_DINING_TABLE_TAB, tab);
     }
 
@@ -146,3 +167,5 @@ export default class DiningTablesEditorActions {
             uuid);
     }
 };
+
+console.log("DiningTablesEditorActions end " + ActionsFactory.actionId);

@@ -8,14 +8,15 @@ import Page from "../Page";
 import RestaurantNav from "../../components/RestaurantNav";
 import SelectEditor from "../../components/widgets/inputs/SelectEditor";
 import TextEditor from "../../components/widgets/inputs/TextEditor";
-import dataStore, {Topics} from "../../stores/DataStore";
+import dataStore from "../../stores/DataStore";
 import ViewController from "../../widgets/ViewController";
 import {SettingsPageActions} from "./SettingsPageActions";
+import BooleanEditor from "../../components/widgets/inputs/boolean/BooleanEditor";
 
 export default class SettingsPage extends ViewController {
 
     constructor(props) {
-        super(props, applicationStore);
+        super(props, applicationStore, dataStore);
     }
 
     componentDidMount() {
@@ -26,7 +27,7 @@ export default class SettingsPage extends ViewController {
     render() {
         let pageContent = this.makePageContent();
         return (
-            <Page title="Impostazioni" {...this.state}>
+            <Page title="Impostazioni">
                 <RestaurantNav/>
                 <Row topSpaced>
                     <Column>
@@ -38,8 +39,8 @@ export default class SettingsPage extends ViewController {
     }
 
     makePageContent() {
-        const settings = this.state.settings;
-        const printers = dataStore.getEntities(Topics.PRINTERS);
+        const settings = this.state.general.settings;
+        const printers = this.state.data.printers;
         let options = [];
         if (settings) {
             const clientSettings = settings.clientSettings;
@@ -74,6 +75,14 @@ export default class SettingsPage extends ViewController {
             options.push([
                 <IntegerEditor options={this.makeIntegerOptions("Righe elenco clienti", "customersRows")}/>,
                 <IntegerEditor options={this.makeIntegerOptions("Colonne elenco clienti", "customersColumns")}/>
+            ]);
+            options.push([
+                <BooleanEditor
+                    label="Utilizza coperti" value={settings.coverCharges}
+                    onConfirm={value => ApplicationActions.setUseCoverCharges(value)}/>,
+                <BooleanEditor
+                    label="Comande ridotte" value={settings.shrinkOrdination}
+                    onConfirm={value => ApplicationActions.setShrinkOrdinations(value)}/>,
             ]);
 
             options.push([
@@ -122,7 +131,7 @@ export default class SettingsPage extends ViewController {
     }
 
     makeIntegerOptions(label, property) {
-        const clientSettings = this.state.settings.clientSettings;
+        const clientSettings = this.state.general.settings.clientSettings;
         return {
             label: label,
             value: clientSettings[property] || null,

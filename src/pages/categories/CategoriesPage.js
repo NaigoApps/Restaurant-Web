@@ -8,10 +8,12 @@ import EditorMode from "../../utils/EditorMode";
 import ViewController from "../../widgets/ViewController";
 import CategoryCreator from "./CategoryCreator";
 import {CategoriesPageActions} from "./CategoriesPageActions";
+import applicationStore from "../../stores/ApplicationStore";
+import dataStore from "../../stores/DataStore";
 
 export default class CategoriesPage extends ViewController {
     constructor(props) {
-        super(props, categoriesPageStore);
+        super(props, categoriesPageStore, applicationStore, dataStore);
     }
 
     componentDidMount() {
@@ -22,22 +24,22 @@ export default class CategoriesPage extends ViewController {
     render() {
         let pageContent = CategoriesPage.makePageContent(this.state);
         return (
-            <Page title="Menu" {...this.state.general}>
-                <CategoriesNav {...this.state}/>
+            <Page title="Menu">
+                <CategoriesNav {...this.state.categories}/>
                 {pageContent}
             </Page>
         )
     }
 
     static makePageContent(data) {
-        const editor = data.editor;
+        const editor = data.categories.editor;
 
         if (editor.mode === EditorMode.CREATING) {
-            return <CategoryCreator {...data}/>;
+            return <CategoryCreator {...data.categories} data={data.data}/>;
         } else if (editor.mode === EditorMode.EDITING) {
-            return <CategoryEditor {...data}/>
+            return <CategoryEditor {...data.categories} data={data.data}/>
         } else {
-            return <CategoriesNavigator {...data}/>;
+            return <CategoriesNavigator data={data.data} general={data.general} page={data.categories.navigator.page}/>;
         }
     }
 }

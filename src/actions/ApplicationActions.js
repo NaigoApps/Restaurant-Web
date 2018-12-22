@@ -28,6 +28,11 @@ export const ApplicationActionTypes = {
     INTEGER_INPUT_CHANGE: "INTEGER_INPUT_CHANGE",
     HIDE_INTEGER_INPUT: "HIDE_INTEGER_INPUT",
 
+    SHOW_PERCENT_INPUT: "SHOW_PERCENT_INPUT",
+    PERCENT_INPUT_CHAR: "PERCENT_INPUT_CHAR",
+    PERCENT_INPUT_CHANGE: "PERCENT_INPUT_CHANGE",
+    HIDE_PERCENT_INPUT: "HIDE_PERCENT_INPUT",
+
     SHOW_SELECT_INPUT: "SHOW_SELECT_INPUT",
     SELECT_INPUT_SELECT: "SELECT_INPUT_SELECT",
     SELECT_INPUT_DESELECT: "SELECT_INPUT_DESELECT",
@@ -50,6 +55,8 @@ export class ApplicationActions {
     static setMainPrinter = printer => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/main-printer", printer);
     static setFiscalPrinter = printer => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/fiscal-printer", printer);
 
+    static setUseCoverCharges = value => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/cover-charges", value);
+    static setShrinkOrdinations = value => asyncActionBuilder.put(ApplicationActionTypes.STORE_SETTINGS, "settings/shrink-ordination", value);
 
     static toggleFullScreen = () => dispatcher.fireEnd(ApplicationActionTypes.TOGGLE_FULL_SCREEN);
     static requestFullScreen = () => dispatcher.fireEnd(ApplicationActionTypes.REQUEST_FULL_SCREEN);
@@ -71,6 +78,11 @@ export class ApplicationActions {
     static hideIntegerInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_INTEGER_INPUT);
     static integerInputChar = (char) => dispatcher.fireEnd(ApplicationActionTypes.INTEGER_INPUT_CHAR, char);
     static integerInputChange = (text) => dispatcher.fireEnd(ApplicationActionTypes.INTEGER_INPUT_CHANGE, text);
+
+    static showPercentInput = (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_PERCENT_INPUT, options);
+    static hidePercentInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_PERCENT_INPUT);
+    static percentInputChar = (char) => dispatcher.fireEnd(ApplicationActionTypes.PERCENT_INPUT_CHAR, char);
+    static percentInputChange = (text) => dispatcher.fireEnd(ApplicationActionTypes.PERCENT_INPUT_CHANGE, text);
 
     static showSelectInput = (options) => dispatcher.fireEnd(ApplicationActionTypes.SHOW_SELECT_INPUT, options);
     static hideSelectInput = () => dispatcher.fireEnd(ApplicationActionTypes.HIDE_SELECT_INPUT);

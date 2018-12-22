@@ -8,13 +8,13 @@ import CustomersNav from "./CustomersNav";
 import EditorMode from "../../utils/EditorMode";
 import ViewController from "../../widgets/ViewController";
 import CustomerCreator from "./CustomerCreator";
-
-const {Map} = require('immutable');
+import applicationStore from "../../stores/ApplicationStore";
+import dataStore from "../../stores/DataStore";
 
 export default class CustomersPage extends ViewController {
 
     constructor(props) {
-        super(props, customersPageStore);
+        super(props, customersPageStore, applicationStore, dataStore);
     }
 
     componentDidMount() {
@@ -25,21 +25,21 @@ export default class CustomersPage extends ViewController {
     render() {
         let pageContent = CustomersPage.makePageContent(this.state);
         return (
-            <Page title="Clienti" {...this.state.general}>
-                <CustomersNav {...this.state}/>
+            <Page title="Clienti">
+                <CustomersNav {...this.state.customers}/>
                 {pageContent}
             </Page>
         )
     }
 
     static makePageContent(data) {
-        const editorMode = data.editor.mode;
+        const editorMode = data.customers.editor.mode;
         if (editorMode === EditorMode.EDITING) {
-            return <CustomerEditor {...data}/>
+            return <CustomerEditor {...data.customers}/>
         } else if (editorMode === EditorMode.CREATING) {
-            return <CustomerCreator {...data}/>
+            return <CustomerCreator {...data.customers}/>
         } else {
-            return <CustomersNavigator {...data}/>
+            return <CustomersNavigator data={data.data} general={data.general} page={data.customers.navigator.page}/>
         }
     }
 }

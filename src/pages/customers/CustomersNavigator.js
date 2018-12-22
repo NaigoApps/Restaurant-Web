@@ -25,7 +25,7 @@ export default class CustomersNavigator extends Component {
                         rows={StoresUtils.option(data, "customersRows", 3)}
                         cols={StoresUtils.option(data, "customersColumns", 3)}
                         options={data.data.customers}
-                        page={data.navigator.page}
+                        page={data.page}
                         renderer={customer => EntitiesUtils.renderCustomer(customer)}
                         onSelectPage={index => CustomersPageActions.selectCustomerPage(index)}
                         onSelect={customer => CustomersPageActions.selectCustomer(customer)}

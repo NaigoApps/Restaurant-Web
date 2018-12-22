@@ -24,9 +24,16 @@ import EveningEditorActions from "../pages/eveningEditing/EveningEditorActions";
 import DiningTablesEditorActions from "../pages/eveningEditing/diningTableEditing/DiningTablesEditorActions";
 import DiningTable from "../model/DiningTable";
 import Phase from "../model/Phase";
-import {ApplicationActions, ApplicationActionTypes} from "../actions/ApplicationActions";
-import Page from "../pages/Page";
+import {ApplicationActionTypes} from "../actions/ApplicationActions";
 import {Pages} from "../App";
+import Ordination from "../model/Ordination";
+import OrdinationsEditorActions
+    from "../pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationsEditorActions";
+import OrdersEditorActions from "../pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdersEditorActions";
+import Order from "../model/Order";
+import DiningTablesClosingActions
+    from "../pages/eveningEditing/diningTableEditing/tableClosingFeature/DiningTablesClosingActions";
+import Bill from "../model/Bill";
 
 const EVT = "DATA_EVENT";
 
@@ -48,6 +55,7 @@ export const Topics = {
     DINING_TABLES: "diningTables",
     ORDINATIONS: "ordinations",
     ORDERS: "orders",
+    BILLS: "bills"
 };
 
 class DataStore extends AbstractStore {
@@ -55,6 +63,7 @@ class DataStore extends AbstractStore {
         super("data", EVT);
         this.status = STATUSES.NOT_LOADED;
         this.pool = {};
+        this.backups = {};
         this.topics = {};
         Object.keys(Topics).forEach(topic => {
             this.topics[Topics[topic]] = [];
@@ -63,6 +72,7 @@ class DataStore extends AbstractStore {
 
     clearData() {
         this.pool = {};
+        this.backups = {};
         this.status = STATUSES.NOT_LOADED;
     }
 
@@ -193,6 +203,9 @@ class DataStore extends AbstractStore {
 
         this.addEveningHandlers(handlers);
         this.addDiningTablesHandlers(handlers);
+        this.addOrdinationsHandlers(handlers);
+        this.addOrdersHandlers(handlers);
+        this.addBillsHandlers(handlers);
         this.addPhasesHandlers(handlers);
         return handlers;
     }
@@ -206,7 +219,7 @@ class DataStore extends AbstractStore {
     addEveningHandlers(handlers) {
 
         handlers[ApplicationActionTypes.GO_TO_PAGE] = (page) => {
-            if(page === Pages.EVENING_SELECTION){
+            if (page === Pages.EVENING_SELECTION) {
                 this.clearTopic(Topics.EVENINGS);
             }
         };
@@ -214,26 +227,223 @@ class DataStore extends AbstractStore {
         DataStore.assign(handlers, [
                 EveningSelectorActions.CHOOSE,
                 EveningEditorActions.GET_SELECTED,
-                DiningTablesEditorActions.MERGE_DINING_TABLE,
                 EveningEditorActions.CONFIRM_COVER_CHARGE_EDITING],
             (evening) => this.replaceEntities([evening], Evening.create, Topics.EVENINGS));
 
-        handlers[EveningEditorActions.DESELECT_EVENING] = () => this.clearTopic(Topics.EVENINGS);
-        handlers[DiningTablesEditorActions.CREATE_DINING_TABLE] = (table) => this.getEvening().addTable(table);
     }
 
     addDiningTablesHandlers(handlers) {
-        handlers[EveningEditorActions.LOAD_EVENING_TABLES] = tables => {
+        handlers[DataActionTypes.LOAD_DINING_TABLES] = tables => {
             this.replaceEntities(tables, DiningTable.create, Topics.DINING_TABLES, EntitiesUtils.defaultComparator("openingTime"))
         };
 
         handlers[EveningEditorActions.DESELECT_EVENING] = () => {
             this.clearTopic(Topics.EVENINGS);
             this.clearTopic(Topics.DINING_TABLES);
+            this.clearTopic(Topics.ORDINATIONS);
+            this.clearTopic(Topics.ORDERS);
+            this.clearTopic(Topics.BILLS);
         };
 
-        handlers[DiningTablesEditorActions.CREATE_DINING_TABLE] = (table) => {
+        handlers[DiningTablesEditorActions.CRUD.DESELECT] = () => {
+            this.clearTopic(Topics.ORDINATIONS);
+            this.clearTopic(Topics.ORDERS);
+            this.clearTopic(Topics.BILLS);
+        };
+
+        handlers[DiningTablesEditorActions.CRUD.DELETE] = (evening) => {
+            this.updateEntity(evening, Evening.create, Topics.EVENINGS);
+            this.clearTopic(Topics.ORDINATIONS);
+            this.clearTopic(Topics.ORDERS);
+            this.clearTopic(Topics.BILLS);
+        };
+
+        handlers[DiningTablesEditorActions.CRUD.CREATE] = (table) => {
             this.createEntity(table, DiningTable.create, Topics.DINING_TABLES);
+        };
+
+        DataStore.assign(handlers, [
+            DiningTablesEditorActions.CRUD.UPDATE.REMOTE.CCS,
+            DiningTablesEditorActions.CRUD.UPDATE.REMOTE.WAITER,
+            DiningTablesEditorActions.CRUD.UPDATE.REMOTE.TABLE
+        ], (table) => this.updateEntity(table, DiningTable.create, Topics.DINING_TABLES));
+
+        handlers[DiningTablesClosingActions.LOCK_TABLE] = (table) => {
+            this.deleteEntity(table.uuid, Topics.DINING_TABLES);
+            this.clearTopic(Topics.ORDINATIONS);
+            this.clearTopic(Topics.ORDERS);
+            this.clearTopic(Topics.BILLS);
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.DELETE] = (table) => {
+            this.updateEntity(table, DiningTable.create, Topics.DINING_TABLES);
+        };
+    }
+
+    addOrdinationsHandlers(handlers) {
+        handlers[DataActionTypes.LOAD_ORDINATIONS] = ordinations => {
+            this.replaceEntities(ordinations, Ordination.create, Topics.ORDINATIONS, EntitiesUtils.defaultComparator("creationTime"));
+            this.clearTopic(Topics.ORDERS);
+            ordinations.forEach(ordination => {
+                ordination.orders.forEach(order => {
+                    this.createEntity(order, Order.create, Topics.ORDERS);
+                });
+            });
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.BEGIN_CREATION] = (dto) => {
+            this.createEntity(dto, Ordination.create, Topics.ORDINATIONS);
+        };
+        handlers[OrdinationsEditorActions.CRUD.ABORT_CREATION] = (ordination) => {
+            ordination.orders.forEach(order => this.deleteEntity(order.uuid, Topics.ORDERS));
+            ordination.table = null;
+            this.deleteEntity(ordination.uuid, Topics.ORDINATIONS);
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.CREATE] = (newDto, oldDto) => {
+            const oldOrdination = this.getEntity(oldDto.uuid);
+            const orders = oldOrdination.orders.slice();
+            orders.forEach(order => {
+                order.newDto = null;
+                order.bill = null;
+                this.deleteEntity(order.uuid, Topics.ORDERS)
+            });
+            oldOrdination.table = null;
+            this.deleteEntity(oldOrdination.uuid, Topics.ORDINATIONS);
+
+            this.createEntity(newDto, Ordination.create, Topics.ORDINATIONS);
+            newDto.orders.forEach(order => {
+                this.createEntity(order, Order.create, Topics.ORDERS);
+            });
+        };
+
+        handlers[DiningTablesEditorActions.MERGE.CONFIRM] = (merged, old) => {
+            this.clearTopic(Topics.ORDINATIONS);
+            this.clearTopic(Topics.ORDERS);
+            this.clearTopic(Topics.BILLS);
+            this.deleteEntity(old.uuid, Topics.DINING_TABLES);
+
+            this.createEntity(merged, DiningTable.create, Topics.DINING_TABLES);
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.SELECT] = (ordination) => {
+            this.backups[ordination.uuid] = ordination.toDto();
+            const orders = ordination.orders;
+            for (let i = 0; i < orders.length; i++) {
+                this.backups[orders[i].uuid] = orders[i].toDto();
+            }
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.DESELECT] = (ordination) => {
+            const ordersToRemove = ordination.orders;
+            ordersToRemove.forEach(order => {
+                order.ordination = null;
+                order.bill = null;
+                this.deleteEntity(order.uuid, Topics.ORDERS);
+            });
+            const newOrdination = this.updateEntity(this.backups[ordination.uuid], Ordination.create, Topics.ORDINATIONS);
+            delete this.backups[ordination.uuid];
+            newOrdination._orders.forEach(uuid => {
+                this.createEntity(this.backups[uuid], Order.create, Topics.ORDERS);
+                delete this.backups[uuid];
+            });
+        };
+
+        handlers[OrdinationsEditorActions.WIZARD.SELECT_DISH] = (data) => {
+            const dish = data.dish;
+            const quantity = data.quantity;
+            const ordination = data.ordination;
+            const phase = data.phase;
+            for (let i = 0; i < quantity; i++) {
+                this.createEntity(EntitiesUtils.newOrder(dish, phase, ordination), Order.create, Topics.ORDERS);
+            }
+        };
+
+        handlers[OrdersEditorActions.CRUD.UPDATE.LOCAL.QUANTITY.MORE] = (dtos) => {
+            for (let i = 0; i < dtos.length; i++) {
+                this.createEntity(dtos[i], Order.create, Topics.ORDERS);
+            }
+        };
+
+        handlers[OrdersEditorActions.CRUD.UPDATE.LOCAL.QUANTITY.LESS] = (orders) => {
+            for (let i = 0; i < orders.length; i++) {
+                orders[i].ordination = null;
+                orders[i].bill = null;
+                this.deleteEntity(orders[i].uuid, Topics.ORDERS);
+            }
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.UPDATE] = (ordination) => {
+            this.updateEntity(ordination, Ordination.create, Topics.ORDINATIONS);
+            ordination.orders.forEach(order => {
+                this.createEntity(order, Order.create, Topics.ORDERS);
+            });
+        };
+
+        handlers[OrdinationsEditorActions.PRINT_ORDINATION] = (ordination) => {
+            this.updateEntity(ordination, Ordination.create, Topics.ORDINATIONS);
+        };
+
+        // handlers[OrdersEditorActions.CRUD.UPDATE.REMOTE.PRICE] = ordination => {
+        //     this.updateEntity(ordination, Ordination.create, Topics.ORDINATIONS);
+        // };
+
+        // handlers[OrdersEditorActions.CRUD.DELETE] = (ordination) => {
+        //     if(ordination.orders.length === 0){
+        //         const oldOrdination = this.getEntity(ordination.uuid);
+        //         oldOrdination.table = null;
+        //         this.deleteEntity(ordination.uuid, Topics.ORDINATIONS);
+        //     }else {
+        //         this.updateEntity(ordination, Ordination.create, Topics.ORDINATIONS);
+        //     }
+        // };
+    }
+
+    addOrdersHandlers(handlers) {
+        handlers[OrdersEditorActions.CRUD.UPDATE.REMOTE.PRICE] = (ordination) => {
+            this.updateEntity(ordination, Ordination.create, Topics.ORDINATIONS);
+            ordination.orders.forEach(order => {
+                this.updateEntity(order, Order.create, Topics.ORDERS);
+            });
+        };
+    }
+
+    addBillsHandlers(handlers) {
+        handlers[DataActionTypes.LOAD_BILLS] = bills => {
+            this.replaceEntities(bills, Bill.create, Topics.BILLS);
+        };
+
+        handlers[DiningTablesClosingActions.CRUD.BEGIN_CREATION] = (dto) => {
+            this.createEntity(dto, Bill.create, Topics.BILLS);
+        };
+
+        handlers[DiningTablesClosingActions.CRUD.ABORT_CREATION] = (bill) => {
+            const orders = bill.orders;
+            orders.forEach(order => order.bill = null);
+            bill.table = null;
+            this.deleteEntity(bill, Topics.BILLS);
+        };
+
+        handlers[DiningTablesClosingActions.CRUD.CREATE] = (newDto, oldDto) => {
+            const originalBill = this.getEntity(oldDto.uuid);
+            originalBill.table = null;
+            this.deleteEntity(originalBill.uuid, Topics.BILLS);
+
+            this.createEntity(newDto, Bill.create, Topics.BILLS);
+        };
+
+        handlers[DiningTablesClosingActions.QUICK_BILL] = (dto) => {
+            this.createEntity(dto, Bill.create, Topics.BILLS);
+        };
+
+        handlers[DiningTablesClosingActions.CRUD.DELETE] = (billUuid) => {
+            const bill = this.getEntity(billUuid);
+            bill.table = null;
+            this.deleteEntity(billUuid, Topics.BILLS);
+        };
+
+        handlers[DiningTablesClosingActions.PRINT_BILL] = (bill) => {
+            this.updateEntity(bill, Bill.create, Topics.BILLS);
         }
     }
 

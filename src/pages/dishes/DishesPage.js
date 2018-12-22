@@ -8,12 +8,12 @@ import EditorMode from "../../utils/EditorMode";
 import ViewController from "../../widgets/ViewController";
 import DishEditor from "./DishEditor";
 import DishCreator from "./DishCreator";
-
-const {Map} = require('immutable');
+import applicationStore from "../../stores/ApplicationStore";
+import dataStore from "../../stores/DataStore";
 
 export default class DishesPage extends ViewController {
     constructor(props) {
-        super(props, dishesPageStore);
+        super(props, dishesPageStore, applicationStore, dataStore);
     }
 
     componentDidMount() {
@@ -24,20 +24,20 @@ export default class DishesPage extends ViewController {
     render() {
         let pageContent = DishesPage.makePageContent(this.state);
         return (
-            <Page title="Menu" {...this.state.general}>
-                <DishesNav {...this.state}/>
+            <Page title="Menu">
+                <DishesNav {...this.state.dishes}/>
                 {pageContent}
             </Page>
         )
     }
 
     static makePageContent(data) {
-        const editorMode = data.editor.mode;
+        const editorMode = data.dishes.editor.mode;
 
         if (editorMode === EditorMode.CREATING) {
-            return <DishCreator {...data}/>;
+            return <DishCreator {...data.dishes} data={data.data}/>;
         } else if (editorMode === EditorMode.EDITING) {
-            return <DishEditor {...data}/>;
+            return <DishEditor {...data.dishes} data={data.data}/>;
         } else {
             return <DishesNavigator {...data}/>;
         }

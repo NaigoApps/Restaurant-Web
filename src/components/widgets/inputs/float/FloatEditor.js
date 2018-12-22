@@ -11,6 +11,13 @@ export default class FloatEditor extends Component {
         super(props);
     }
 
+    activateEditor(options){
+        if(this.props.onClick){
+            this.props.onClick();
+        }
+        ApplicationActions.showFloatInput(options);
+    }
+
     render() {
         let options = this.props.options;
         let value;
@@ -34,12 +41,16 @@ export default class FloatEditor extends Component {
                 disabled={this.props.disabled}
                 type={this.props.type}
                 text={text}
-                commitAction={() => ApplicationActions.showFloatInput(options)}
+                commitAction={() => this.activateEditor(options)}
                 size={this.props.size}
             />;
         } else {
+            let label = null;
+            if(options.label){
+                label = <Column auto justify="center"><span><b>{options.label}</b>:</span></Column>;
+            }
             const text = <Row>
-                <Column auto justify="center"><span><b>{options.label}</b>:</span></Column>
+                {label}
                 <Column><span className="text-left">{value}</span></Column>
             </Row>;
             return <Button
@@ -47,7 +58,7 @@ export default class FloatEditor extends Component {
                 type={this.props.type}
                 highPadding
                 text={text}
-                commitAction={() => ApplicationActions.showFloatInput(options)}
+                commitAction={() => this.activateEditor(options)}
                 size={this.props.size}
             />;
         }

@@ -27,7 +27,7 @@ export default class OkCancelModal extends Component {
             </div>
             <div className="modal-footer">
                 <Button type={this.props.confirmType || "success"}
-                        disabled={!this.props.isValid}
+                        disabled={this.props.isValid !== undefined && !this.props.isValid}
                         text={this.props.confirmMessage || "Conferma"}
                         commitAction={this.props.confirmAction}/>
                 <Button type={this.props.abortType || "danger"}

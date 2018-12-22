@@ -77,7 +77,7 @@ export class WaitersPageActions {
     }
 
     registerSocket() {
-        let socket = new WebSocket('ws://localhost:8080/restaurant/notifications')
+        let socket = new WebSocket('ws://localhost:8080/restaurant/notifications');
         socket.onopen = function (event) {
             console.info("Connection opened");
         };

@@ -26,7 +26,7 @@ export default class DishesNavigator extends Component {
                     <SelectEditor options={{
                         multiSelect: true,
                         label: "Categorie visualizzate",
-                        value: data.visibleCategories,
+                        value: data.dishes.visibleCategories,
                         values: data.data.categories,
                         comparator: EntitiesUtils.nameComparator,
                         rows: 4,
@@ -49,8 +49,8 @@ export default class DishesNavigator extends Component {
                         bordered
                         rows={StoresUtils.option(data, "dishesRows", 3)}
                         cols={StoresUtils.option(data, "dishesColumns", 3)}
-                        options={data.visibleDishes}
-                        page={data.navigator.page}
+                        options={data.dishes.visibleDishes}
+                        page={data.dishes.navigator.page}
                         color={dish => dish ? dish.category.color : Color.black}
                         renderer={dish => dish ? dish.name : "?"}
                         colorRenderer={dish => DishesNavigator.color(dish)}

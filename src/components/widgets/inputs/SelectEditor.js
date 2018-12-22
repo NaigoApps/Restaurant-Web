@@ -5,6 +5,7 @@ import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
 import Text from "../../../widgets/Text";
 import Color from "../../../utils/Color";
+import RenderingData from "./RenderingData";
 
 /**
  * Events:
@@ -35,7 +36,11 @@ export default class SelectEditor extends Component {
         if (!options.renderer || !value) {
             return value || "";
         }
-        return options.renderer(value);
+        const result = options.renderer(value);
+        if(result instanceof RenderingData){
+            return result.text;
+        }
+        return result;
     }
 
     findValue(value) {

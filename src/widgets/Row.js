@@ -19,6 +19,12 @@ export default class Row extends Component {
         if(this.props.justify){
             classes.push("justify-content-" + this.props.justify)
         }
+        if(this.props.bitSpaced){
+            classes.push("top-bit-sep");
+        }
+        if(this.props.bitPadded){
+            classes.push("bit-pad")
+        }
         if(this.props.topSpaced){
             classes.push("top-sep");
         }
@@ -34,8 +40,13 @@ export default class Row extends Component {
         if(this.props.ofList){
             classes.push("of-list");
         }
-        if(this.props.textColor){
-            classes.push("text-" + this.props.textColor);
+        // if(this.props.textColor){
+        //     classes.push("text-" + this.props.textColor);
+        // }
+        if(this.props.bgColor){
+            classes.push("bg-" + this.props.bgColor);
+        }else if(this.props.bgBlink){
+            classes.push("bg-blink-" + this.props.bgBlink);
         }
         if(this.props.customCss){
             classes.push(this.props.customCss);
@@ -43,9 +54,17 @@ export default class Row extends Component {
         return classes.join(" ");
     }
 
+    getStyle(){
+        if(this.props.textColor){
+            return {
+                color: this.props.textColor.toHexString()
+            }
+        }
+    }
+
     render() {
         return (
-            <div className={this.getCss()}>
+            <div className={this.getCss()} style={this.getStyle()}>
                 {this.props.children}
             </div>
         );

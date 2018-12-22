@@ -3,7 +3,6 @@ import Icon from "./Icon";
 import Row from "./Row";
 import Column from "./Column";
 import Text from "./Text";
-import Color from "../utils/Color";
 
 /**
  * Expects:
@@ -87,11 +86,7 @@ export default class Button extends Component {
                 </Row>;
             }
         } else if (text) {
-            let color = this.props.color || Color.black;
-            if(this.props.active){
-                color = Color.white;
-            }
-            content = <Text color={color}>{text}</Text>;
+            content = <Text>{text}</Text>;
         } else if (icon) {
             content = <Icon name={icon}/>
         } else {
@@ -107,7 +102,7 @@ export default class Button extends Component {
             <button
                 type="button"
                 className={this.getClassName()}
-                style={{backgroundColor : bg}}
+                style={{backgroundColor: bg}}
                 onMouseUp={this.clickAction.bind(this)}
                 disabled={!!this.props.disabled}>
                 {content}

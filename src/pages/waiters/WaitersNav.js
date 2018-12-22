@@ -19,7 +19,7 @@ export default class WaitersNav extends Component {
     static makeNavContent(data) {
         let elements = [];
 
-        const editor = data.editor;
+        const editor = data.waiters.editor;
 
         elements.push(<NavConfigurationButton key="home"/>);
 

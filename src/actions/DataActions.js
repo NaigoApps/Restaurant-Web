@@ -1,4 +1,5 @@
 import asyncActionBuilder from "./RequestBuilder";
+import ActionsFactory from "../utils/ActionsFactory";
 
 export class DataActionTypes {
     static LOAD_PRINTER_SERVICES = "LOAD_PRINTER_SERVICES";
@@ -13,6 +14,11 @@ export class DataActionTypes {
     static LOAD_ADDITIONS = "LOAD_ADDITIONS";
     static LOAD_DISHES = "LOAD_DISHES";
     static LOAD_DISH_STATUSES = "LOAD_DISH_STATUSES";
+
+    static LOAD_DINING_TABLES = ActionsFactory.next();
+    static LOAD_ORDINATIONS = ActionsFactory.next();
+    static LOAD_ORDERS = ActionsFactory.next();
+    static LOAD_BILLS = ActionsFactory.next();
 }
 
 export class DataActions {
@@ -67,16 +73,20 @@ export class DataActions {
         asyncActionBuilder.get(DataActionTypes.LOAD_DINING_TABLES, 'dining-tables');
     }
 
-    static loadOrdinations(){
-        asyncActionBuilder.get(DataActionTypes.LOAD_ORDINATIONS, 'ordinations');
+    static loadOrdinations(table){
+        let resource = 'ordinations';
+        if(table){
+            resource += '/' + table.uuid
+        }
+        asyncActionBuilder.get(DataActionTypes.LOAD_ORDINATIONS, resource);
     }
 
-    static loadOrders(){
-        asyncActionBuilder.get(DataActionTypes.LOAD_ORDERS, 'orders');
-    }
-
-    static loadBills(){
-        asyncActionBuilder.get(DataActionTypes.LOAD_BILLS, 'bills');
+    static loadBills(table){
+        let resource = 'bills';
+        if(table){
+            resource += '/' + table.uuid
+        }
+        asyncActionBuilder.get(DataActionTypes.LOAD_BILLS, resource);
     }
 }
 

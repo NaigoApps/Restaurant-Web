@@ -2,12 +2,6 @@ import React, {Component} from 'react';
 import Column from "./Column";
 import Row from "./Row";
 
-/**
- * Expects:
- * - name: label caption
- * - changeAction: action to throw on change
- */
-
 export default class FormattedParagraph extends Component {
     constructor(props) {
         super(props);
@@ -28,9 +22,9 @@ export default class FormattedParagraph extends Component {
             leftColumn = <Column left>{left}</Column>;
         }
         return (
-            <Row textColor={this.props.textColor}>
+            <Row textColor={this.props.textColor} bgColor={this.props.bgColor} bgBlink={this.props.bgBlink} align="center">
                 {leftColumn}
-                <Column right auto>{right}</Column>
+                <Column auto>{right}</Column>
             </Row>
         );
     }

@@ -1,35 +1,37 @@
-import {EntitiesUtils} from "../../../../utils/EntitiesUtils";
 import OrdinationsEditorActions from "./OrdinationsEditorActions";
-import {OrdersActionTypes} from "./ordersEditing/OrdersActions";
 import DiningTablesEditorActions from "../DiningTablesEditorActions";
 import EveningEditorActions from "../../EveningEditorActions";
-import EditorMode from "../../../../utils/EditorMode";
 import AbstractStore from "../../../../stores/AbstractStore";
-import StoresUtils from "../../../StoresUtils";
 import EveningSelectorActions from "../../eveningSelection/EveningSelectorActions";
+import dataStore, {Topics} from "../../../../stores/DataStore";
+import CRUDStatus from "../../../../utils/CRUDStatus";
+import OrdersEditorActions from "./OrdersEditorActions";
 
 const EVT_ORDINATION_EDITOR_CHANGED = "EVT_ORDINATION_EDITOR_CHANGED";
 
 class OrdinationEditingStore extends AbstractStore {
     constructor() {
-        super("ordinationEditing", EVT_ORDINATION_EDITOR_CHANGED);
+        super("ordinationEditing", EVT_ORDINATION_EDITOR_CHANGED, dataStore);
         this.init();
     }
 
     init() {
-        this.page = 0;
-        this.editor = StoresUtils.initEditor();
-        this.deletingOrdination = false;
-        this.ordinationEditor = this.resetOrdinationEditor();
+        this.currentOrdination = null;
+        this.crudStatus = CRUDStatus.RETRIEVE;
+        this.wizardData = {};
+        this.aborting = false;
+        this.options = null;
+        this.resetWizard();
     }
 
     buildState() {
         return {
-            editor: this.editor,
-            page: this.page,
-            ordinationEditor: this.ordinationEditor,
-            deletingOrdination: this.deletingOrdination
-        }
+            currentOrdination: this.currentOrdination,
+            crudStatus: this.crudStatus,
+            wizardData: this.wizardData,
+            aborting: this.aborting,
+            options: this.options,
+        };
     }
 
     getActionsClass() {
@@ -39,97 +41,137 @@ class OrdinationEditingStore extends AbstractStore {
     getActionCompletedHandlers() {
         const handlers = {};
 
+        this.addCRUDHandlers(handlers);
+        this.addWizardHandlers(handlers);
+
         AbstractStore.assign(handlers, [
             EveningEditorActions.GET_SELECTED,
             EveningEditorActions.DESELECT_EVENING,
             EveningEditorActions.SHOW_EVENING_REVIEW,
             EveningSelectorActions.CHOOSE,
-            DiningTablesEditorActions.SELECT_DINING_TABLE,
+            DiningTablesEditorActions.CRUD.SELECT,
+            DiningTablesEditorActions.CRUD.DESELECT,
         ], () => this.init());
+
+        handlers[OrdersEditorActions.SET_ADDITIONS_PAGE] = (page) => {
+            this.wizardData.additionsPage = page
+        };
 
         return handlers;
     }
 
-    handleCompletedAction(action) {
-        let changed = true;
-        switch (action.type) {
-            case OrdinationsEditorActions.SELECT_ORDINATION_PAGE:
-                this.page = action.body;
-                break;
-            case OrdersActionTypes.BEGIN_ORDERS_EDITING:
-                this.ordinationEditor = this.initOrdinationEditor(this.getSelectedOrdination());
-                break;
-            case OrdinationsEditorActions.BEGIN_ORDINATION_CREATION:
-                this.status = EditorMode.CREATING;
-                this.ordination = EntitiesUtils.newOrdination();
-                this.ordinationEditor = this.initOrdinationEditor(this.getSelectedOrdination());
-                break;
-            case OrdinationsEditorActions.CREATE_ORDINATION:
-                this.status = EditorMode.EDITING;
-                this.ordination = action.body.get('uuid');
-                this.ordinationEditor = this.resetOrdinationEditor();
-                break;
-            case OrdinationsEditorActions.UPDATE_ORDERS:
-                this.ordinationEditor = this.resetOrdinationEditor();
-                break;
-            case OrdinationsEditorActions.BEGIN_ORDINATION_EDITING:
-                this.status = EditorMode.EDITING;
-                this.ordination = action.body;
-                this.ordinationEditor = this.resetOrdinationEditor();
-                break;
-            case OrdinationsEditorActions.BEGIN_ORDINATION_DELETION:
-                this.deletingOrdination = true;
-                break;
-            case OrdinationsEditorActions.ABORT_ORDINATION_DELETION:
-                this.deletingOrdination = false;
-                break;
-            //FIXME
-            // case ACT_DESELECT_EVENING:
-            case OrdinationsEditorActions.DELETE_ORDINATION:
-            case OrdinationsEditorActions.ABORT_ORDINATION_EDITING:
-            case OrdinationsEditorActions.ABORT_ORDINATION_CREATION:
-                this.deletingOrdination = false;
-                this.status = EditorMode.SURFING;
-                this.ordination = null;
-                this.ordinationEditor = this.resetOrdinationEditor();
-                break;
-            case OrdinationsEditorActions.ABORT_ORDERS_EDITING:
-                this.ordinationEditor = this.resetOrdinationEditor();
-                break;
-            default:
-                changed = false;
-                break;
-        }
-        return changed;
+    addWizardHandlers(handlers) {
+        handlers[OrdinationsEditorActions.WIZARD.SELECT_CATEGORY_PAGE] = (page) => this.wizardData.categoryPage = page;
+        handlers[OrdinationsEditorActions.WIZARD.SELECT_DISH_PAGE] = (page) => this.wizardData.dishPage = page;
+        handlers[OrdinationsEditorActions.WIZARD.SELECT_CATEGORY] = (cat) => this.wizardData.selectedCategory = cat;
+        handlers[OrdinationsEditorActions.WIZARD.DESELECT_CATEGORY] = () => this.wizardData.selectedCategory = null;
+
+        handlers[OrdinationsEditorActions.WIZARD.SET_QUANTITY] = (value) => this.wizardData.quantity = value;
+        handlers[OrdinationsEditorActions.WIZARD.SET_PHASE] = (value) => this.wizardData.selectedPhase = value;
+
+        handlers[OrdinationsEditorActions.WIZARD.SELECT_DISH] = () => {
+            this.wizardData.quantity = 1;
+            this.currentOrdination = dataStore.getEntity(this.currentOrdination.uuid);
+        };
     }
 
-    resetOrdinationEditor() {
-        const editor = this.initOrdinationEditor();
-        editor.visible = false;
-        return editor;
-    }
+    addCRUDHandlers(handlers) {
 
-    initOrdinationEditor(ordination) {
-        return {
-            orders: ordination ? ordination.get('orders') : [],
-            visible: true
+        handlers[OrdinationsEditorActions.CRUD.BEGIN_CREATION] = (data) => {
+            this.currentOrdination = dataStore.getEntity(data.uuid);
+            this.crudStatus = CRUDStatus.CREATE;
+            this.resetWizard(true);
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.ABORT_CREATION] = () => {
+            this.currentOrdination = null;
+            this.crudStatus = CRUDStatus.RETRIEVE;
+            this.resetWizard(false);
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.SELECT] = (ordination) => {
+            this.currentOrdination = ordination;
+            this.crudStatus = CRUDStatus.UPDATE;
+            this.options = null;
+            this.resetWizard(false);
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.CREATE] = () => {
+            this.currentOrdination = null;
+            this.crudStatus = CRUDStatus.RETRIEVE;
+            this.resetWizard(false);
+        };
+
+        handlers[OrdinationsEditorActions.SHOW_OPTIONS] = (ordinationUuid) => this.options = ordinationUuid;
+        handlers[OrdinationsEditorActions.HIDE_OPTIONS] = () => this.options = false;
+
+        handlers[OrdinationsEditorActions.PRINT_ORDINATION] = (ordination) => {
+            this.currentOrdination = null;
+            this.crudStatus = CRUDStatus.RETRIEVE;
+            this.resetWizard(false);
+            this.options = null;
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.UPDATE] = () => {
+            this.currentOrdination = null;
+            this.crudStatus = CRUDStatus.RETRIEVE;
+            this.resetWizard(false);
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.DESELECT] = () => {
+            this.currentOrdination = null;
+            this.crudStatus = CRUDStatus.RETRIEVE;
+            this.resetWizard(false);
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.BEGIN_DELETION] = (ordination) => {
+            this.crudStatus = CRUDStatus.DELETE;
+            this.currentOrdination = ordination;
+            this.options = null;
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.ABORT_DELETION] = () => {
+            this.currentOrdination = null;
+            this.crudStatus = CRUDStatus.RETRIEVE;
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.BEGIN_ABORTION] = (ordination) => {
+            this.crudStatus = CRUDStatus.RETRIEVE;
+            this.currentOrdination = ordination;
+            this.aborting = true;
+            this.options = null;
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.ABORT_ABORTION] = () => {
+            this.crudStatus = CRUDStatus.RETRIEVE;
+            this.currentOrdination = null;
+            this.aborting = false;
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.ABORT] = () => {
+            this.crudStatus = CRUDStatus.RETRIEVE;
+            this.currentOrdination = null;
+            this.aborting = false;
+        };
+
+        handlers[OrdinationsEditorActions.CRUD.DELETE] = () => {
+            this.currentOrdination = null;
+            this.crudStatus = CRUDStatus.RETRIEVE;
         }
     }
 
-    getSelectedOrdination() {
-        if (this.status === EditorMode.EDITING) {
-            // let evening = eveningStore.getEvening().getPayload();
-            // if (evening) {
-            //     let table = diningTableEditingStore.getState().get('diningTable');
-            //     if (table) {
-            //         return findByUuid(table.get('ordinations'), this.ordination);
-            //     }
-            // }
-        } else if (this.status === EditorMode.CREATING) {
-            return this.ordination;
+    resetWizard(visible) {
+        this.wizardData = {
+            visible: !!visible,
+            selectedCategory: null,
+            categoryPage: 0,
+            additionsPage: 0,
+            dishPage: 0,
+            selectedPhase: dataStore.getEntities(Topics.PHASES)[0],
+            quantity: 1
         }
-        return null;
     }
+
 }
 
 const ordinationEditingStore = new OrdinationEditingStore();

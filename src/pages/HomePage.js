@@ -7,12 +7,15 @@ import Column from "../widgets/Column";
 import ViewController from "../widgets/ViewController";
 import {Pages} from "../App";
 import EveningEditorActions from "./eveningEditing/EveningEditorActions";
-import homePageStore from "./HomePageStore";
+import dataStore from "../stores/DataStore";
+import loadingStore from "../stores/LoadingStore";
+import applicationStore from "../stores/ApplicationStore";
+import errorsStore from "../stores/ErrorsStore";
 
 class HomePage extends ViewController {
 
     constructor(props){
-        super(props, homePageStore);
+        super(props, dataStore, loadingStore, applicationStore, errorsStore);
     }
 
     componentDidMount(){
@@ -36,7 +39,7 @@ class HomePage extends ViewController {
 
     render() {
         return (
-            <Page title="Home" {...this.state.general}>
+            <Page title="Home">
                 <Row grow>
                     <Column sm="3">
                         <Button

@@ -24,7 +24,7 @@ export default class WaitersNavigator extends Component {
                         rows={StoresUtils.option(data, 'waitersRows', 3)}
                         cols={StoresUtils.option(data, 'waitersColumns', 3)}
                         options={data.data.waiters}
-                        page={data.navigator.page}
+                        page={data.waiters.navigator.page}
                         renderer={waiter => waiter.name}
                         colorRenderer={waiter => WaitersNavigator.color(waiter)}
                         onSelectPage={index => WaitersPageActions.selectNavigatorPage(index)}

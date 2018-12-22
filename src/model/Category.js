@@ -67,6 +67,10 @@ export default class Category extends BaseEntity {
         return this.getEntities(this._additions).sort(EntitiesUtils.nameComparator);
     }
 
+    hasAddition(addition){
+        return this._additions.includes(addition.uuid);
+    }
+
     hasDish(dish) {
         return this.hasDishUuid(dish.uuid);
     }

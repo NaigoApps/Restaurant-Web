@@ -5,10 +5,10 @@ import OrdinationsUtils from "../../OrdinationsUtils";
 import Scrollable from "../../../../components/widgets/Scrollable";
 import DiningTablesUtils from "../../tables/DiningTablesUtils";
 import FormattedParagraph from "../../../../widgets/FormattedParagraph";
-import {DiningTablesClosingActions} from "./DiningTablesClosingActions";
-import {iGet} from "../../../../utils/Utils";
+import DiningTablesClosingActions from "./DiningTablesClosingActions";
 import FloatEditor from "../../../../components/widgets/inputs/float/FloatEditor";
 import IntegerEditor from "../../../../components/widgets/inputs/IntegerEditor";
+import PercentEditor from "../../../../components/widgets/inputs/PercentEditor";
 
 export default class DiningTableClosingReviewPage extends Component {
     constructor(props) {
@@ -17,39 +17,32 @@ export default class DiningTableClosingReviewPage extends Component {
 
     buildInvoiceSummary() {
         const data = this.props;
-        let table = iGet(data, "diningTableEditing.diningTable");
-        let dishes = data.get('dishes');
-        let additions = data.get('additions');
-        let closingData = iGet(data, 'tableClosingFeature');
+        let table = data.table;
+        let closingData = data.billsEditing;
         if (closingData) {
-            let invoiceOrders = iGet(closingData, 'bill.orders');
-            let orders = DiningTablesUtils.findTableOrders(table);
-            orders = orders.filter(order => invoiceOrders.includes(order.get('uuid')));
-            let total = OrdinationsUtils.total(orders);
-            orders = DiningTablesUtils.implode(orders);
-            orders = OrdinationsUtils.sortByDish(orders, dishes, additions);
-            let coverCharges = iGet(closingData, 'bill.coverCharges');
-            let coverChargesPrice = coverCharges * iGet(data, "evening.coverCharge");
-            total += coverChargesPrice;
+            let invoiceOrders = closingData.currentBill.orders;
+            let tableOrders = table.listOrders();
+            tableOrders = tableOrders.filter(order => invoiceOrders.includes(order));
+            let total = OrdinationsUtils.total(tableOrders);
+            tableOrders = DiningTablesUtils.implode(tableOrders);
+            tableOrders = OrdinationsUtils.sortByDish(tableOrders);
+            total += closingData.currentBill.coverCharges * data.data.evening.coverCharge;
 
             let refinedTotalView = this.buildRefinedTotalView();
+
+            const coverChargesComponent = this.buildCoverChargesComponent();
             return (
                 <Row grow>
                     <Column>
                         <Row grow>
                             <Column>
                                 <Scrollable>
-                                    <Row align="center">
-                                        <Column>
-                                            <FormattedParagraph leftText={coverCharges + " COPERTI"}
-                                                                rightText={OrdinationsUtils.formatPrice(coverChargesPrice)}/>
-                                        </Column>
-                                    </Row>
+                                    {coverChargesComponent}
                                     {
-                                        orders.map(grp => {
-                                            let left = OrdinationsUtils.renderImplodedOrder(grp, data.get('dishes'), this.props.get('additions'));
+                                        tableOrders.map(grp => {
+                                            let left = OrdinationsUtils.renderImplodedOrder(grp, data.dishes, this.props.additions);
                                             return (
-                                                <Row key={grp.get('groupId')} align="center">
+                                                <Row key={grp.groupId} align="center">
                                                     <Column>
                                                         <FormattedParagraph leftText={left}
                                                                             rightText={OrdinationsUtils.formatGroupPrice(grp)}/>
@@ -75,6 +68,20 @@ export default class DiningTableClosingReviewPage extends Component {
         return null;
     }
 
+    buildCoverChargesComponent(){
+        const coverCharges = this.props.billsEditing.currentBill.coverCharges;
+        if(coverCharges > 0) {
+            const coverChargesPrice = coverCharges * this.props.data.evening.coverCharge;
+            return <Row align="center">
+                <Column>
+                    <FormattedParagraph leftText={coverCharges + " COPERTI"}
+                                        rightText={OrdinationsUtils.formatPrice(coverChargesPrice)}/>
+                </Column>
+            </Row>
+        }
+        return null;
+    }
+
 
     render() {
         let summary = this.buildInvoiceSummary();
@@ -93,15 +100,15 @@ export default class DiningTableClosingReviewPage extends Component {
 
     buildRefinedTotalView() {
         const data = this.props;
-        let wizardData = iGet(data, 'tableClosingFeature.closingWizard');
-        let discount = iGet(wizardData, 'percent');
-        let billsNumber = iGet(wizardData, 'split');
+        let wizardData = data.billsEditing.closingWizard;
+        let discount = wizardData.percent;
+        let billsNumber = wizardData.split;
 
         let discountedTotal = OrdinationsUtils.formatPrice(this.calculateDiscountedTotal());
-        let totalSplittedPrice = OrdinationsUtils.formatPrice(iGet(data, 'tableClosingFeature.bill.total') / billsNumber);
+        let totalSplittedPrice = OrdinationsUtils.formatPrice(data.billsEditing.currentBill.total / billsNumber);
         if (billsNumber > 1) {
             totalSplittedPrice = totalSplittedPrice + " x " + billsNumber + " = " +
-                OrdinationsUtils.formatPrice(iGet(data, 'tableClosingFeature.bill.total'));
+                OrdinationsUtils.formatPrice(data.billsEditing.currentBill.total);
         }
         return [
             <Row key="discount">
@@ -122,17 +129,17 @@ export default class DiningTableClosingReviewPage extends Component {
 
     calculateDiscountedTotal() {
         const data = this.props;
-        let table = iGet(data, "diningTableEditing.diningTable");
-        let wizardData = iGet(data, 'tableClosingFeature.closingWizard');
+        let table = data.table;
+        let wizardData = data.billsEditing.closingWizard;
 
-        let discount = wizardData.get('percent');
+        let discount = wizardData.percent;
 
-        let invoiceOrders = iGet(data, 'tableClosingFeature.bill.orders');
-        let orders = DiningTablesUtils.findTableOrders(table);
+        let invoiceOrders = data.billsEditing.currentBill.orders;
+        let orders = table.listOrders();
 
-        orders = orders.filter(order => invoiceOrders.includes(order.get('uuid')));
+        orders = orders.filter(order => invoiceOrders.includes(order));
         let total = OrdinationsUtils.total(orders);
-        total += iGet(data, 'tableClosingFeature.bill.coverCharges') * iGet(data, 'evening.coverCharge');
+        total += data.billsEditing.currentBill.coverCharges * data.data.evening.coverCharge;
         return total - discount * total / 100;
     }
 
@@ -144,9 +151,9 @@ export default class DiningTableClosingReviewPage extends Component {
 
     buildRefiningComponent() {
         const data = this.props;
-        const wizardData = iGet(data, 'tableClosingFeature.closingWizard');
-        const billsNumber = wizardData.get('split');
-        const singlePartTotal = iGet(data, 'tableClosingFeature.bill.total') / billsNumber;
+        const wizardData = data.billsEditing.closingWizard;
+        const billsNumber = wizardData.split;
+        const singlePartTotal = data.billsEditing.currentBill.total / billsNumber;
         return <Row>
             <Column>
                 <Row>
@@ -164,14 +171,12 @@ export default class DiningTableClosingReviewPage extends Component {
                 </Row>
                 <Row topSpaced>
                     <Column>
-                        <IntegerEditor
+                        <PercentEditor
                             type="info"
                             options={{
                                 label: "Sconto percentuale",
-                                value: wizardData.get('percent'),
-                                callback: result => DiningTablesClosingActions.setPercent(result),
-                                min: 0,
-                                max: 99
+                                value: wizardData.percent,
+                                callback: result => DiningTablesClosingActions.setPercent(result)
                             }}
                             percent
                         />
@@ -182,7 +187,7 @@ export default class DiningTableClosingReviewPage extends Component {
                         <FloatEditor
                             type="info"
                             options={{
-                                label: "Totale definitivo",
+                                label: (billsNumber > 1) ? "Totale per parte" : "Totale definitivo",
                                 value: parseFloat(singlePartTotal.toFixed(2)),
                                 callback: value => DiningTablesClosingActions.setFinalTotal(value * billsNumber)
                             }}

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
 import SwitchInput from "../../../../components/widgets/SwitchInput";
-import {DiningTablesClosingActions} from "./DiningTablesClosingActions";
+import DiningTablesClosingActions from "./DiningTablesClosingActions";
 import {iGet} from "../../../../utils/Utils";
 
 export default class DiningTableClosingModePage extends Component {
@@ -22,12 +22,12 @@ export default class DiningTableClosingModePage extends Component {
     }
 
     render() {
-        let quick = iGet(this.props, "tableClosingFeature.closingWizard.quick");
+        let quick = this.props.billsEditing.closingWizard.quick;
         return (
             <Row>
                 <Column>
                     <Row>
-                        <Column>
+                        <Column align="center">
                             <SwitchInput
                                 value={!quick}
                                 leftText="Rapido"

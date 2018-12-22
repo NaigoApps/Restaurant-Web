@@ -3,8 +3,6 @@ import Column from "../../../../widgets/Column";
 import Row from "../../../../widgets/Row";
 import Keyboard, {BACKSPACE, DELETE, LEFT, RIGHT} from "../Keyboard";
 
-const {Map} = require('immutable');
-
 export default class TextInput extends Component {
     constructor(props) {
         super(props);

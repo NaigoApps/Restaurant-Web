@@ -1,4 +1,5 @@
 import BaseEntity from "./BaseEntity";
+import {EntitiesUtils} from "../utils/EntitiesUtils";
 
 export default class Order extends BaseEntity {
     constructor(dto, pool) {
@@ -40,7 +41,17 @@ export default class Order extends BaseEntity {
     }
 
     set ordination(ordination) {
-        this._ordinationId = ordination.uuid;
+        if (BaseEntity.equals(this.ordination, ordination)) {
+            return;
+        }
+        if (this.ordination) {
+            this.ordination.removeOrder(this);
+        }
+        this._ordinationId = null;
+        if (ordination) {
+            this._ordinationId = ordination.uuid;
+            this.ordination.addOrder(this);
+        }
     }
 
     get dish() {
@@ -53,6 +64,21 @@ export default class Order extends BaseEntity {
 
     get additions() {
         return this.getEntities(this._additions);
+    }
+
+    addAddition(addition){
+        if(!this._additions.includes(addition.uuid)){
+            this._additions.push(addition.uuid);
+            this.price += addition.price;
+        }
+    }
+
+    removeAddition(addition){
+        const index = this.additions.indexOf(addition);
+        if(index !== -1){
+            this._additions.splice(index, 1);
+            this.price -= addition.price;
+        }
     }
 
     get price() {
@@ -84,6 +110,15 @@ export default class Order extends BaseEntity {
     }
 
     set bill(bill) {
-        this._billId = bill.uuid;
+        if(bill === this.bill){
+            return;
+        }
+        if(this.bill){
+            this.bill.removeOrder(this);
+        }
+        this._billId = bill ? bill.uuid : null;
+        if(this.bill){
+            this.bill.addOrder(this);
+        }
     }
 }

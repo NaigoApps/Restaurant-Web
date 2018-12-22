@@ -8,11 +8,13 @@ import EditorMode from "../../utils/EditorMode";
 import ViewController from "../../widgets/ViewController";
 import additionsPageStore from "./AdditionsPageStore";
 import AdditionCreator from "./AdditionCreator";
+import applicationStore from "../../stores/ApplicationStore";
+import dataStore from "../../stores/DataStore";
 
 export default class AdditionsPage extends ViewController {
 
     constructor(props) {
-        super(props, additionsPageStore);
+        super(props, additionsPageStore, applicationStore, dataStore);
     }
 
     componentDidMount() {
@@ -23,21 +25,21 @@ export default class AdditionsPage extends ViewController {
     render() {
         let pageContent = AdditionsPage.makePageContent(this.state);
         return (
-            <Page title="Varianti" {...this.state.general}>
-                <AdditionsNav {...this.state}/>
+            <Page title="Varianti">
+                <AdditionsNav {...this.state.additions}/>
                 {pageContent}
             </Page>
         )
     }
 
     static makePageContent(data) {
-        const editorMode = data.editor.mode;
+        const editorMode = data.additions.editor.mode;
         if (editorMode === EditorMode.EDITING) {
-            return <AdditionEditor {...data}/>
+            return <AdditionEditor {...data.additions}/>
         } else if (editorMode === EditorMode.CREATING) {
-            return <AdditionCreator {...data}/>
+            return <AdditionCreator {...data.additions}/>
         } else {
-            return <AdditionsNavigator {...data}/>
+            return <AdditionsNavigator data={data.data} general={data.general} page={data.additions.navigator.page}/>
         }
     }
 

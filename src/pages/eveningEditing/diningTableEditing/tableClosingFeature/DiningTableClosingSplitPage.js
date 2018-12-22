@@ -3,43 +3,48 @@ import Button from "../../../../widgets/Button";
 import Row from "../../../../widgets/Row";
 import Column from "../../../../widgets/Column";
 import OrdinationsUtils from "../../OrdinationsUtils";
-import {findByUuid, iGet, uuid} from "../../../../utils/Utils";
+import {uuid} from "../../../../utils/Utils";
 import Scrollable from "../../../../components/widgets/Scrollable";
 import DiningTablesUtils from "../../tables/DiningTablesUtils";
 import FormattedParagraph from "../../../../widgets/FormattedParagraph";
-import {DiningTablesClosingActions} from "./DiningTablesClosingActions";
+import DiningTablesClosingActions from "./DiningTablesClosingActions";
 
 export default class DiningTableClosingSplitPage extends Component {
     constructor(props) {
         super(props);
     }
 
-    dishName(dishUuid) {
-        let dishes = this.props.get('dishes');
-        if (dishes) {
-            let dish = findByUuid(dishes, dishUuid);
-            if (dish) {
-                return dish.get('name');
-            }
-        }
-        return "?";
+    render() {
+        let leftContent = this.buildDiningTableSummary();
+        let rightContent = this.buildInvoiceSummary();
+        return (
+            <Row grow>
+                <Column lg="6">
+                    {leftContent}
+                </Column>
+                <Column lg="6">
+                    {rightContent}
+                </Column>
+            </Row>
+        )
     }
 
     buildDiningTableSummary() {
         let data = this.props;
-        let dishes = data.get('dishes');
-        let additions = data.get('additions');
-        let table = iGet(data, "diningTableEditing.diningTable");
-        let bill = iGet(data, "tableClosingFeature.bill");
-        let wizardData = iGet(data, "tableClosingFeature.closingWizard");
+        let table = data.table;
 
-        let orders = DiningTablesUtils.findTableOpenedOrders(table, bill);
-        let coverCharges = DiningTablesUtils.findTableOpenedCoverCharges(table, bill);
+        let orders = table.listOpenedOrders();
+        let coverCharges = table.listOpenedCoverCharges();
 
-        let total = OrdinationsUtils.total(orders) + coverCharges * iGet(data, "evening.coverCharge");
+        let total = OrdinationsUtils.total(orders) + coverCharges * data.data.evening.coverCharge;
 
         orders = DiningTablesUtils.implode(orders);
-        orders = OrdinationsUtils.sortByDish(orders, dishes, additions);
+        orders = OrdinationsUtils.sortByDish(orders);
+
+        let coverChargesCloseRow;
+        if(table.coverCharges > 0){
+            coverChargesCloseRow = this.buildCoverChargesCloseRow();
+        }
 
         return (
             <Row grow>
@@ -47,31 +52,15 @@ export default class DiningTableClosingSplitPage extends Component {
                     <Row grow>
                         <Column>
                             <Scrollable>
-                                <Row align="center">
-                                    <Column>
-                                        <FormattedParagraph leftText={coverCharges + " COPERTI"}
-                                                            rightText={OrdinationsUtils.formatPrice(coverCharges * iGet(data, 'evening.coverCharge'))}/>
-                                    </Column>
-                                    <Column auto>
-                                        <div className="ml-auto">
-                                            <Button highPadding
-                                                    icon="caret-right" disabled={coverCharges === 0}
-                                                    commitAction={() => DiningTablesClosingActions.closeCoverCharges(1)}/>
-                                            &nbsp;<Button highPadding
-                                                          icon="step-forward" disabled={coverCharges === 0}
-                                                          commitAction={() => DiningTablesClosingActions.closeAllCoverCharges()}/>
-
-                                        </div>
-                                    </Column>
-                                </Row>
+                                {coverChargesCloseRow}
                                 {orders.map(order => {
                                     let singleButton = <Button highPadding
                                                                icon="caret-right"
                                                                commitAction={() => DiningTablesClosingActions.closeOrders(order, 1)}/>;
                                     let allButton = <Button highPadding
                                                             icon="step-forward"
-                                                            commitAction={() => DiningTablesClosingActions.closeOrders(order, order.get('orders').size)}/>;
-                                    let left = OrdinationsUtils.renderImplodedOrder(order, dishes, additions);
+                                                            commitAction={() => DiningTablesClosingActions.closeOrders(order, order.orders.length)}/>;
+                                    let left = OrdinationsUtils.renderImplodedOrder(order);
                                     return (
                                         <Row key={uuid()} align="center">
                                             <Column>
@@ -91,7 +80,7 @@ export default class DiningTableClosingSplitPage extends Component {
                         <Column>
                             <Button highPadding
                                     icon="fast-forward"
-                                    commitAction={() => DiningTablesClosingActions.closeAllOrders()}/>
+                                    commitAction={() => DiningTablesClosingActions.closeAll()}/>
                         </Column>
                     </Row>
                     <Row>
@@ -104,43 +93,52 @@ export default class DiningTableClosingSplitPage extends Component {
         )
     }
 
+    buildCoverChargesCloseRow(){
+        const table = this.props.table;
+        let coverCharges = table.listOpenedCoverCharges();
+        return <Row align="center">
+            <Column>
+                <FormattedParagraph leftText={coverCharges + " COPERTI"}
+                                    rightText={OrdinationsUtils.formatPrice(coverCharges * table.evening.coverCharge)}/>
+            </Column>
+            <Column auto>
+                <div className="ml-auto">
+                    <Button highPadding
+                            icon="caret-right" disabled={coverCharges === 0}
+                            commitAction={() => DiningTablesClosingActions.closeCoverCharges(1)}/>
+                    &nbsp;<Button highPadding
+                                  icon="step-forward" disabled={coverCharges === 0}
+                                  commitAction={() => DiningTablesClosingActions.closeAllCoverCharges()}/>
+
+                </div>
+            </Column>
+        </Row>
+    }
+
     buildInvoiceSummary() {
         let data = this.props;
-        let dishes = data.get('dishes');
-        let additions = data.get('additions');
-        let wizardData = iGet(data, "tableClosingFeature.closingWizard");
-        let invoiceOrders = iGet(data, 'tableClosingFeature.bill.orders');
-        let table = iGet(data, "diningTableEditing.diningTable");
-        let orders = DiningTablesUtils.findTableOrders(table);
-        orders = orders.filter(order => invoiceOrders.includes(order.get('uuid')));
+        let invoiceOrders = data.billsEditing.currentBill.orders;
+        let table = data.table;
+        let orders = table.listOrders();
+        orders = orders.filter(order => invoiceOrders.includes(order));
         let total = OrdinationsUtils.total(orders);
         orders = DiningTablesUtils.implode(orders);
-        orders = OrdinationsUtils.sortByDish(orders, dishes, additions);
-        let coverCharges = iGet(data, 'tableClosingFeature.bill.coverCharges');
-        total += coverCharges * iGet(data, "evening.coverCharge");
+        orders = OrdinationsUtils.sortByDish(orders);
+        let coverCharges = data.billsEditing.currentBill.coverCharges;
+        total += coverCharges * data.data.evening.coverCharge;
+
+        let coverChargesOpenRow;
+        if(table.coverCharges > 0){
+            coverChargesOpenRow = this.buildCoverChargesOpenRow();
+        }
+
         return (
             <Row grow>
                 <Column>
                     <Row grow>
                         <Column>
                             <Scrollable>
-                                <Row align="center">
-                                    <Column auto>
-                                        <div className="ml-auto">
-                                            <Button highPadding
-                                                    icon="caret-left" disabled={coverCharges === 0}
-                                                    commitAction={() => DiningTablesClosingActions.openCoverCharges(1)}/>
-                                            &nbsp;<Button highPadding
-                                                          icon="step-backward" disabled={coverCharges === 0}
-                                                          commitAction={() => DiningTablesClosingActions.openAllCoverCharges()}/>
-
-                                        </div>
-                                    </Column>
-                                    <Column>
-                                        <FormattedParagraph leftText={coverCharges + " COPERTI"}
-                                                            rightText={OrdinationsUtils.formatPrice(coverCharges * iGet(data, "evening.coverCharge"))}/>
-                                    </Column>
-                                </Row>
+                                {coverChargesOpenRow}
                                 {
                                     orders.map(order => {
                                         let singleButton = <Button highPadding
@@ -148,8 +146,8 @@ export default class DiningTableClosingSplitPage extends Component {
                                                                    commitAction={() => DiningTablesClosingActions.openOrders(order, 1)}/>;
                                         let allButton = <Button highPadding
                                                                 icon="step-backward"
-                                                                commitAction={() => DiningTablesClosingActions.openOrders(order, order.get('orders').size)}/>;
-                                        let left = OrdinationsUtils.renderImplodedOrder(order, dishes, additions);
+                                                                commitAction={() => DiningTablesClosingActions.openOrders(order, order.orders.length)}/>;
+                                        let left = OrdinationsUtils.renderImplodedOrder(order);
                                         return (
                                             <Row key={uuid()} align="center">
                                                 <Column auto>
@@ -170,7 +168,7 @@ export default class DiningTableClosingSplitPage extends Component {
                         <Column>
                             <Button highPadding
                                     icon="fast-backward"
-                                    commitAction={() => DiningTablesClosingActions.openAllOrders()}/>
+                                    commitAction={() => DiningTablesClosingActions.openAll()}/>
                         </Column>
                     </Row>
                     <Row>
@@ -183,20 +181,27 @@ export default class DiningTableClosingSplitPage extends Component {
         );
     }
 
+    buildCoverChargesOpenRow(){
+        let table = this.props.table;
+        let coverCharges = this.props.billsEditing.currentBill.coverCharges;
+        return <Row align="center">
+            <Column auto>
+                <div className="ml-auto">
+                    <Button highPadding
+                            icon="caret-left" disabled={coverCharges === 0}
+                            commitAction={() => DiningTablesClosingActions.openCoverCharges(1)}/>
+                    &nbsp;<Button highPadding
+                                  icon="step-backward" disabled={coverCharges === 0}
+                                  commitAction={() => DiningTablesClosingActions.openAllCoverCharges()}/>
 
-    render() {
-        let leftContent = this.buildDiningTableSummary();
-        let rightContent = this.buildInvoiceSummary();
-        return (
-            <Row grow>
-                <Column lg="6">
-                    {leftContent}
-                </Column>
-                <Column lg="6">
-                    {rightContent}
-                </Column>
-            </Row>
-        )
+                </div>
+            </Column>
+            <Column>
+                <FormattedParagraph leftText={coverCharges + " COPERTI"}
+                                    rightText={OrdinationsUtils.formatPrice(coverCharges * table.evening.coverCharge)}/>
+            </Column>
+        </Row>
     }
+
 
 }

@@ -1,94 +1,153 @@
 import dispatcher from "../../../../dispatcher/SimpleDispatcher";
 import asyncActionBuilder from "../../../../actions/RequestBuilder";
-import {OrdinationCreatorActionTypes} from "./OrdinationsCreatorActions";
+import ActionsFactory from "../../../../utils/ActionsFactory";
+import {DataActions} from "../../../../actions/DataActions";
 
 export const OrdinationEditorActionTypes = {};
 
 export default class OrdinationsEditorActions {
-    static BEGIN_ORDINATION_CREATION = "BEGIN_ORDINATION_CREATION";
-    static ABORT_ORDINATION_CREATION = "ABORT_ORDINATION_CREATION";
-    static CREATE_ORDINATION = "CREATE_ORDINATION";
-    static BEGIN_ORDINATION_EDITING = "BEGIN_ORDINATION_EDITING";
-    static ABORT_ORDINATION_EDITING = "ABORT_ORDINATION_EDITING";
-    static UPDATE_ORDERS = "UPDATE_ORDERS";
-    static SELECT_ORDINATION_PAGE = "SELECT_ORDINATION_PAGE";
-    static ABORT_ORDERS_EDITING = "ABORT_ORDERS_EDITING";
+
+    static CRUD = {
+        BEGIN_CREATION: ActionsFactory.next(),
+        ABORT_CREATION: ActionsFactory.next(),
+        CREATE: ActionsFactory.next(),
+        SELECT: ActionsFactory.next(),
+        DESELECT: ActionsFactory.next(),
+        BEGIN_DELETION: ActionsFactory.next(),
+        DELETE: ActionsFactory.next(),
+        ABORT_DELETION: ActionsFactory.next(),
+        BEGIN_ABORTION: ActionsFactory.next(),
+        ABORT: ActionsFactory.next(),
+        ABORT_ABORTION: ActionsFactory.next(),
+        UPDATE: ActionsFactory.next()
+    };
+
+    static WIZARD = {
+        SELECT_CATEGORY_PAGE: ActionsFactory.next(),
+        SELECT_DISH_PAGE: ActionsFactory.next(),
+        SELECT_DISH: ActionsFactory.next(),
+        SELECT_CATEGORY: ActionsFactory.next(),
+        DESELECT_CATEGORY: ActionsFactory.next(),
+        SET_QUANTITY: ActionsFactory.next(),
+        SET_PHASE: ActionsFactory.next(),
+    };
+
+    static SHOW_OPTIONS = ActionsFactory.next();
+    static HIDE_OPTIONS = ActionsFactory.next();
+
     static PRINT_ORDINATION = "PRINT_ORDINATION";
-    static ABORT_ORDINATION = "ABORT_ORDINATION";
-
-    static BEGIN_ORDINATION_DELETION = "BEGIN_ORDINATION_DELETION";
-    static ABORT_ORDINATION_DELETION = "ABORT_ORDINATION_DELETION";
-    static DELETE_ORDINATION = "DELETE_ORDINATION";
 
 
-    static beginOrdinationCreation() {
-        dispatcher.fireEnd(OrdinationCreatorActionTypes.BEGIN_ORDINATION_CREATION);
+    static beginCreation(dto) {
+        dispatcher.fireEnd(OrdinationsEditorActions.CRUD.BEGIN_CREATION, dto);
     }
 
-    static abortOrdinationCreation() {
-        dispatcher.fireEnd(OrdinationCreatorActionTypes.ABORT_ORDINATION_CREATION);
+    static abortOrdinationCreation(ordination) {
+        dispatcher.fireEnd(OrdinationsEditorActions.CRUD.ABORT_CREATION, ordination);
     }
 
-    static onConfirmOrders(table, ordination, orders) {
+    static createOrdination(table, ordination) {
         asyncActionBuilder.post(
-            OrdinationCreatorActionTypes.CREATE_ORDINATION,
-            'dining-tables/' + table + '/ordinations', orders);
+            OrdinationsEditorActions.CRUD.CREATE,
+            'ordinations?table=' + table.uuid, ordination.toDto())
+            .then(() => DataActions.loadDiningTables());
     }
 
-    static onAbortOrders() {
-        dispatcher.fireEnd(OrdinationCreatorActionTypes.ABORT_ORDINATION_CREATION);
+    static showOptions(ordination) {
+        dispatcher.fireEnd(this.SHOW_OPTIONS, ordination.uuid);
     }
 
-    static abortOrdinationEditing() {
-        dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDINATION_EDITING);
+    static hideOptions() {
+        dispatcher.fireEnd(this.HIDE_OPTIONS);
     }
 
-    static beginOrdinationEditing(uuid) {
-        dispatcher.fireEnd(OrdinationEditorActionTypes.BEGIN_ORDINATION_EDITING, uuid);
+    static selectOrdination(ordination) {
+        dispatcher.fireEnd(this.CRUD.SELECT, ordination);
     }
 
-    static selectOrdinationPage(page) {
-        dispatcher.fireEnd(OrdinationEditorActionTypes.SELECT_ORDINATION_PAGE, page);
+    static updateOrdination(ordination) {
+        asyncActionBuilder.put(this.CRUD.UPDATE, 'ordinations/' + ordination.uuid, ordination.toDto())
+            .then(() => DataActions.loadDiningTables());
     }
 
-    static onConfirmOrders(tableUuid, ordinationUuid, orders) {
-        asyncActionBuilder.put(
-            OrdinationEditorActionTypes.UPDATE_ORDERS,
-            'dining-tables/' + ordinationUuid + '/orders', orders);
+    static deselectOrdination(ordination) {
+        dispatcher.fireEnd(this.CRUD.DESELECT, ordination);
     }
 
-    static onAbortOrders() {
-        dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDERS_EDITING);
-    }
-
-    static printOrdination(uuid) {
+    static printOrdination(ordination) {
         asyncActionBuilder.post(
-            OrdinationEditorActionTypes.PRINT_ORDINATION,
+            OrdinationsEditorActions.PRINT_ORDINATION,
             'printers/print',
-            uuid
+            ordination.uuid
         );
     }
 
-    static abortOrdination(uuid) {
-        asyncActionBuilder.put(
-            OrdinationEditorActionTypes.ABORT_ORDINATION,
-            'ordinations/' + uuid + "/abort"
-        );
-    }
-
-    static beginOrdinationDeletion() {
-        dispatcher.fireEnd(OrdinationEditorActionTypes.BEGIN_ORDINATION_DELETION);
+    static beginOrdinationDeletion(ordination) {
+        dispatcher.fireEnd(this.CRUD.BEGIN_DELETION, ordination);
     }
 
     static abortOrdinationDeletion() {
-        dispatcher.fireEnd(OrdinationEditorActionTypes.ABORT_ORDINATION_DELETION);
+        dispatcher.fireEnd(this.CRUD.ABORT_DELETION);
     }
 
-    static deleteOrdination(tabUuid, ordUuid) {
-        asyncActionBuilder.remove(
-            OrdinationEditorActionTypes.DELETE_ORDINATION,
-            'dining-tables/' + tabUuid + "/ordinations",
-            ordUuid
+    static beginOrdinationAbortion(ordination) {
+        dispatcher.fireEnd(this.CRUD.BEGIN_ABORTION, ordination);
+    }
+
+    static abortOrdination(ordination) {
+        asyncActionBuilder.put(
+            this.CRUD.ABORT,
+            'ordinations/' + ordination.uuid + "/abort"
         );
+    }
+
+    static abortOrdinationAbortion() {
+        dispatcher.fireEnd(this.CRUD.ABORT_ABORTION);
+    }
+
+    static deleteOrdination(ordination) {
+        asyncActionBuilder.remove(
+            this.CRUD.DELETE,
+            'ordinations/' + ordination.uuid
+        ).then((table) => {
+            DataActions.loadDiningTables();
+            DataActions.loadOrdinations(table);
+            DataActions.loadBills(table);
+        })
+    }
+
+    //Creation wizard
+
+    static selectWizardCategoryPage(page) {
+        dispatcher.fireEnd(OrdinationsEditorActions.WIZARD.SELECT_CATEGORY_PAGE, page);
+    }
+
+    static selectWizardDishPage(page) {
+        dispatcher.fireEnd(OrdinationsEditorActions.WIZARD.SELECT_DISH_PAGE, page);
+    }
+
+    static selectWizardDish(dish, ordination, quantity, phase) {
+        dispatcher.fireEnd(OrdinationsEditorActions.WIZARD.SELECT_DISH, {
+            dish: dish,
+            ordination: ordination,
+            quantity: quantity,
+            phase: phase
+        });
+    }
+
+    static selectWizardCategory(cat) {
+        dispatcher.fireEnd(OrdinationsEditorActions.WIZARD.SELECT_CATEGORY, cat);
+    }
+
+    static deselectWizardCategory() {
+        dispatcher.fireEnd(OrdinationsEditorActions.WIZARD.DESELECT_CATEGORY);
+    }
+
+    static setWizardQuantity(quantity) {
+        dispatcher.fireEnd(OrdinationsEditorActions.WIZARD.SET_QUANTITY, quantity);
+    }
+
+    static setWizardPhase(phase) {
+        dispatcher.fireEnd(OrdinationsEditorActions.WIZARD.SET_PHASE, phase);
     }
 };

@@ -34,27 +34,32 @@ export class EntitiesUtils {
         }
     }
 
-    static newOrdination() {
+    static newOrdination(table) {
         return {
+            uuid: uuid(),
+            table: table.uuid,
             orders: []
         };
     }
 
-    static newBill() {
+    static newBill(table) {
         return {
+            uuid: uuid(),
+            table: table.uuid,
             orders: [],
             total: 0,
             coverCharges: 0
         };
     }
 
-    static newOrder(dish, phase) {
+    static newOrder(dish, phase, ordination) {
         return {
             uuid: uuid(),
-            dish: dish.get('uuid'),
-            price: dish.get('price'),
-            phase: phase,
-            additions: []
+            dish: dish.uuid,
+            price: dish.price,
+            phase: phase.uuid ,
+            additions: [],
+            ordination: ordination.uuid
         };
     }
 
@@ -142,6 +147,6 @@ export class EntitiesUtils {
     }
 
     static renderEvening(evening){
-        return "Riepilogo " + formatDate(evening.day);
+        return "Serata " + formatDate(evening.day);
     }
 }

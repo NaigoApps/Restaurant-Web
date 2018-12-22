@@ -22,7 +22,7 @@ export default class DishEditor extends React.Component {
             <Column>
                 <Row>
                     <Column>
-                        <h3 className="text-center">Creazione piatto</h3>
+                        <h3 className="text-center">Modifica piatto</h3>
                     </Column>
                 </Row>
                 <Row>

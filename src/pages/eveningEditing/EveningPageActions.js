@@ -4,7 +4,7 @@ import {SettingsPageActions} from "../settings/SettingsPageActions";
 class EveningPageActions {
 
     initEveningPage() {
-        this.initializeEvening();
+        DataActions.loadDiningTables();
 
         DataActions.loadWaiters();
         DataActions.loadPhases();
@@ -17,12 +17,6 @@ class EveningPageActions {
         SettingsPageActions.loadSettings();
     }
 
-    initializeEvening() {
-        DataActions.loadDiningTables();
-        DataActions.loadOrdinations();
-        DataActions.loadOrders();
-        DataActions.loadBills();
-    }
 }
 
 const eveningPageActions = new EveningPageActions();

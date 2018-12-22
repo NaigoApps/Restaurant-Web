@@ -5,9 +5,6 @@ import ColumnSpace from "../../../widgets/ColumnSpace";
 import Column from "../../../widgets/Column";
 import Button from "../../../widgets/Button";
 import ButtonGroup from "../../../widgets/ButtonGroup";
-import Color from "../../../utils/Color";
-import DiningTablesUtils from "../../../pages/eveningEditing/tables/DiningTablesUtils";
-import DiningTablesEditorActions from "../../../pages/eveningEditing/diningTableEditing/DiningTablesEditorActions";
 import RenderingData from "./RenderingData";
 import TextButton from "../../../widgets/TextButton";
 
@@ -62,12 +59,12 @@ export default class SelectInput extends Component {
         let renderingData;
         if (this.props.renderer) {
             renderingData = this.props.renderer(option);
-            if(renderingData instanceof RenderingData){
+            if (renderingData instanceof RenderingData) {
                 return renderingData;
             }
-            renderingData = new RenderingData(renderingData, null, null);
-        }else{
-            renderingData = new RenderingData(option, null, null);
+            renderingData = new RenderingData(renderingData, null);
+        } else {
+            renderingData = new RenderingData(option, null);
         }
         return renderingData;
     }
@@ -83,7 +80,8 @@ export default class SelectInput extends Component {
         let pageButtons;
 
         optionsList = distribute(entities, pageSize);
-
+        const realRows = Math.max(
+            ...optionsList.map(list => Math.ceil(list.length / cols)));
         let currentPage = Math.min(this.props.page, optionsList.length - 1);
 
         pageButtons = this.buildPageButtons(optionsList, currentPage);
@@ -92,21 +90,17 @@ export default class SelectInput extends Component {
         optionsList = distribute(optionsList, cols);
         optionsList = optionsList.map((row, rowIndex) => {
             let buttons = row.map(option => {
-                //Fixme color, type in button should be removed
-                const color = this.props.color ? this.props.color(option) : Color.black;
+                const color = this.props.color ? this.props.color(option) : null;
                 const bg = this.props.colorRenderer ? this.props.colorRenderer(option) : "secondary";
                 const renderData = this.renderOption(option);
-                if(!renderData.color){
-                    renderData.color = color;
-                }
-                if(!renderData.backgroundColor){
+                if (!renderData.backgroundColor) {
                     renderData.backgroundColor = bg;
                 }
                 return (
                     <Column key={uuid()}>
                         <TextButton
+                            color={color}
                             active={this.isSelected(this.id(option))}
-                            color={renderData.color}
                             backgroundColor={renderData.backgroundColor}
                             text={renderData.text}
                             commitAction={() => this.select(option)}
@@ -122,9 +116,9 @@ export default class SelectInput extends Component {
             return <Row key={rowIndex} ofList={rowIndex > 0}>{buttons}</Row>
         });
 
-        while (optionsList.size < rows) {
-            optionsList = optionsList.push(
-                <Row key={optionsList.size + uuid()} grow ofList>
+        while (optionsList.length < realRows) {
+            optionsList.push(
+                <Row key={optionsList.length + uuid()} grow ofList>
                     <ColumnSpace/>
                 </Row>);
         }
@@ -149,7 +143,7 @@ export default class SelectInput extends Component {
                     <Button
                         key={index}
                         active={currentPage === index}
-                        commitAction={this.selectPage.bind(this, index)}
+                        commitAction={() => this.selectPage(index)}
                         text={index + 1}
                         highPadding
                     />

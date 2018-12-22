@@ -23,7 +23,7 @@ export default class LocationsNavigator extends Component {
                         rows={StoresUtils.option(data, "locationsRows", 3)}
                         cols={StoresUtils.option(data, "locationsColumns", 3)}
                         options={data.data.locations}
-                        page={data.navigator.page}
+                        page={data.page}
                         renderer={location => location.name}
                         onSelectPage={index => LocationsPageActions.selectLocationNavigatorPage(index)}
                         onSelect={location => LocationsPageActions.selectLocation(location)}

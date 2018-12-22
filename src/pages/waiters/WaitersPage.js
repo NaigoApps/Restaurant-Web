@@ -8,11 +8,13 @@ import EditorMode from "../../utils/EditorMode";
 import ViewController from "../../widgets/ViewController";
 import {WaitersPageActions} from "./WaitersPageActions";
 import WaiterCreator from "./WaiterCreator";
+import applicationStore from "../../stores/ApplicationStore";
+import dataStore from "../../stores/DataStore";
 
 export default class WaitersPage extends ViewController {
 
     constructor(props) {
-        super(props, waitersPageStore);
+        super(props, waitersPageStore, applicationStore, dataStore);
     }
 
     componentDidMount() {
@@ -23,7 +25,7 @@ export default class WaitersPage extends ViewController {
     render() {
         let pageContent = WaitersPage.makePageContent(this.state);
         return (
-            <Page title="Camerieri" {...this.state.general}>
+            <Page title="Camerieri">
                 <WaitersNav {...this.state}/>
                 {pageContent}
             </Page>
@@ -32,10 +34,10 @@ export default class WaitersPage extends ViewController {
 
     static makePageContent(data) {
 
-        if (data.editor.mode === EditorMode.EDITING) {
-            return <WaiterEditor {...data}/>
-        } else if (data.editor.mode  === EditorMode.CREATING) {
-            return <WaiterCreator {...data}/>
+        if (data.waiters.editor.mode === EditorMode.EDITING) {
+            return <WaiterEditor {...data.waiters} data={data.data}/>
+        } else if (data.waiters.editor.mode  === EditorMode.CREATING) {
+            return <WaiterCreator {...data.waiters} data={data.data}/>
         } else {
             return <WaitersNavigator {...data}/>
         }

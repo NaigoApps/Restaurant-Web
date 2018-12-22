@@ -8,7 +8,7 @@ export default class PopupContainer extends React.Component {
     }
 
     componentDidMount() {
-        this.centerContent();
+        this.centerHorizontally();
         //Init background for bug
         let container = global.$("#p-container-" + this.props.id);
         container.css({backgroundColor: 'rgba(255,255,255,0)'});
@@ -25,10 +25,13 @@ export default class PopupContainer extends React.Component {
             this.hide();
         } else if (!prevProps.visible && this.props.visible) {
             this.show();
+        }else{
+            this.centerVertically();
         }
+        this.centerHorizontally();
     }
 
-    centerContent() {
+    centerHorizontally() {
         let container = global.$("#p-container-" + this.props.id);
         let content = global.$("#p-content-" + this.props.id);
         let containerWidth = container.width();
@@ -38,35 +41,63 @@ export default class PopupContainer extends React.Component {
         });
     }
 
+    centerVertically() {
+        let content = global.$("#p-content-" + this.props.id);
+        let windowHeight = global.$(window).height();
+        let contentHeight = content.height();
+
+        content.css({
+            bottom: (windowHeight - contentHeight) / 2
+        });
+    }
+
     hide() {
         let container = global.$("#p-container-" + this.props.id);
         let content = global.$("#p-content-" + this.props.id);
         let contentHeight = content.outerHeight();
-        content.animate({
-            bottom: -contentHeight
-        });
-        container.animate({
-            backgroundColor: 'rgba(255,255,255,0)'
-        }, {
-            complete: () => container.css({visibility: "hidden"})
-        });
+        if (this.props.fade) {
+            content.animate({
+                bottom: -contentHeight
+            }, {
+                complete: () => container.animate({backgroundColor: 'rgba(255,255,255,0)'}, {
+                    complete: () => container.css({visibility: "hidden"})
+                })
+            });
+        } else {
+            container.css({visibility: "hidden"});
+        }
     }
 
     show() {
-        this.centerContent();
+        this.centerHorizontally();
         let container = global.$("#p-container-" + this.props.id);
         let content = global.$("#p-content-" + this.props.id);
 
         let windowHeight = global.$(window).height();
         let contentHeight = content.height();
 
+
+        let outerHeight = content.outerHeight();
+        content.css({
+            bottom: -outerHeight
+        });
+
         container.css({visibility: "visible"});
-        container.animate({
-            backgroundColor: 'rgba(255,255,255,0.8)'
-        });
-        content.animate({
-            bottom: (windowHeight - contentHeight) / 2
-        });
+        if (this.props.fade) {
+            container.animate({
+                backgroundColor: 'rgba(255,255,255,0.8)'
+            }, {
+                complete: () => content.animate({bottom: (windowHeight - contentHeight) / 2})
+            });
+
+        } else {
+            container.css({
+                backgroundColor: 'rgba(255,255,255,0.8)'
+            });
+            content.css({
+                bottom: (windowHeight - contentHeight) / 2
+            });
+        }
     }
 
     containerClass() {
@@ -84,12 +115,13 @@ export default class PopupContainer extends React.Component {
     }
 
     render() {
+        const size = this.props.size || "auto";
         return <div
             id={"p-container-" + this.props.id}
             className={this.containerClass()}
             onClick={(evt) => this.mayClose(evt)}>
-            <div id={"p-content-" + this.props.id} className="popup-content-container">
-                <Row>
+            <div id={"p-content-" + this.props.id} className={"popup-content-container " + size}>
+                <Row grow>
                     <Column>
                         {this.props.children}
                     </Column>

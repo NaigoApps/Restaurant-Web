@@ -1,9 +1,6 @@
-import React, {Component} from 'react';
+import React from 'react';
 import errorsStore from "../stores/ErrorsStore";
-import $ from "jquery";
 import applicationStore from "../stores/ApplicationStore";
-
-import * as screenfull from 'screenfull';
 import Modal from "../widgets/modal/Modal";
 import Button from "../widgets/Button";
 import Row from "../widgets/Row";
@@ -13,69 +10,68 @@ import ApplicationFloatInput from "../components/widgets/ApplicationFloatInput";
 import ApplicationIntegerInput from "../components/widgets/ApplicationIntegerInput";
 import ApplicationSelectInput from "../components/widgets/ApplicationSelectInput";
 import ApplicationColorInput from "../components/widgets/ApplicationColorInput";
-import Alert from "../components/widgets/Alert";
 import ErrorActions from "../stores/ErrorActions";
+import ViewController from "../widgets/ViewController";
+import loadingStore from "../stores/LoadingStore";
+import ApplicationPercentInput from "../components/widgets/ApplicationPercentInput";
+import PopupContainer from "../components/widgets/PopupContainer";
 
-export default class Page extends Component {
+export const ApplicationContext = React.createContext(undefined);
+
+export default class Page extends ViewController {
 
     constructor(props) {
-        super(props);
+        super(props, errorsStore, loadingStore, applicationStore);
     }
 
     clearMessages() {
         ErrorActions.clearErrorMessages();
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (!prevProps.fullscreen && this.props.fullscreen) {
-            if (screenfull.enabled) {
-                screenfull.request();
-            }
-        } else if (prevProps.fullscreen && !this.props.fullscreen) {
-            screenfull.exit();
-        }
-
-        // if (!prevState.error.message && this.state.error.message) {
-        //     $("#error-modal").modal("show");
-        // }
+    shouldComponentUpdate(nextProps, nextState) {
+        return !nextState.loading.busy ||
+            !this.state.loading.busy && nextState.loading.busy;
     }
 
     render() {
-        const loadingComponent = this.props.loading.busy ? this.buildLoadingComponent() : null;
+        const loadingComponent = this.buildLoadingComponent();
 
         return (
-            <div className="container-fluid main">
-                <Row fullHeight>
-                    <Column>
-                        {this.props.children}
-                    </Column>
-                    <Modal visible={!!this.props.error.message}>
-                        <div className="modal-header">
-                            <h4 className="modal-title text-danger text-center">
-                                <span className="glyphicon glyphicon-warning-sign"/> Errore
-                            </h4>
-                        </div>
-                        <div className="modal-body">
-                            <div className="text-center text-danger">{this.props.error.message}</div>
-                        </div>
-                        <div className="modal-footer">
-                            <Button text="Chiudi" commitAction={this.clearMessages}/>
-                        </div>
-                    </Modal>
-                    <ApplicationTextInput {...this.props.textInput}/>
-                    <ApplicationFloatInput {...this.props.floatInput}/>
-                    <ApplicationIntegerInput {...this.props.integerInput}/>
-                    <ApplicationSelectInput {...this.props.selectInput}/>
-                    <ApplicationColorInput {...this.props.colorInput}/>
-                </Row>
-                {loadingComponent}
-            </div>
+            <ApplicationContext.Provider value={this.state.general}>
+                <div className="container-fluid main">
+                    <Row fullHeight>
+                        <Column>
+                            {this.props.children}
+                        </Column>
+                        <Modal visible={!!this.state.error.message}>
+                            <div className="modal-header">
+                                <h4 className="modal-title text-danger text-center">
+                                    <span className="glyphicon glyphicon-warning-sign"/> Errore
+                                </h4>
+                            </div>
+                            <div className="modal-body">
+                                <div className="text-center text-danger">{this.state.error.message}</div>
+                            </div>
+                            <div className="modal-footer">
+                                <Button text="Chiudi" commitAction={this.clearMessages}/>
+                            </div>
+                        </Modal>
+                        <ApplicationTextInput {...this.state.general.textInput}/>
+                        <ApplicationFloatInput {...this.state.general.floatInput}/>
+                        <ApplicationIntegerInput {...this.state.general.integerInput}/>
+                        <ApplicationPercentInput {...this.state.general.percentInput}/>
+                        <ApplicationSelectInput {...this.state.general.selectInput}/>
+                        <ApplicationColorInput {...this.state.general.colorInput}/>
+                    </Row>
+                    {loadingComponent}
+                </div>
+            </ApplicationContext.Provider>
         )
     }
 
     buildLoadingComponent() {
-        return <Alert visible={true}>
+        return <PopupContainer visible={this.state.loading.busy}>
             <h1 className="text-center text-warning">LOADING</h1>
-        </Alert>;
+        </PopupContainer>;
     }
 };

@@ -2,7 +2,13 @@
 @import "custom_bootstrap";
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
+$touch-height: 48px;
+
 /*CSS*/
+
+label {
+  margin-bottom: 0;
+}
 
 .tiles-container {
   display: flex;
@@ -22,8 +28,20 @@ html {
   padding-right: 5px;
 }
 
+.top-bit-sep {
+  margin-top: 5px;
+}
+
+.bit-pad {
+  padding: 5px;
+}
+
 .top-sep {
   padding-top: 15px;
+}
+
+.row.of-list {
+  padding-top: 5px;
 }
 
 .form-inline .form-group {
@@ -194,8 +212,7 @@ a.button-link {
 
 .bordered {
   border: 1px solid #cccccc;
-  border-radius: 5px;
-  padding: 5px;
+  border-radius: 0.3rem;
 }
 
 .nav-pills > .nav-item {
@@ -232,8 +249,8 @@ body {
 
 .btn {
   white-space: normal;
-  min-height: 48px;
-  height: 48px;
+  min-height: $touch-height;
+  height: $touch-height;
   line-height: 1.0rem;
   font-size: 1.0rem;
   padding-top: 0;
@@ -286,10 +303,6 @@ body {
   margin-right: -5px;
 }
 
-.row.of-list {
-  padding-top: 5px;
-}
-
 .popup-container {
   position: fixed;
   padding-bottom: 10px;
@@ -304,13 +317,33 @@ body {
 
 .popup-content-container {
   position: absolute;
+  display: flex;
   bottom: 0;
   padding: 10px;
   border-radius: 10px;
   background-color: white;
   border: 1px solid rgb(204, 204, 204);
   z-index: 5010;
-  min-width: 500px;
+
+  &.auto {
+    min-width: 300px;
+  }
+
+  &.sm {
+    min-height: 300px;
+    min-width: 500px;
+  }
+
+  &.md {
+    min-height: 500px;
+    min-width: 700px;
+  }
+
+  &.lg {
+    min-height: 700px;
+    min-width: 1000px;
+  }
+
 }
 
 .btn.round {
@@ -344,4 +377,27 @@ body {
 
 .bg-orange {
   background-color: #eb9316 !important;
+}
+
+.align-items-start {
+  align-items: flex-start;
+}
+
+.align-items-end {
+  align-items: flex-end;
+}
+
+.justify-content-space-between {
+  justify-content: space-between;
+}
+
+.clickable {
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  min-height: $touch-height;
+
+  &:hover {
+    cursor: pointer;
+    background-color: white;
+  }
 }

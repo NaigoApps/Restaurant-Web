@@ -22,7 +22,7 @@ export default class TablesNavigator extends Component {
                     rows={StoresUtils.option(data, "tablesRows", 3)}
                     cols={StoresUtils.option(data, "tablesColumns", 3)}
                     options={data.data.tables}
-                    page={data.navigator.page}
+                    page={data.page}
                     renderer={table => table.name}
                     onSelectPage={index => TablesPageActions.selectNavigatorPage(index)}
                     onSelect={table => TablesPageActions.selectTable(table)}

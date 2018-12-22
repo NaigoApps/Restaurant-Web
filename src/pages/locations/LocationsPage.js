@@ -8,11 +8,13 @@ import EditorMode from "../../utils/EditorMode";
 import ViewController from "../../widgets/ViewController";
 import LocationCreator from "./LocationCreator";
 import {LocationsPageActions} from "./LocationsPageActions";
+import applicationStore from "../../stores/ApplicationStore";
+import dataStore from "../../stores/DataStore";
 
 export default class LocationsPage extends ViewController {
 
     constructor(props) {
-        super(props, locationsPageStore);
+        super(props, locationsPageStore, applicationStore, dataStore);
     }
 
     componentDidMount() {
@@ -23,21 +25,21 @@ export default class LocationsPage extends ViewController {
     render() {
         let pageContent = LocationsPage.makePageContent(this.state);
         return (
-            <Page title="Postazioni" {...this.state.general}>
-                <LocationsNav {...this.state}/>
+            <Page title="Postazioni">
+                <LocationsNav {...this.state.locations}/>
                 {pageContent}
             </Page>
         )
     }
 
     static makePageContent(data) {
-        const editor = data.editor;
+        const editor = data.locations.editor;
         if (editor.mode === EditorMode.EDITING) {
-            return <LocationEditor {...data}/>
+            return <LocationEditor {...data.locations} data={data.data}/>
         } else if (editor.mode === EditorMode.CREATING) {
-            return <LocationCreator {...data}/>
+            return <LocationCreator {...data.locations} data={data.data}/>
         } else {
-            return <LocationsNavigator {...data}/>
+            return <LocationsNavigator data={data.data} general={data.general} page={data.locations.navigator.page}/>
         }
     }
 }

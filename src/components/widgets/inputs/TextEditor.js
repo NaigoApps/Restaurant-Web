@@ -4,7 +4,7 @@ import Column from "../../../widgets/Column";
 import Row from "../../../widgets/Row";
 import {ApplicationActions} from "../../../actions/ApplicationActions";
 
-export default class TTextEditor extends Component {
+export default class TextEditor extends Component {
     constructor(props) {
         super(props);
     }

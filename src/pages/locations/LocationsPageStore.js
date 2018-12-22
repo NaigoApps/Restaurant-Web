@@ -37,9 +37,9 @@ class LocationsPageStore extends AbstractStore {
         handlers[LocationsPageActionTypes.SET_LOCATION_EDITOR_NAME] = (name) => this.editor.location.name = name;
         handlers[LocationsPageActionTypes.SET_LOCATION_EDITOR_PRINTER] = (printer) => this.editor.location.printer = printer;
         handlers[LocationsPageActionTypes.CREATE_LOCATION] = (location) =>
-            this.initEditor(new Location(location, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(location.uuid));
         handlers[LocationsPageActionTypes.UPDATE_EDITING_LOCATION] = (location) =>
-            this.initEditor(new Location(location, dataStore.getPool()));
+            this.initEditor(dataStore.getEntity(location.uuid));
         handlers[LocationsPageActionTypes.DELETE_EDITING_LOCATION] = () => this.initEditor();
 
         handlers[DataActionTypes.LOAD_LOCATIONS] = () => Utils.nop();

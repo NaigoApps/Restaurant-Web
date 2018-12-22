@@ -23,7 +23,7 @@ export default class AdditionsNavigator extends Component {
                         rows={StoresUtils.option(data, "additionsRows", 3)}
                         cols={StoresUtils.option(data, "additionsColumns", 3)}
                         options={data.data.additions}
-                        page={data.navigator.page}
+                        page={data.page}
                         renderer={addition => addition.name}
                         onSelectPage={index => AdditionsPageActions.selectAdditionsPage(index)}
                         onSelect={addition => AdditionsPageActions.selectAddition(addition)}

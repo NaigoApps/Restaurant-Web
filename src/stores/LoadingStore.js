@@ -14,7 +14,7 @@ class LoadingStore extends AbstractStore {
         return StoresUtils.ALL_ACTIONS;
     }
 
-    getState(){
+    buildState(){
         return {
             busy: this.isBusy()
         }

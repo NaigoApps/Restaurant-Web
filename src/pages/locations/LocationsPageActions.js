@@ -71,7 +71,7 @@ export class LocationsPageActions {
     static setLocationPrinter(uuid, printer) {
         asyncActionBuilder.put(
             LocationsPageActionTypes.UPDATE_EDITING_LOCATION,
-            'locations/' + uuid + '/lineCharacters',
+            'locations/' + uuid + '/printer',
             printer.uuid
         );
     }

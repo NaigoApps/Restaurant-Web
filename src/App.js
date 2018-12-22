@@ -10,19 +10,12 @@ import AdditionsPage from "./pages/additions/AdditionsPage";
 import CustomersPage from "./pages/customers/CustomersPage";
 import EveningPage from "./pages/eveningEditing/EveningPage";
 import applicationStore from "./stores/ApplicationStore";
-import eveningSelectorStore from "./pages/eveningEditing/eveningSelection/EveningSelectorStore";
-import diningTableEditingStore from "./pages/eveningEditing/diningTableEditing/DiningTableEditorStore";
-import ordinationEditingStore
-    from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/OrdinationEditingStore";
-import ordersEditingStore
-    from "./pages/eveningEditing/diningTableEditing/ordinationsEditing/ordersEditing/OrdersEditingStore";
-import tableClosingFeatureStore
-    from "./pages/eveningEditing/diningTableEditing/tableClosingFeature/TableClosingFeatureStore";
 import SettingsPage from "./pages/settings/SettingsPage";
 import loadingStore from "./stores/LoadingStore";
 import DishesPage from "./pages/dishes/DishesPage";
 import ViewController from "./widgets/ViewController";
 import EveningSelectionPage from "./pages/eveningEditing/eveningSelection/EveningSelectionPage";
+import errorsStore from "./stores/ErrorsStore";
 
 export class Pages {
     static HOME = "HOME";
@@ -59,26 +52,15 @@ pages[Pages.EVENINGS] = <EveningPage/>;
 class App extends ViewController {
 
     constructor(props) {
-        super(props, applicationStore);
-        this.requireModules();
+        super(props, applicationStore, loadingStore, errorsStore);
     }
 
     static catch(store) {
         console.log("Catching " + store.storeName);
     }
 
-    requireModules() {
-        App.catch(loadingStore);
-
-        App.catch(eveningSelectorStore);
-        App.catch(diningTableEditingStore);
-        App.catch(ordinationEditingStore);
-        App.catch(ordersEditingStore);
-        App.catch(tableClosingFeatureStore);
-    }
-
     render() {
-        let page = pages[this.state.currentPage];
+        let page = pages[this.state.general.currentPage];
         return page || <HomePage/>;
     }
 }

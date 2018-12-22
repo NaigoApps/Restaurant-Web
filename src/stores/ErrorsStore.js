@@ -1,5 +1,6 @@
 import AbstractStore from "./AbstractStore";
 import ErrorActions from "./ErrorActions";
+import EveningEditorActions from "../pages/eveningEditing/EveningEditorActions";
 
 const EVT_ERRORS_STORE_CHANGED = "EVT_ERRORS_STORE_CHANGED";
 
@@ -10,7 +11,9 @@ class ErrorsStore extends AbstractStore {
     }
 
     handleErrorAction(action) {
-        this.lastMessage = action.body;
+        if(action.type !== EveningEditorActions.GET_SELECTED) {
+            this.lastMessage = action.body;
+        }
         return true;
     }
 
